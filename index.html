@@ -1,85 +1,1809 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KABEPIC</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>KABEPIC</title>
+  <meta
+    name="description"
+    content="思い出を、暮らしの背景に。スマホで編集し、壁に静かに流すフォトウォール。"
+  />
+  <meta name="theme-color" content="#e9e1d3" />
+  <style>
+    :root {
+      --bg: #e8dfcf;
+      --wall: #efe7da;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: rgba(255, 255, 255, 0.96);
+      --line: rgba(0, 0, 0, 0.08);
+      --text: #1c1b18;
+      --muted: #7a746c;
+      --accent: #2f5bda;
+      --accent-soft: rgba(47, 91, 218, 0.12);
+      --danger: #c63d3d;
+      --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.12);
+      --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.08);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --fade-ms: 1200ms;
+      --morph-ms: 360ms;
+      --wall-max-width: 1240px;
+      --wall-min-height: 820px;
+      --wall-bg: #efe7da;
+    }
 
-<style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
 
-body{
-margin:0;
-font-family:-apple-system;
-background:#efe6d8;
-}
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.28), transparent 30%),
+        linear-gradient(180deg, #e8dfcf 0%, #e1d8c8 100%);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Hiragino Sans",
+        "Noto Sans JP",
+        sans-serif;
+      overflow-x: hidden;
+    }
 
-.wall{
-position:relative;
-width:100%;
-height:80vh;
-background:#f2eadc;
-overflow:hidden;
-}
+    body.display-mode {
+      background: var(--wall-bg);
+    }
 
-.frame{
-position:absolute;
-width:180px;
-height:180px;
-background-size:contain;
-background-repeat:no-repeat;
-background-position:center;
-}
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-.frame img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
 
-.square{
-background-image:url("frame_square.png");
-}
+    .hidden {
+      display: none !important;
+    }
 
-.vertical{
-background-image:url("frame_vertical.png");
-}
+    .app {
+      min-height: 100vh;
+      padding:
+        calc(var(--safe-top) + 12px)
+        12px
+        calc(var(--safe-bottom) + 18px);
+    }
 
-.horizontal{
-background-image:url("frame_horizontal.png");
-}
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
 
-.oval{
-background-image:url("frame_oval.png");
--webkit-mask-image:url("mask_oval.png");
-mask-image:url("mask_oval.png");
--webkit-mask-size:contain;
-mask-size:contain;
-}
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
 
-</style>
+    .topbar {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 126px;
+      height: 54px;
+      padding: 0 16px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 0.03em;
+    }
+
+    .status-pill {
+      min-height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      color: var(--muted);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.4fr 1fr;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.58);
+      border: 1px solid var(--line);
+    }
+
+    .btn {
+      min-height: 54px;
+      min-width: 86px;
+      padding: 0 16px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      font-weight: 700;
+      line-height: 1.15;
+      transition:
+        transform 140ms ease,
+        background 140ms ease,
+        color 140ms ease,
+        box-shadow 140ms ease,
+        border-color 140ms ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 12px 28px rgba(47,91,218,0.28);
+    }
+
+    .btn.soft {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(47,91,218,0.18);
+      box-shadow: none;
+    }
+
+    .btn.danger {
+      color: var(--danger);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .workspace {
+      padding: 12px;
+    }
+
+    .wall-wrap {
+      position: relative;
+      width: 100%;
+      max-width: var(--wall-max-width);
+      min-height: var(--wall-min-height);
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.2), transparent 28%),
+        var(--wall-bg);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.42),
+        inset 0 -12px 30px rgba(110, 92, 60, 0.05);
+    }
+
+    .wall-canvas {
+      position: relative;
+      width: 100%;
+      min-height: inherit;
+      aspect-ratio: 16 / 10;
+    }
+
+    .display-mode .app {
+      padding: 0;
+      background: var(--wall-bg);
+    }
+
+    .display-mode .shell {
+      max-width: none;
+      gap: 0;
+    }
+
+    .display-mode .topbar,
+    .display-mode .controls,
+    .display-mode .photo-bank,
+    .display-mode .hint {
+      display: none !important;
+    }
+
+    .display-mode .workspace {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      border: 0;
+    }
+
+    .display-mode .wall-wrap {
+      max-width: none;
+      min-height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .display-mode .wall-canvas {
+      min-height: 100vh;
+      aspect-ratio: auto;
+    }
+
+    .frame {
+      position: absolute;
+      transform-origin: top left;
+      transition:
+        left var(--morph-ms) ease,
+        top var(--morph-ms) ease,
+        width var(--morph-ms) ease,
+        height var(--morph-ms) ease,
+        transform 160ms ease,
+        filter 160ms ease;
+      user-select: none;
+      will-change: left, top, width, height;
+    }
+
+    .frame.selected {
+      filter: drop-shadow(0 18px 26px rgba(0,0,0,0.16));
+      z-index: 30 !important;
+    }
+
+    .frame.longpress {
+      z-index: 35 !important;
+    }
+
+    .frame-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .photo-viewport {
+      position: absolute;
+      top: var(--inset-top);
+      right: var(--inset-right);
+      bottom: var(--inset-bottom);
+      left: var(--inset-left);
+      overflow: hidden;
+      background: rgba(255,255,255,0.16);
+      isolation: isolate;
+      z-index: 1;
+    }
+
+    .frame[data-shape="vertical"] .photo-viewport {
+      border-radius: 2px;
+    }
+
+    .frame[data-shape="horizontal"] .photo-viewport {
+      border-radius: 2px;
+    }
+
+    .frame[data-shape="square"] .photo-viewport {
+      border-radius: 1px;
+    }
+
+    .frame[data-shape="oval"] .photo-viewport {
+      -webkit-mask-image: url("mask_oval.png");
+      mask-image: url("mask_oval.png");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+    }
+
+    .photo-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity var(--fade-ms) ease;
+      pointer-events: none;
+    }
+
+    .photo-layer.active {
+      opacity: 1;
+    }
+
+    .photo {
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: var(--photo-x, 50%) var(--photo-y, 50%);
+      background-size: cover;
+    }
+
+    .frame[data-shape="square"] .photo {
+      background-size: contain;
+      background-color: transparent;
+    }
+
+    .frame-overlay {
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% 100%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .frame[data-shape="vertical"] .frame-overlay {
+      background-image: url("frame_vertical.png");
+    }
+
+    .frame[data-shape="horizontal"] .frame-overlay {
+      background-image: url("frame_horizontal.png");
+    }
+
+    .frame[data-shape="square"] .frame-overlay {
+      background-image: url("frame_square.png");
+    }
+
+    .frame[data-shape="oval"] .frame-overlay {
+      background-image: url("frame_oval.png");
+    }
+
+    .frame-badge {
+      position: absolute;
+      top: -14px;
+      left: -14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(23, 30, 48, 0.95);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.98rem;
+      font-weight: 800;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.2);
+      border: 2px solid rgba(255,255,255,0.26);
+      z-index: 4;
+    }
+
+    .frame-lock {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      padding: 0 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--line);
+      font-size: 0.78rem;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+      z-index: 5;
+    }
+
+    .frame.locked .frame-lock {
+      display: inline-flex;
+    }
+
+    .frame-controls {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .frame.selected .frame-controls {
+      pointer-events: auto;
+    }
+
+    .move-hit {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      outline: 2px solid rgba(47,91,218,0.24);
+      outline-offset: 4px;
+      opacity: 0;
+      transition: opacity 120ms ease;
+      cursor: grab;
+    }
+
+    .frame.selected .move-hit {
+      opacity: 1;
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: -12px;
+      bottom: -12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #fff;
+      border: 2px solid var(--accent);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+      cursor: nwse-resize;
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .selection-info {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .controls-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .photo-bank {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .photo-bank-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .photo-bank-title {
+      font-weight: 800;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      gap: 10px;
+    }
+
+    .thumb {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+    }
+
+    .thumb.active {
+      outline: 2px solid rgba(47,91,218,0.28);
+      outline-offset: 2px;
+    }
+
+    .thumb button {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      display: block;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-meta {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(17,17,17,0.72);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .thumb-delete {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+      color: var(--danger);
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .hint {
+      padding: 14px 16px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .hint strong {
+      color: var(--text);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: calc(var(--safe-top) + 14px);
+      transform: translateX(-50%) translateY(-10px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-lg);
+      font-weight: 800;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 9999;
+      max-width: min(92vw, 460px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .brand {
+        min-width: 114px;
+        font-size: 1.08rem;
+      }
+
+      .btn {
+        min-width: 78px;
+        min-height: 50px;
+      }
+
+      .wall-wrap {
+        min-height: 700px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div id="toast" class="toast" aria-live="polite"></div>
 
-<div class="wall">
+  <input
+    id="photoInput"
+    class="hidden"
+    type="file"
+    accept="image/*"
+    multiple
+  />
 
-<div class="frame square" style="top:40px;left:30px;">
-<img src="https://picsum.photos/300?1">
-</div>
+  <div id="app" class="app">
+    <div class="shell">
+      <section id="topbar" class="card topbar">
+        <div class="topbar-row">
+          <div class="brand">KABEPIC</div>
+          <div id="statusPill" class="status-pill">写真を追加してください</div>
+        </div>
 
-<div class="frame vertical" style="top:40px;left:230px;">
-<img src="https://picsum.photos/300?2">
-</div>
+        <div class="toolbar">
+          <div class="toolbar-group" id="frameSetGroup">
+            <button class="btn frame-set-btn" data-layout="calm">Calm 3</button>
+            <button class="btn frame-set-btn" data-layout="flow">Flow 5</button>
+            <button class="btn frame-set-btn active" data-layout="story">Story 8</button>
+            <button class="btn frame-set-btn" data-layout="scene">Scene 11</button>
+          </div>
 
-<div class="frame horizontal" style="top:220px;left:100px;">
-<img src="https://picsum.photos/300?3">
-</div>
+          <div class="toolbar-group">
+            <button id="addPhotosBtn" class="btn primary">写真を追加</button>
+            <button id="toggleDisplayBtn" class="btn">表示モード</button>
+            <button id="saveBtn" class="btn soft">保存</button>
+            <button id="loadBtn" class="btn soft">読込</button>
+            <button id="resetBtn" class="btn danger">リセット</button>
+          </div>
+        </div>
+      </section>
 
-<div class="frame oval" style="top:220px;left:320px;">
-<img src="https://picsum.photos/300?4">
-</div>
+      <section id="workspaceCard" class="card workspace">
+        <div id="wallWrap" class="wall-wrap">
+          <div id="wallCanvas" class="wall-canvas"></div>
+        </div>
+      </section>
 
-</div>
+      <section id="controls" class="card controls">
+        <div class="controls-row">
+          <div id="selectionInfo" class="selection-info">選択中：なし</div>
+          <div class="controls-actions">
+            <button id="shapeBtn" class="btn">形変更</button>
+            <button id="lockBtn" class="btn">写真固定</button>
+            <button id="unlockBtn" class="btn soft">固定解除</button>
+            <button id="frontBtn" class="btn soft">前面</button>
+            <button id="deleteFrameBtn" class="btn danger">削除</button>
+            <button id="addFrameBtn" class="btn soft">フレーム追加</button>
+          </div>
+        </div>
+      </section>
 
+      <section id="photoBank" class="card photo-bank">
+        <div class="photo-bank-head">
+          <div class="photo-bank-title">写真一覧</div>
+          <div style="color: var(--muted); font-weight: 700; font-size: 0.92rem;">
+            タップで選択中フレームに固定
+          </div>
+        </div>
+        <div id="thumbGrid" class="thumb-grid"></div>
+      </section>
+
+      <section id="hint" class="card hint">
+        <strong>使い方</strong><br />
+        写真追加 → Story / Flow などを選ぶ → フレーム移動 / サイズ変更 → 表示モード。<br />
+        フレーム長押しで写真位置調整に入ります。正方形だけ自動で contain、楕円は自動適用されず手動変更です。
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "kabepic_state_v2";
+      const DB_NAME = "kabepic_photos_v2";
+      const DB_STORE = "photos";
+      const MAX_LONG_EDGE = 1600;
+      const JPEG_QUALITY = 0.82;
+      const MIN_W = 11;
+      const MAX_W = 30;
+      const SAFE_PAD = 2.2;
+      const HOLD_MS = 420;
+      const FADE_MS = 1200;
+
+      const SHAPES = ["vertical", "horizontal", "square", "oval"];
+      const SHAPE_RATIO = {
+        vertical: 4 / 5,
+        horizontal: 5 / 4,
+        square: 1,
+        oval: 4 / 5
+      };
+
+      const SHAPE_LABEL = {
+        vertical: "縦",
+        horizontal: "横",
+        square: "正方形",
+        oval: "楕円"
+      };
+
+      const INSETS = {
+        vertical:   { top: "11.5%", right: "11.2%", bottom: "13.4%", left: "11.2%" },
+        horizontal: { top: "10.8%", right: "10.2%", bottom: "12.0%", left: "10.2%" },
+        square:     { top: "11.2%", right: "11.2%", bottom: "11.2%", left: "11.2%" },
+        oval:       { top: "12.2%", right: "12.4%", bottom: "14.2%", left: "12.4%" }
+      };
+
+      const WALL_BG = {
+        warm: "#efe7da",
+        gray: "#e3e3de",
+        white: "#f5f2eb"
+      };
+
+      const LAYOUTS = {
+        calm: [
+          { shape: "vertical", x: 9,  y: 12, w: 20, z: 1 },
+          { shape: "square",   x: 39, y: 24, w: 16, z: 2 },
+          { shape: "horizontal", x: 60, y: 13, w: 22, z: 1 }
+        ],
+        flow: [
+          { shape: "vertical", x: 8,  y: 11, w: 17, z: 1 },
+          { shape: "square",   x: 28, y: 22, w: 13, z: 2 },
+          { shape: "horizontal", x: 43, y: 10, w: 20, z: 1 },
+          { shape: "vertical", x: 68, y: 22, w: 15, z: 2 },
+          { shape: "square",   x: 82, y: 9,  w: 10, z: 1 }
+        ],
+        story: [
+          { shape: "square", x: 6,  y: 10, w: 13, z: 2 },
+          { shape: "vertical", x: 21, y: 19, w: 15, z: 3 },
+          { shape: "horizontal", x: 34, y: 9,  w: 20, z: 1 },
+          { shape: "square", x: 56, y: 21, w: 12, z: 2 },
+          { shape: "vertical", x: 69, y: 9,  w: 14, z: 1 },
+          { shape: "horizontal", x: 18, y: 49, w: 18, z: 1 },
+          { shape: "vertical", x: 45, y: 47, w: 14, z: 2 },
+          { shape: "square", x: 69, y: 50, w: 11, z: 1 }
+        ],
+        scene: [
+          { shape: "square", x: 4, y: 11, w: 11, z: 1 },
+          { shape: "vertical", x: 16, y: 20, w: 13, z: 3 },
+          { shape: "horizontal", x: 29, y: 8, w: 18, z: 1 },
+          { shape: "square", x: 49, y: 23, w: 11, z: 2 },
+          { shape: "vertical", x: 61, y: 9, w: 13, z: 2 },
+          { shape: "square", x: 77, y: 16, w: 10, z: 1 },
+          { shape: "horizontal", x: 9, y: 53, w: 15, z: 1 },
+          { shape: "vertical", x: 28, y: 49, w: 12.5, z: 2 },
+          { shape: "square", x: 45, y: 57, w: 10, z: 1 },
+          { shape: "horizontal", x: 58, y: 52, w: 17, z: 2 },
+          { shape: "vertical", x: 80, y: 46, w: 11, z: 1 }
+        ]
+      };
+
+      const els = {
+        app: document.getElementById("app"),
+        wallWrap: document.getElementById("wallWrap"),
+        wallCanvas: document.getElementById("wallCanvas"),
+        toast: document.getElementById("toast"),
+        statusPill: document.getElementById("statusPill"),
+        selectionInfo: document.getElementById("selectionInfo"),
+        thumbGrid: document.getElementById("thumbGrid"),
+        photoInput: document.getElementById("photoInput"),
+        topbar: document.getElementById("topbar"),
+        controls: document.getElementById("controls"),
+        photoBank: document.getElementById("photoBank"),
+        hint: document.getElementById("hint"),
+        addPhotosBtn: document.getElementById("addPhotosBtn"),
+        toggleDisplayBtn: document.getElementById("toggleDisplayBtn"),
+        saveBtn: document.getElementById("saveBtn"),
+        loadBtn: document.getElementById("loadBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        shapeBtn: document.getElementById("shapeBtn"),
+        lockBtn: document.getElementById("lockBtn"),
+        unlockBtn: document.getElementById("unlockBtn"),
+        frontBtn: document.getElementById("frontBtn"),
+        deleteFrameBtn: document.getElementById("deleteFrameBtn"),
+        addFrameBtn: document.getElementById("addFrameBtn")
+      };
+
+      const state = {
+        db: null,
+        mode: "edit",
+        wallPreset: "warm",
+        layout: "story",
+        photos: [],
+        frames: [],
+        selectedFrameId: null,
+        selectedPhotoId: null,
+        toastTimer: null
+      };
+
+      function uid(prefix = "id") {
+        return `${prefix}_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function showToast(message) {
+        clearTimeout(state.toastTimer);
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        state.toastTimer = setTimeout(() => {
+          els.toast.classList.remove("show");
+        }, 2000);
+      }
+
+      function setWallPreset(name) {
+        state.wallPreset = WALL_BG[name] ? name : "warm";
+        document.documentElement.style.setProperty("--wall-bg", WALL_BG[state.wallPreset]);
+      }
+
+      function aspectBucket(width, height) {
+        const ratio = width / height;
+        if (ratio > 1.05) return "horizontal";
+        if (ratio < 0.95) return "vertical";
+        return "square";
+      }
+
+      function shapeHeightPct(shape, widthPct) {
+        return widthPct / SHAPE_RATIO[shape];
+      }
+
+      function defaultRuntime() {
+        return {
+          currentPhotoId: null,
+          lastPhotoId: null,
+          activeLayer: 0,
+          timer: null
+        };
+      }
+
+      function normalizeFrame(frame) {
+        const next = {
+          id: frame.id || uid("frame"),
+          shape: frame.shape || "square",
+          x: Number(frame.x ?? 10),
+          y: Number(frame.y ?? 10),
+          w: Number(frame.w ?? 14),
+          z: Number(frame.z ?? 1),
+          photoPosX: Number.isFinite(frame.photoPosX) ? frame.photoPosX : 50,
+          photoPosY: Number.isFinite(frame.photoPosY) ? frame.photoPosY : 50,
+          lockedPhotoId: frame.lockedPhotoId || null,
+          runtime: defaultRuntime()
+        };
+        next.w = clamp(next.w, MIN_W, MAX_W);
+        keepInside(next);
+        return next;
+      }
+
+      function makeFramesFromLayout(layoutKey) {
+        const layout = LAYOUTS[layoutKey] || LAYOUTS.story;
+        return layout.map((item, index) => normalizeFrame({
+          id: uid("frame"),
+          shape: item.shape,
+          x: item.x,
+          y: item.y,
+          w: item.w,
+          z: item.z ?? index + 1
+        }));
+      }
+
+      function keepInside(frame) {
+        const h = shapeHeightPct(frame.shape, frame.w);
+        frame.w = clamp(frame.w, MIN_W, MAX_W);
+        frame.x = clamp(frame.x, SAFE_PAD, 100 - SAFE_PAD - frame.w);
+        frame.y = clamp(frame.y, SAFE_PAD, 100 - SAFE_PAD - h);
+      }
+
+      function rectFor(frame) {
+        return {
+          left: frame.x,
+          top: frame.y,
+          right: frame.x + frame.w,
+          bottom: frame.y + shapeHeightPct(frame.shape, frame.w)
+        };
+      }
+
+      function overlaps(a, b) {
+        return !(
+          a.right <= b.left ||
+          a.left >= b.right ||
+          a.bottom <= b.top ||
+          a.top >= b.bottom
+        );
+      }
+
+      function collides(candidate, ignoreId = null) {
+        const a = rectFor(candidate);
+        return state.frames.some(frame => {
+          if (frame.id === ignoreId || frame.id === candidate.id) return false;
+          return overlaps(a, rectFor(frame));
+        });
+      }
+
+      function clearFrameTimer(frame) {
+        if (frame.runtime?.timer) {
+          clearTimeout(frame.runtime.timer);
+        }
+        frame.runtime = frame.runtime || defaultRuntime();
+        frame.runtime.timer = null;
+      }
+
+      function clearAllTimers() {
+        state.frames.forEach(clearFrameTimer);
+      }
+
+      function getPoolForShape(shape) {
+        if (shape === "oval") return [];
+        return state.photos.filter(photo => photo.bucket === shape);
+      }
+
+      function chooseNextPhoto(frame) {
+        if (frame.lockedPhotoId) {
+          return state.photos.find(photo => photo.id === frame.lockedPhotoId) || null;
+        }
+
+        let pool = getPoolForShape(frame.shape);
+        if (!pool.length) {
+          pool = state.photos.slice();
+        }
+        if (!pool.length) return null;
+        if (pool.length === 1) return pool[0];
+
+        const filtered = pool.filter(photo =>
+          photo.id !== frame.runtime.currentPhotoId &&
+          photo.id !== frame.runtime.lastPhotoId
+        );
+        const source = filtered.length ? filtered : pool.filter(photo => photo.id !== frame.runtime.currentPhotoId);
+        const finalPool = source.length ? source : pool;
+        return finalPool[Math.floor(Math.random() * finalPool.length)];
+      }
+
+      function scheduleFrame(frame) {
+        clearFrameTimer(frame);
+
+        if (state.mode !== "display") return;
+
+        const next = chooseNextPhoto(frame);
+        if (!next) {
+          frame.runtime.currentPhotoId = null;
+          frame.runtime.lastPhotoId = null;
+          renderFrame(frame.id);
+          return;
+        }
+
+        if (!frame.runtime.currentPhotoId) {
+          frame.runtime.currentPhotoId = next.id;
+          renderFrame(frame.id);
+        }
+
+        const pool = frame.lockedPhotoId ? [next] : getPoolForShape(frame.shape).length ? getPoolForShape(frame.shape) : state.photos;
+        if (pool.length <= 1) return;
+
+        const wait = 25000 + Math.floor(Math.random() * 10001);
+        frame.runtime.timer = setTimeout(() => {
+          rotateFrame(frame.id);
+        }, wait);
+      }
+
+      function rotateFrame(frameId) {
+        const frame = state.frames.find(item => item.id === frameId);
+        if (!frame) return;
+
+        const next = chooseNextPhoto(frame);
+        if (!next) return;
+
+        if (frame.runtime.currentPhotoId === next.id) {
+          scheduleFrame(frame);
+          return;
+        }
+
+        frame.runtime.lastPhotoId = frame.runtime.currentPhotoId;
+        frame.runtime.currentPhotoId = next.id;
+        frame.runtime.activeLayer = frame.runtime.activeLayer === 0 ? 1 : 0;
+        renderFrame(frame.id);
+        scheduleFrame(frame);
+      }
+
+      function ensureRuntimePhotos() {
+        state.frames.forEach(frame => {
+          frame.runtime = frame.runtime || defaultRuntime();
+          const currentExists = state.photos.some(photo => photo.id === frame.runtime.currentPhotoId);
+          const lockedExists = state.photos.some(photo => photo.id === frame.lockedPhotoId);
+          if (!lockedExists) {
+            frame.lockedPhotoId = null;
+          }
+          if (!currentExists) {
+            frame.runtime.currentPhotoId = null;
+            frame.runtime.lastPhotoId = null;
+          }
+          if (!frame.runtime.currentPhotoId) {
+            const next = chooseNextPhoto(frame);
+            frame.runtime.currentPhotoId = next?.id || null;
+          }
+        });
+      }
+
+      function statusText() {
+        if (!state.photos.length) return "写真を追加してください";
+        return `写真 ${state.photos.length}枚`;
+      }
+
+      function selectedFrame() {
+        return state.frames.find(frame => frame.id === state.selectedFrameId) || null;
+      }
+
+      function updateSelectionInfo() {
+        const frame = selectedFrame();
+        if (!frame) {
+          els.selectionInfo.textContent = "選択中：なし";
+          return;
+        }
+        els.selectionInfo.textContent =
+          `選択中：${SHAPE_LABEL[frame.shape]} / ${Math.round(frame.w)} / ` +
+          (frame.lockedPhotoId ? "写真固定" : "自動");
+      }
+
+      function saveState() {
+        const payload = {
+          wallPreset: state.wallPreset,
+          layout: state.layout,
+          frames: state.frames.map(frame => ({
+            id: frame.id,
+            shape: frame.shape,
+            x: frame.x,
+            y: frame.y,
+            w: frame.w,
+            z: frame.z,
+            photoPosX: frame.photoPosX,
+            photoPosY: frame.photoPosY,
+            lockedPhotoId: frame.lockedPhotoId || null
+          }))
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }
+
+      function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        try {
+          const parsed = JSON.parse(raw);
+          state.wallPreset = parsed.wallPreset || "warm";
+          state.layout = parsed.layout || "story";
+          state.frames = (parsed.frames || []).map(normalizeFrame);
+          return !!state.frames.length;
+        } catch {
+          return false;
+        }
+      }
+
+      function applyLayout(layoutKey) {
+        clearAllTimers();
+        state.layout = layoutKey;
+        state.frames = makeFramesFromLayout(layoutKey);
+        state.selectedFrameId = null;
+        ensureRuntimePhotos();
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+      }
+
+      function renderFrameSetButtons() {
+        document.querySelectorAll(".frame-set-btn").forEach(button => {
+          button.classList.toggle("active", button.dataset.layout === state.layout);
+        });
+      }
+
+      function renderFrame(frameId) {
+        const node = els.wallCanvas.querySelector(`.frame[data-id="${frameId}"]`);
+        if (!node) return;
+
+        const frame = state.frames.find(item => item.id === frameId);
+        if (!frame) return;
+
+        const h = shapeHeightPct(frame.shape, frame.w);
+        const inset = INSETS[frame.shape];
+        const currentPhoto = state.photos.find(photo => photo.id === frame.runtime.currentPhotoId) || null;
+        const previousPhoto = state.photos.find(photo => photo.id === frame.runtime.lastPhotoId) || null;
+
+        node.dataset.shape = frame.shape;
+        node.style.left = `${frame.x}%`;
+        node.style.top = `${frame.y}%`;
+        node.style.width = `${frame.w}%`;
+        node.style.height = `${h}%`;
+        node.style.zIndex = String(frame.z);
+        node.style.setProperty("--inset-top", inset.top);
+        node.style.setProperty("--inset-right", inset.right);
+        node.style.setProperty("--inset-bottom", inset.bottom);
+        node.style.setProperty("--inset-left", inset.left);
+
+        node.classList.toggle("selected", state.selectedFrameId === frame.id && state.mode === "edit");
+        node.classList.toggle("locked", !!frame.lockedPhotoId);
+
+        const badge = node.querySelector(".frame-badge");
+        badge.textContent = String(
+          [...state.frames].sort((a, b) => a.z - b.z).findIndex(item => item.id === frame.id) + 1
+        );
+
+        const lock = node.querySelector(".frame-lock");
+        lock.textContent = "固定";
+
+        const layer0 = node.querySelector(".photo-layer.layer-0 .photo");
+        const layer1 = node.querySelector(".photo-layer.layer-1 .photo");
+        const photoLayer0 = node.querySelector(".photo-layer.layer-0");
+        const photoLayer1 = node.querySelector(".photo-layer.layer-1");
+
+        if (frame.runtime.activeLayer === 0) {
+          if (currentPhoto) {
+            layer0.style.backgroundImage = `url("${currentPhoto.dataUrl}")`;
+            layer0.style.setProperty("--photo-x", `${frame.photoPosX}%`);
+            layer0.style.setProperty("--photo-y", `${frame.photoPosY}%`);
+          } else {
+            layer0.style.backgroundImage = "none";
+          }
+
+          if (previousPhoto) {
+            layer1.style.backgroundImage = `url("${previousPhoto.dataUrl}")`;
+            layer1.style.setProperty("--photo-x", `${frame.photoPosX}%`);
+            layer1.style.setProperty("--photo-y", `${frame.photoPosY}%`);
+          } else {
+            layer1.style.backgroundImage = "none";
+          }
+
+          photoLayer0.classList.add("active");
+          photoLayer1.classList.remove("active");
+        } else {
+          if (currentPhoto) {
+            layer1.style.backgroundImage = `url("${currentPhoto.dataUrl}")`;
+            layer1.style.setProperty("--photo-x", `${frame.photoPosX}%`);
+            layer1.style.setProperty("--photo-y", `${frame.photoPosY}%`);
+          } else {
+            layer1.style.backgroundImage = "none";
+          }
+
+          if (previousPhoto) {
+            layer0.style.backgroundImage = `url("${previousPhoto.dataUrl}")`;
+            layer0.style.setProperty("--photo-x", `${frame.photoPosX}%`);
+            layer0.style.setProperty("--photo-y", `${frame.photoPosY}%`);
+          } else {
+            layer0.style.backgroundImage = "none";
+          }
+
+          photoLayer1.classList.add("active");
+          photoLayer0.classList.remove("active");
+        }
+      }
+
+      function renderWall() {
+        els.wallCanvas.innerHTML = "";
+
+        const sorted = [...state.frames].sort((a, b) => a.z - b.z);
+
+        sorted.forEach(frame => {
+          const node = document.createElement("div");
+          node.className = "frame";
+          node.dataset.id = frame.id;
+          node.dataset.shape = frame.shape;
+          node.innerHTML = `
+            <div class="frame-inner">
+              <div class="photo-viewport">
+                <div class="photo-layer layer-0">
+                  <div class="photo"></div>
+                </div>
+                <div class="photo-layer layer-1">
+                  <div class="photo"></div>
+                </div>
+              </div>
+              <div class="frame-overlay"></div>
+              <div class="frame-badge">1</div>
+              <div class="frame-lock">固定</div>
+              <div class="frame-controls">
+                <div class="move-hit"></div>
+                <div class="resize-handle"></div>
+              </div>
+            </div>
+          `;
+          els.wallCanvas.appendChild(node);
+          renderFrame(frame.id);
+          bindFrameEvents(node, frame.id);
+        });
+      }
+
+      function renderThumbs() {
+        els.thumbGrid.innerHTML = "";
+
+        state.photos.forEach(photo => {
+          const wrap = document.createElement("div");
+          wrap.className = "thumb" + (state.selectedPhotoId === photo.id ? " active" : "");
+          wrap.innerHTML = `
+            <button type="button" data-photo-id="${photo.id}">
+              <img src="${photo.dataUrl}" alt="">
+              <div class="thumb-meta">${photo.bucket === "vertical" ? "縦" : photo.bucket === "horizontal" ? "横" : "正方形"}</div>
+            </button>
+            <button type="button" class="thumb-delete" data-remove-id="${photo.id}">×</button>
+          `;
+          els.thumbGrid.appendChild(wrap);
+        });
+
+        els.thumbGrid.querySelectorAll("[data-photo-id]").forEach(button => {
+          button.addEventListener("click", () => {
+            const photoId = button.dataset.photoId;
+            state.selectedPhotoId = photoId;
+            const frame = selectedFrame();
+            if (frame) {
+              frame.lockedPhotoId = photoId;
+              frame.runtime.lastPhotoId = frame.runtime.currentPhotoId;
+              frame.runtime.currentPhotoId = photoId;
+              render();
+              saveState();
+              startDisplayTimersIfNeeded();
+              showToast("写真を固定しました");
+            } else {
+              renderThumbs();
+            }
+          });
+        });
+
+        els.thumbGrid.querySelectorAll("[data-remove-id]").forEach(button => {
+          button.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            const photoId = button.dataset.removeId;
+            await removePhoto(photoId);
+          });
+        });
+      }
+
+      function renderStatus() {
+        els.statusPill.textContent = statusText();
+        els.toggleDisplayBtn.textContent = state.mode === "edit" ? "表示モード" : "編集モード";
+      }
+
+      function renderMode() {
+        document.body.classList.toggle("display-mode", state.mode === "display");
+      }
+
+      function render() {
+        renderFrameSetButtons();
+        renderWall();
+        renderThumbs();
+        updateSelectionInfo();
+        renderStatus();
+        renderMode();
+      }
+
+      function startDisplayTimersIfNeeded() {
+        clearAllTimers();
+        if (state.mode !== "display") return;
+        ensureRuntimePhotos();
+        state.frames.forEach(frame => {
+          renderFrame(frame.id);
+          scheduleFrame(frame);
+        });
+      }
+
+      function bringSelectedToFront() {
+        const frame = selectedFrame();
+        if (!frame) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+        const maxZ = Math.max(...state.frames.map(item => item.z), 1);
+        frame.z = maxZ + 1;
+        saveState();
+        render();
+      }
+
+      function cycleShape() {
+        const frame = selectedFrame();
+        if (!frame) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+
+        const currentIndex = SHAPES.indexOf(frame.shape);
+        const nextShape = SHAPES[(currentIndex + 1) % SHAPES.length];
+        const backup = { ...frame };
+        frame.shape = nextShape;
+        keepInside(frame);
+
+        if (collides(frame, frame.id)) {
+          Object.assign(frame, backup);
+          showToast("その形だと重なります");
+          return;
+        }
+
+        if (nextShape === "oval" && !frame.lockedPhotoId) {
+          frame.lockedPhotoId = null;
+        }
+
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+      }
+
+      function lockSelectedPhoto() {
+        const frame = selectedFrame();
+        if (!frame) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+
+        if (state.selectedPhotoId) {
+          frame.lockedPhotoId = state.selectedPhotoId;
+          frame.runtime.lastPhotoId = frame.runtime.currentPhotoId;
+          frame.runtime.currentPhotoId = state.selectedPhotoId;
+        } else if (frame.runtime.currentPhotoId) {
+          frame.lockedPhotoId = frame.runtime.currentPhotoId;
+        } else {
+          showToast("固定する写真がありません");
+          return;
+        }
+
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast("写真を固定しました");
+      }
+
+      function unlockSelectedPhoto() {
+        const frame = selectedFrame();
+        if (!frame) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+        frame.lockedPhotoId = null;
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast("固定を解除しました");
+      }
+
+      function deleteSelectedFrame() {
+        if (!state.selectedFrameId) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+        state.frames = state.frames.filter(frame => frame.id !== state.selectedFrameId);
+        state.selectedFrameId = null;
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast("フレームを削除しました");
+      }
+
+      function addFrame() {
+        const base = normalizeFrame({
+          shape: "square",
+          x: 40,
+          y: 40,
+          w: 12,
+          z: Math.max(...state.frames.map(frame => frame.z), 1) + 1
+        });
+
+        for (let i = 0; i < 20; i += 1) {
+          base.x = 8 + i * 2;
+          base.y = 10 + i * 2;
+          keepInside(base);
+          if (!collides(base)) break;
+        }
+
+        if (collides(base)) {
+          showToast("置ける場所がありません");
+          return;
+        }
+
+        state.frames.push(base);
+        state.selectedFrameId = base.id;
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+      }
+
+      function toggleDisplayMode() {
+        state.mode = state.mode === "edit" ? "display" : "edit";
+        render();
+        startDisplayTimersIfNeeded();
+      }
+
+      function resetLayoutOnly() {
+        clearAllTimers();
+        state.layout = "story";
+        state.frames = makeFramesFromLayout("story");
+        state.selectedFrameId = null;
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast("Storyに戻しました");
+      }
+
+      async function removePhoto(photoId) {
+        state.photos = state.photos.filter(photo => photo.id !== photoId);
+        state.selectedPhotoId = state.selectedPhotoId === photoId ? null : state.selectedPhotoId;
+        await dbDelete(photoId);
+
+        state.frames.forEach(frame => {
+          if (frame.lockedPhotoId === photoId) {
+            frame.lockedPhotoId = null;
+          }
+          if (frame.runtime.currentPhotoId === photoId) {
+            frame.runtime.currentPhotoId = null;
+          }
+          if (frame.runtime.lastPhotoId === photoId) {
+            frame.runtime.lastPhotoId = null;
+          }
+        });
+
+        ensureRuntimePhotos();
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast("写真を削除しました");
+      }
+
+      async function dbPut(photo) {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).put(photo);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      async function dbDelete(photoId) {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).delete(photoId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      async function dbGetAll() {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(DB_STORE, "readonly");
+          const req = tx.objectStore(DB_STORE).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function dbClear() {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      async function openDB() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) {
+              db.createObjectStore(DB_STORE, { keyPath: "id" });
+            }
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      function fitWithin(width, height, maxLongEdge) {
+        const long = Math.max(width, height);
+        if (long <= maxLongEdge) return { width, height };
+        const scale = maxLongEdge / long;
+        return {
+          width: Math.round(width * scale),
+          height: Math.round(height * scale)
+        };
+      }
+
+      async function compressPhoto(file) {
+        const dataUrl = await fileToDataUrl(file);
+        const img = await loadImage(dataUrl);
+        const size = fitWithin(img.width, img.height, MAX_LONG_EDGE);
+        const canvas = document.createElement("canvas");
+        canvas.width = size.width;
+        canvas.height = size.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, size.width, size.height);
+        const compressed = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+
+        return {
+          id: uid("photo"),
+          name: file.name,
+          width: size.width,
+          height: size.height,
+          dataUrl: compressed,
+          bucket: aspectBucket(size.width, size.height),
+          createdAt: Date.now()
+        };
+      }
+
+      async function addPhotos(files) {
+        const list = Array.from(files || []);
+        if (!list.length) return;
+
+        showToast("写真を準備しています…");
+
+        for (const file of list) {
+          const photo = await compressPhoto(file);
+          state.photos.push(photo);
+          await dbPut(photo);
+        }
+
+        state.photos.sort((a, b) => a.createdAt - b.createdAt);
+        ensureRuntimePhotos();
+        saveState();
+        render();
+        startDisplayTimersIfNeeded();
+        showToast(`${list.length}枚追加しました`);
+      }
+
+      function bindFrameEvents(node, frameId) {
+        if (state.mode !== "edit") return;
+
+        const moveHit = node.querySelector(".move-hit");
+        const resizeHandle = node.querySelector(".resize-handle");
+
+        node.addEventListener("click", () => {
+          state.selectedFrameId = frameId;
+          updateSelectionInfo();
+          render();
+        });
+
+        moveHit.addEventListener("pointerdown", (event) => {
+          const frame = state.frames.find(item => item.id === frameId);
+          if (!frame) return;
+
+          state.selectedFrameId = frameId;
+          render();
+
+          const startX = event.clientX;
+          const startY = event.clientY;
+          const origin = {
+            x: frame.x,
+            y: frame.y,
+            photoPosX: frame.photoPosX,
+            photoPosY: frame.photoPosY
+          };
+
+          let isCropping = false;
+          let moved = false;
+          let holdTimer = setTimeout(() => {
+            isCropping = true;
+            node.classList.add("longpress");
+          }, HOLD_MS);
+
+          const onMove = (moveEvent) => {
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+
+            if (!isCropping && Math.abs(dx) + Math.abs(dy) > 8) {
+              clearTimeout(holdTimer);
+              moved = true;
+              const next = { ...frame, x: origin.x + dx * 0.08, y: origin.y + dy * 0.08 };
+              keepInside(next);
+              if (!collides(next, frame.id)) {
+                frame.x = next.x;
+                frame.y = next.y;
+                renderFrame(frame.id);
+              }
+            }
+
+            if (isCropping) {
+              frame.photoPosX = clamp(origin.photoPosX - dx * 0.22, 0, 100);
+              frame.photoPosY = clamp(origin.photoPosY - dy * 0.22, 0, 100);
+              renderFrame(frame.id);
+            }
+          };
+
+          const onUp = () => {
+            clearTimeout(holdTimer);
+            node.classList.remove("longpress");
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            if (moved || isCropping) {
+              saveState();
+            }
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+
+        resizeHandle.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+
+          const frame = state.frames.find(item => item.id === frameId);
+          if (!frame) return;
+
+          state.selectedFrameId = frameId;
+          render();
+
+          const startX = event.clientX;
+          const originW = frame.w;
+
+          const onMove = (moveEvent) => {
+            const dx = moveEvent.clientX - startX;
+            const next = { ...frame, w: originW + dx * 0.07 };
+            next.w = clamp(next.w, MIN_W, MAX_W);
+            keepInside(next);
+            if (!collides(next, frame.id)) {
+              frame.w = next.w;
+              keepInside(frame);
+              renderFrame(frame.id);
+            }
+          };
+
+          const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            saveState();
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+      }
+
+      function bindUI() {
+        document.querySelectorAll(".frame-set-btn").forEach(button => {
+          button.addEventListener("click", () => {
+            applyLayout(button.dataset.layout);
+          });
+        });
+
+        els.addPhotosBtn.addEventListener("click", () => {
+          els.photoInput.click();
+        });
+
+        els.photoInput.addEventListener("change", async (event) => {
+          await addPhotos(event.target.files);
+          event.target.value = "";
+        });
+
+        els.toggleDisplayBtn.addEventListener("click", () => {
+          toggleDisplayMode();
+        });
+
+        els.saveBtn.addEventListener("click", () => {
+          saveState();
+          showToast("配置を保存しました");
+        });
+
+        els.loadBtn.addEventListener("click", () => {
+          if (!loadState()) {
+            showToast("保存データがありません");
+            return;
+          }
+          ensureRuntimePhotos();
+          render();
+          startDisplayTimersIfNeeded();
+          showToast("保存データを読み込みました");
+        });
+
+        els.resetBtn.addEventListener("click", () => {
+          resetLayoutOnly();
+        });
+
+        els.shapeBtn.addEventListener("click", cycleShape);
+        els.lockBtn.addEventListener("click", lockSelectedPhoto);
+        els.unlockBtn.addEventListener("click", unlockSelectedPhoto);
+        els.frontBtn.addEventListener("click", bringSelectedToFront);
+        els.deleteFrameBtn.addEventListener("click", deleteSelectedFrame);
+        els.addFrameBtn.addEventListener("click", addFrame);
+
+        window.addEventListener("keydown", (event) => {
+          if (state.mode !== "edit") return;
+
+          if (event.key === "Escape") {
+            state.selectedFrameId = null;
+            render();
+            return;
+          }
+
+          const frame = selectedFrame();
+          if (!frame) return;
+
+          const step = event.shiftKey ? 1.2 : 0.35;
+          let changed = false;
+
+          if (event.key === "ArrowLeft") {
+            const next = { ...frame, x: frame.x - step };
+            keepInside(next);
+            if (!collides(next, frame.id)) {
+              frame.x = next.x;
+              changed = true;
+            }
+          } else if (event.key === "ArrowRight") {
+            const next = { ...frame, x: frame.x + step };
+            keepInside(next);
+            if (!collides(next, frame.id)) {
+              frame.x = next.x;
+              changed = true;
+            }
+          } else if (event.key === "ArrowUp") {
+            const next = { ...frame, y: frame.y - step };
+            keepInside(next);
+            if (!collides(next, frame.id)) {
+              frame.y = next.y;
+              changed = true;
+            }
+          } else if (event.key === "ArrowDown") {
+            const next = { ...frame, y: frame.y + step };
+            keepInside(next);
+            if (!collides(next, frame.id)) {
+              frame.y = next.y;
+              changed = true;
+            }
+          }
+
+          if (changed) {
+            saveState();
+            renderFrame(frame.id);
+          }
+        });
+      }
+
+      async function init() {
+        state.db = await openDB();
+        state.photos = (await dbGetAll()).sort((a, b) => a.createdAt - b.createdAt);
+
+        if (!loadState()) {
+          state.layout = "story";
+          state.frames = makeFramesFromLayout("story");
+        }
+
+        setWallPreset(state.wallPreset);
+        ensureRuntimePhotos();
+        bindUI();
+        render();
+        startDisplayTimersIfNeeded();
+      }
+
+      init().catch((error) => {
+        console.error(error);
+        showToast("初期化に失敗しました");
+      });
+    })();
+  </script>
 </body>
-    </html>
+</html>
