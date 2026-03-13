@@ -490,7 +490,7 @@
       left: 12px;
       right: 12px;
       bottom: calc(var(--safe-bottom) + 12px);
-      z-index: 2500;
+      z-index: 2700;
       background: rgba(255,255,255,0.98);
       border: 1px solid var(--panel-line);
       box-shadow: var(--shadow-lg);
@@ -533,15 +533,16 @@
 
     .sheet-body {
       padding: 14px;
+      max-height: min(56vh, 520px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-      gap: 10px;
-      max-height: min(44vh, 380px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 12px;
+      overflow: visible;
     }
 
     .thumb-card {
@@ -750,6 +751,11 @@
 
       .thumb-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .sheet-body {
+        max-height: min(58vh, 560px);
       }
     }
   </style>
@@ -1452,7 +1458,7 @@
 
       function buildSelectionBar() {
         const frame = getSelectedFrame();
-        if (state.mode !== "edit" || !frame) {
+        if (state.mode !== "edit" || !frame || state.sheetOpen) {
           els.selectionBar.classList.add("hidden");
           return;
         }
@@ -1526,6 +1532,7 @@
       function togglePhotoSheet(force) {
         state.sheetOpen = typeof force === "boolean" ? force : !state.sheetOpen;
         els.photoSheet.classList.toggle("open", state.sheetOpen && state.mode === "edit");
+        buildSelectionBar();
       }
 
       function openViewer(src) {
