@@ -1,1943 +1,2081 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>KABEPIC</title>
-<meta name="description" content="思い出を、暮らしの背景に。" />
-<style>
-  :root {
-    --bg: #e8dfcf;
-    --wall: #efe7da;
-    --panel: rgba(255, 255, 255, 0.92);
-    --panel-strong: rgba(255, 255, 255, 0.98);
-    --line: rgba(0, 0, 0, 0.08);
-    --text: #1c1c1c;
-    --muted: #7a746c;
-    --accent: #2f5bda;
-    --accent-soft: rgba(47, 91, 218, 0.12);
-    --danger: #c63d3d;
-    --shadow-lg: 0 18px 42px rgba(0, 0, 0, 0.12);
-    --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.08);
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --fade-ms: 1500ms;
-    --ui-gap: 12px;
-    --world-w: 2400;
-    --world-h: 1500;
-  }
-
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  html,
-  body {
-    margin: 0;
-    min-height: 100%;
-    background:
-      radial-gradient(circle at top left, rgba(255,255,255,0.28), transparent 30%),
-      linear-gradient(180deg, #e8dfcf 0%, #e2d8c8 100%);
-    color: var(--text);
-    font-family:
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Hiragino Sans",
-      "Noto Sans JP",
-      sans-serif;
-    overflow: hidden;
-  }
-
-  body.display-mode {
-    background: var(--wall);
-  }
-
-  button,
-  input {
-    font: inherit;
-  }
-
-  button {
-    border: 0;
-    background: none;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .hidden {
-    display: none !important;
-  }
-
-  .app {
-    min-height: 100vh;
-    padding:
-      calc(var(--safe-top) + 12px)
-      12px
-      calc(var(--safe-bottom) + 16px);
-    display: grid;
-    gap: var(--ui-gap);
-  }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .topbar {
-    padding: 12px;
-    display: grid;
-    gap: 12px;
-  }
-
-  .topbar-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 128px;
-    height: 54px;
-    padding: 0 16px;
-    border-radius: 18px;
-    background: var(--panel-strong);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
-    font-weight: 800;
-    font-size: 1.16rem;
-    letter-spacing: 0.03em;
-  }
-
-  .status-pill {
-    min-height: 54px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-    border-radius: 18px;
-    background: var(--panel-strong);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
-    color: var(--muted);
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .toolbar {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 12px;
-  }
-
-  .toolbar-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.6);
-    border: 1px solid var(--line);
-  }
-
-  .btn {
-    min-height: 54px;
-    min-width: 88px;
-    padding: 0 16px;
-    border-radius: 18px;
-    background: var(--panel-strong);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
-    font-weight: 700;
-    transition:
-      transform 140ms ease,
-      background 140ms ease,
-      color 140ms ease,
-      border-color 140ms ease,
-      box-shadow 140ms ease,
-      opacity 140ms ease;
-    white-space: nowrap;
-  }
-
-  .btn:active {
-    transform: scale(0.98);
-  }
-
-  .btn.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 12px 28px rgba(47,91,218,0.3);
-  }
-
-  .btn.primary {
-    background: var(--accent);
-    color: #fff;
-    border-color: transparent;
-  }
-
-  .btn.soft {
-    background: var(--accent-soft);
-    color: var(--accent);
-    border-color: rgba(47,91,218,0.18);
-    box-shadow: none;
-  }
-
-  .btn.danger {
-    color: var(--danger);
-  }
-
-  .btn[disabled] {
-    opacity: 0.55;
-    cursor: default;
-    pointer-events: none;
-  }
-
-  .workspace {
-    padding: 12px;
-  }
-
-  .wall-scroll {
-    width: 100%;
-    height: min(66vh, 760px);
-    overflow: auto;
-    border-radius: 28px;
-    background:
-      radial-gradient(circle at 15% 12%, rgba(255,255,255,0.22), transparent 28%),
-      linear-gradient(180deg, #ece4d6 0%, #e5dccd 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.42),
-      inset 0 -16px 36px rgba(110,92,60,0.04);
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-  }
-
-  .wall-scroll::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  .wall-scroll::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.12);
-    border-radius: 999px;
-  }
-
-  .wall-stage-wrap {
-    position: relative;
-    width: calc(var(--world-w) * 1px);
-    min-width: calc(var(--world-w) * 1px);
-    height: calc(var(--world-h) * 1px);
-    min-height: calc(var(--world-h) * 1px);
-  }
-
-  .wall-stage {
-    position: relative;
-    width: calc(var(--world-w) * 1px);
-    height: calc(var(--world-h) * 1px);
-    background: var(--wall);
-    user-select: none;
-  }
-
-  .display-mode .app {
-    padding: 0;
-    gap: 0;
-  }
-
-  .display-mode .topbar,
-  .display-mode .controls,
-  .display-mode .photo-bank,
-  .display-mode .hint {
-    display: none !important;
-  }
-
-  .display-mode .workspace {
-    padding: 0;
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-  }
-
-  .display-mode .wall-scroll {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    overflow: hidden;
-    box-shadow: none;
-    background: var(--wall);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .display-mode .wall-stage-wrap {
-    min-width: 0;
-    min-height: 0;
-    transform-origin: center center;
-  }
-
-  .display-back-hint {
-    position: fixed;
-    top: calc(var(--safe-top) + 12px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9000;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: rgba(24, 31, 51, 0.82);
-    color: #fff;
-    font-size: 0.88rem;
-    font-weight: 700;
-    opacity: 0;
-    transition: opacity 220ms ease;
-    pointer-events: none;
-  }
-
-  body.display-mode .display-back-hint {
-    opacity: 1;
-  }
-
-  .frame {
-    position: absolute;
-    user-select: none;
-    transition:
-      left 260ms ease,
-      top 260ms ease,
-      width 260ms ease,
-      height 260ms ease,
-      filter 140ms ease;
-    will-change: left, top, width, height;
-  }
-
-  .frame.selected {
-    z-index: 40 !important;
-    filter: drop-shadow(0 18px 28px rgba(0,0,0,0.18));
-  }
-
-  .frame.adjusting {
-    z-index: 45 !important;
-  }
-
-  .frame-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .photo-viewport {
-    position: absolute;
-    top: var(--pv-top);
-    right: var(--pv-right);
-    bottom: var(--pv-bottom);
-    left: var(--pv-left);
-    overflow: hidden;
-    z-index: 1;
-    background: transparent;
-    touch-action: none;
-  }
-
-  .photo-viewport.oval {
-    -webkit-mask-image: url("mask_oval.png");
-    mask-image: url("mask_oval.png");
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-  }
-
-  .photo-layer {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity var(--fade-ms) ease;
-  }
-
-  .photo-layer.active {
-    opacity: 1;
-  }
-
-  .photo-box {
-    position: absolute;
-    inset: 0;
-    background-repeat: no-repeat;
-    background-position: var(--photo-x, 50%) var(--photo-y, 50%);
-    background-size: cover;
-  }
-
-  .frame-art-wrap {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  .frame-art {
-    position: absolute;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .frame-number {
-    position: absolute;
-    top: -18px;
-    left: -18px;
-    width: 58px;
-    height: 58px;
-    border-radius: 999px;
-    background: rgba(24, 31, 51, 0.96);
-    color: #fff;
-    box-shadow: 0 10px 22px rgba(0,0,0,0.22);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.3rem;
-    z-index: 6;
-    cursor: grab;
-    border: 3px solid rgba(255,255,255,0.18);
-    touch-action: none;
-  }
-
-  .frame-number:active {
-    cursor: grabbing;
-  }
-
-  .resize-handle {
-    position: absolute;
-    right: -14px;
-    bottom: -14px;
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.96);
-    border: 3px solid rgba(47,91,218,0.92);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.18);
-    z-index: 6;
-    touch-action: none;
-  }
-
-  .display-mode .frame-number,
-  .display-mode .resize-handle,
-  .display-mode .frame-lock,
-  .display-mode .selection-outline {
-    display: none !important;
-  }
-
-  .frame-lock {
-    position: absolute;
-    right: -8px;
-    top: -12px;
-    min-width: 42px;
-    height: 30px;
-    padding: 0 10px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.94);
-    border: 1px solid var(--line);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.10);
-    color: var(--muted);
-    font-size: 0.74rem;
-    font-weight: 800;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 6;
-  }
-
-  .frame.locked .frame-lock {
-    display: inline-flex;
-  }
-
-  .selection-outline {
-    position: absolute;
-    inset: -8px;
-    border-radius: 18px;
-    border: 3px solid rgba(47,91,218,0.26);
-    pointer-events: none;
-    opacity: 0;
-    z-index: 2;
-  }
-
-  .frame.selected .selection-outline {
-    opacity: 1;
-  }
-
-  .controls {
-    padding: 12px;
-    display: grid;
-    gap: 12px;
-  }
-
-  .controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .selection-info {
-    color: var(--muted);
-    font-weight: 700;
-  }
-
-  .controls-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .photo-bank {
-    padding: 12px;
-    display: grid;
-    gap: 12px;
-  }
-
-  .photo-bank-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .photo-bank-title {
-    font-weight: 800;
-  }
-
-  .thumb-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: 10px;
-  }
-
-  .thumb {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(255,255,255,0.65);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
-  }
-
-  .thumb.active {
-    outline: 3px solid rgba(47,91,218,0.35);
-    outline-offset: 2px;
-  }
-
-  .thumb button {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    display: block;
-  }
-
-  .thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .thumb-meta {
-    position: absolute;
-    left: 6px;
-    bottom: 6px;
-    min-width: 24px;
-    height: 24px;
-    padding: 0 8px;
-    border-radius: 999px;
-    background: rgba(17,17,17,0.74);
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.72rem;
-    font-weight: 800;
-  }
-
-  .thumb-delete {
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.95);
-    border: 1px solid var(--line);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-    color: var(--danger);
-    font-weight: 900;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-  }
-
-  .hint {
-    padding: 14px 16px;
-    color: var(--muted);
-    font-size: 0.94rem;
-    line-height: 1.6;
-  }
-
-  .hint strong {
-    color: var(--text);
-  }
-
-  .toast {
-    position: fixed;
-    left: 50%;
-    top: calc(var(--safe-top) + 14px);
-    transform: translateX(-50%) translateY(-10px);
-    opacity: 0;
-    pointer-events: none;
-    padding: 12px 16px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.97);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-lg);
-    font-weight: 800;
-    transition: opacity 180ms ease, transform 180ms ease;
-    z-index: 9999;
-    max-width: min(92vw, 520px);
-    text-align: center;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  @media (max-width: 980px) {
-    .toolbar {
-      grid-template-columns: 1fr;
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover"
+  />
+  <title>KABEPIC</title>
+  <meta name="description" content="思い出を、暮らしの背景に。" />
+  <style>
+    :root {
+      --wall-bg: #f2ede3;
+      --panel: rgba(255, 255, 255, 0.92);
+      --panel-line: rgba(0, 0, 0, 0.08);
+      --text: #1c1c1c;
+      --muted: #6d685f;
+      --accent: #2f5bda;
+      --accent-soft: rgba(47, 91, 218, 0.12);
+      --danger: #c84343;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --shadow-lg: 0 18px 36px rgba(0, 0, 0, 0.12);
+      --shadow-md: 0 10px 22px rgba(0, 0, 0, 0.10);
+      --world-w: 2400;
+      --world-h: 1500;
+      --toolbar-h: 96px;
+      --fade-ms: 1200ms;
     }
-  }
 
-  @media (max-width: 720px) {
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--wall-bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Hiragino Sans",
+        "Noto Sans JP",
+        sans-serif;
+      overflow: hidden;
+    }
+
+    body.display-mode {
+      background: var(--wall-bg);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--wall-bg);
+    }
+
+    .toolbar {
+      position: fixed;
+      top: calc(var(--safe-top) + 12px);
+      left: 12px;
+      right: 12px;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 64px;
+      padding: 10px 12px;
+      border-radius: 22px;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
     .brand {
-      min-width: 112px;
+      font-weight: 900;
       font-size: 1.06rem;
+      letter-spacing: 0.04em;
+      padding: 0 6px 0 2px;
+      white-space: nowrap;
+    }
+
+    .toolbar-scroll {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .toolbar-scroll::-webkit-scrollbar {
+      display: none;
     }
 
     .btn {
-      min-width: 78px;
-      min-height: 50px;
+      min-height: 44px;
       padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-md);
+      font-weight: 800;
+      white-space: nowrap;
+      transition:
+        transform 140ms ease,
+        background 140ms ease,
+        color 140ms ease,
+        border-color 140ms ease,
+        opacity 140ms ease;
     }
 
-    .frame-number {
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn.soft {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(47, 91, 218, 0.14);
+      box-shadow: none;
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn.danger {
+      color: var(--danger);
+    }
+
+    .btn[disabled] {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-right .btn {
+      min-width: 44px;
+      padding: 0 12px;
+    }
+
+    .viewport {
+      position: absolute;
+      inset: 0;
+      padding-top: calc(var(--safe-top) + 92px);
+      padding-bottom: calc(var(--safe-bottom) + 12px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+    }
+
+    .display-mode .viewport {
+      padding: 0;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .stage-wrap {
+      position: relative;
+      width: calc(var(--world-w) * 1px);
+      height: calc(var(--world-h) * 1px);
+      transform-origin: top left;
+      will-change: transform;
+    }
+
+    .display-mode .stage-wrap {
+      transform-origin: center center;
+    }
+
+    .stage {
+      position: relative;
+      width: calc(var(--world-w) * 1px);
+      height: calc(var(--world-h) * 1px);
+      background: var(--wall-bg);
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255,255,255,0.18), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.02));
+      pointer-events: none;
+    }
+
+    .display-mode .toolbar,
+    .display-mode .bottom-sheet,
+    .display-mode .selection-bar,
+    .display-mode #displayHint {
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .frame {
+      position: absolute;
+      user-select: none;
+      transition:
+        left 360ms ease,
+        top 360ms ease,
+        width 360ms ease,
+        height 360ms ease,
+        filter 160ms ease;
+      will-change: left, top, width, height;
+    }
+
+    .frame.selected {
+      z-index: 30 !important;
+      filter: drop-shadow(0 18px 28px rgba(0,0,0,0.16));
+    }
+
+    .selection-outline {
+      position: absolute;
+      inset: -8px;
+      border-radius: 20px;
+      border: 3px solid rgba(47, 91, 218, 0.22);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .frame.selected .selection-outline {
+      opacity: 1;
+    }
+
+    .photo-viewport {
+      position: absolute;
+      top: var(--pv-top);
+      right: var(--pv-right);
+      bottom: var(--pv-bottom);
+      left: var(--pv-left);
+      overflow: hidden;
+      z-index: 2;
+      touch-action: none;
+      background: transparent;
+    }
+
+    .photo-viewport.oval {
+      -webkit-mask-image: url("mask_oval.png");
+      mask-image: url("mask_oval.png");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+    }
+
+    .photo-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity var(--fade-ms) ease;
+    }
+
+    .photo-layer.active {
+      opacity: 1;
+    }
+
+    .photo-box {
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: var(--photo-x, 50%) var(--photo-y, 50%);
+      background-size: cover;
+      background-image: none;
+    }
+
+    .frame-art-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .frame-art {
+      position: absolute;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .frame-badge {
+      position: absolute;
+      top: -18px;
+      left: -18px;
       width: 52px;
       height: 52px;
-      font-size: 1.08rem;
+      border-radius: 999px;
+      background: rgba(18, 26, 46, 0.96);
+      color: #fff;
+      border: 3px solid rgba(255,255,255,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.05rem;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+      z-index: 6;
+      cursor: grab;
+      touch-action: none;
     }
 
-    .wall-scroll {
-      height: min(62vh, 720px);
+    .frame-badge:active {
+      cursor: grabbing;
     }
-  }
-</style>
+
+    .resize-handle {
+      position: absolute;
+      right: -14px;
+      bottom: -14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.96);
+      border: 3px solid rgba(47, 91, 218, 0.92);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+      z-index: 6;
+      touch-action: none;
+    }
+
+    .frame-pin {
+      position: absolute;
+      top: -10px;
+      right: -8px;
+      min-width: 40px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--panel-line);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      color: var(--muted);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      z-index: 6;
+    }
+
+    .frame.locked .frame-pin {
+      display: inline-flex;
+    }
+
+    .display-mode .frame-badge,
+    .display-mode .resize-handle,
+    .display-mode .frame-pin,
+    .display-mode .selection-outline {
+      display: none !important;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.42);
+      font-weight: 800;
+      z-index: 3;
+      pointer-events: none;
+      line-height: 1.5;
+    }
+
+    .empty-state span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+      border: 1px dashed rgba(0,0,0,0.14);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .display-mode .empty-state {
+      display: none !important;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: calc(var(--safe-bottom) + 12px);
+      z-index: 1800;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      border-radius: 24px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 220ms ease, opacity 220ms ease;
+      overflow: hidden;
+    }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--panel-line);
+    }
+
+    .sheet-title {
+      font-weight: 900;
+      font-size: 0.96rem;
+    }
+
+    .sheet-meta {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.84rem;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      gap: 10px;
+      padding: 12px;
+      max-height: min(34vh, 280px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .thumb {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-md);
+    }
+
+    .thumb.selected {
+      outline: 3px solid rgba(47, 91, 218, 0.28);
+      outline-offset: 2px;
+    }
+
+    .thumb button {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      display: block;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-badge {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.76);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .thumb-delete {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid var(--panel-line);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+      color: var(--danger);
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .selection-bar {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: calc(var(--safe-bottom) + 12px);
+      z-index: 1700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px 12px;
+      border-radius: 22px;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      scrollbar-width: none;
+    }
+
+    .selection-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    #displayHint {
+      position: fixed;
+      top: calc(var(--safe-top) + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2100;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(24, 31, 51, 0.82);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      opacity: 0;
+      transition: opacity 220ms ease;
+      pointer-events: none;
+    }
+
+    body.display-mode #displayHint.show {
+      opacity: 1;
+    }
+
+    #toast {
+      position: fixed;
+      top: calc(var(--safe-top) + 88px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      z-index: 2200;
+      max-width: min(92vw, 520px);
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.97);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      font-weight: 900;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .more-menu,
+    .frames-menu {
+      position: fixed;
+      top: calc(var(--safe-top) + 86px);
+      right: 12px;
+      z-index: 2050;
+      min-width: 176px;
+      padding: 8px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .more-menu.open,
+    .frames-menu.open {
+      display: flex;
+    }
+
+    .menu-item {
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .menu-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .menu-item.danger {
+      color: var(--danger);
+    }
+
+    .status-mini {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .brand {
+        display: none;
+      }
+
+      .toolbar {
+        min-height: 60px;
+        padding: 8px 10px;
+      }
+
+      .btn {
+        min-height: 40px;
+        padding: 0 12px;
+      }
+
+      #toast {
+        top: calc(var(--safe-top) + 78px);
+      }
+    }
+  </style>
 </head>
 <body>
-  <div id="toast" class="toast" aria-live="polite"></div>
-  <div id="displayBackHint" class="display-back-hint">タップで編集に戻る</div>
+  <div id="app">
+    <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
 
-  <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
+    <div id="toolbar" class="toolbar">
+      <div class="brand">KABEPIC</div>
 
-  <div class="app">
-    <section id="topbar" class="card topbar">
-      <div class="topbar-row">
-        <div class="brand">KABEPIC</div>
-        <div id="statusPill" class="status-pill">写真を追加してください</div>
+      <div class="toolbar-scroll">
+        <button id="addPhotosBtn" class="btn primary">＋写真追加</button>
+        <button id="framesBtn" class="btn">Frames</button>
+        <button id="photosBtn" class="btn">写真一覧</button>
+        <button id="displayBtn" class="btn">▶ 表示</button>
+        <button id="zoomOutBtn" class="btn soft">−</button>
+        <button id="fitBtn" class="btn soft">全体</button>
+        <button id="zoomInBtn" class="btn soft">＋</button>
       </div>
 
-      <div class="toolbar">
-        <div class="toolbar-group">
-          <button class="btn frame-set-btn" data-layout="calm">Calm 3</button>
-          <button class="btn frame-set-btn" data-layout="flow">Flow 5</button>
-          <button class="btn frame-set-btn active" data-layout="story">Story 8</button>
-          <button class="btn frame-set-btn" data-layout="scene">Scene 11</button>
-        </div>
-
-        <div class="toolbar-group">
-          <button id="addPhotosBtn" class="btn primary">写真を追加</button>
-          <button id="toggleDisplayBtn" class="btn">表示モード</button>
-          <button id="saveBtn" class="btn soft">保存</button>
-          <button id="loadBtn" class="btn soft">読込</button>
-          <button id="resetBtn" class="btn danger">リセット</button>
-        </div>
+      <div class="toolbar-right">
+        <div id="statusMini" class="status-mini">写真 0枚</div>
+        <button id="moreBtn" class="btn">⋯</button>
       </div>
-    </section>
+    </div>
 
-    <section class="card workspace">
-      <div id="wallScroll" class="wall-scroll">
-        <div id="wallStageWrap" class="wall-stage-wrap">
-          <div id="wallStage" class="wall-stage"></div>
-        </div>
+    <div id="framesMenu" class="frames-menu"></div>
+
+    <div id="moreMenu" class="more-menu">
+      <button id="saveBtn" class="menu-item">保存</button>
+      <button id="loadBtn" class="menu-item">読込</button>
+      <button id="resetBtn" class="menu-item danger">リセット</button>
+    </div>
+
+    <div id="viewport" class="viewport">
+      <div id="stageWrap" class="stage-wrap">
+        <div id="stage" class="stage"></div>
       </div>
-    </section>
+    </div>
 
-    <section id="controls" class="card controls">
-      <div class="controls-row">
-        <div id="selectionInfo" class="selection-info">選択中：なし</div>
-        <div class="controls-actions">
-          <button id="shapeBtn" class="btn">形変更</button>
-          <button id="lockBtn" class="btn">写真固定</button>
-          <button id="unlockBtn" class="btn soft">固定解除</button>
-          <button id="frontBtn" class="btn soft">前面</button>
-          <button id="deleteFrameBtn" class="btn danger">削除</button>
-          <button id="addFrameBtn" class="btn soft">フレーム追加</button>
-        </div>
-      </div>
-    </section>
+    <div id="selectionBar" class="selection-bar hidden">
+      <button id="toggleStyleBtn" class="btn">装飾 / シンプル</button>
+      <button id="toggleOvalBtn" class="btn">楕円</button>
+      <button id="pinPhotoBtn" class="btn soft">写真固定</button>
+      <button id="unpinPhotoBtn" class="btn soft">固定解除</button>
+      <button id="openPhotosBtn" class="btn soft">写真一覧を開く</button>
+      <div id="selectionMeta" class="status-mini">選択なし</div>
+    </div>
 
-    <section id="photoBank" class="card photo-bank">
-      <div class="photo-bank-head">
-        <div class="photo-bank-title">写真一覧</div>
-        <div id="uploadStateText" style="color: var(--muted); font-weight: 700; font-size: 0.92rem;">
-          サムネイルを押すと選択中フレームに固定
+    <div id="photoSheet" class="bottom-sheet">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title">写真一覧</div>
+          <div id="sheetMeta" class="sheet-meta">0枚</div>
         </div>
+        <button id="closeSheetBtn" class="btn">閉じる</button>
       </div>
       <div id="thumbGrid" class="thumb-grid"></div>
-    </section>
+    </div>
 
-    <section id="hint" class="card hint">
-      <strong>操作</strong><br />
-      移動は左上の番号バッジをドラッグ。サイズ変更は右下の青ハンドルだけ。<br />
-      写真位置調整は写真部分を長押し。編集モードは縦横スクロールで全体を確認できます。<br />
-      表示モード中は画面タップで編集に戻ります。
-    </section>
+    <div id="toast"></div>
+    <div id="displayHint">タップで編集に戻る</div>
   </div>
 
-<script>
-(() => {
-  "use strict";
+  <script>
+    (() => {
+      "use strict";
 
-  const STORAGE_KEY = "kabepic_state_final_v2";
-  const DB_NAME = "kabepic_photos_final_v2";
-  const DB_STORE = "photos";
+      const STORAGE_KEY = "kabepic_mvp_layout_v5";
+      const PHOTO_DB_NAME = "kabepic_photos_v5";
+      const PHOTO_STORE = "photos";
 
-  const WORLD_W = 2400;
-  const WORLD_H = 1500;
+      const WORLD_W = 2400;
+      const WORLD_H = 1500;
 
-  const HOLD_MS = 420;
-  const SWITCH_MIN = 25000;
-  const SWITCH_MAX = 35000;
-  const MAX_LONG_EDGE = 1600;
-  const JPEG_QUALITY = 0.84;
-  const MIN_FRAME_W = 180;
-  const MAX_FRAME_W = 620;
-  const EDIT_SCROLL_LEFT = 180;
-  const EDIT_SCROLL_TOP = 120;
+      const EDIT_MIN_ZOOM = 1;
+      const EDIT_MAX_ZOOM = 2.8;
+      const EDIT_STEP = 0.18;
+      const HOLD_MS = 420;
+      const SWITCH_MIN_MS = 25000;
+      const SWITCH_MAX_MS = 35000;
+      const FADE_MS = 1200;
+      const MAX_LONG_EDGE = 1600;
+      const JPEG_QUALITY = 0.84;
+      const MIN_SIZE = 170;
+      const MAX_SIZE = 760;
+      const EDGE_MARGIN = 48;
 
-  const els = {
-    toast: document.getElementById("toast"),
-    wallScroll: document.getElementById("wallScroll"),
-    wallStageWrap: document.getElementById("wallStageWrap"),
-    wallStage: document.getElementById("wallStage"),
-    statusPill: document.getElementById("statusPill"),
-    selectionInfo: document.getElementById("selectionInfo"),
-    thumbGrid: document.getElementById("thumbGrid"),
-    photoInput: document.getElementById("photoInput"),
-    addPhotosBtn: document.getElementById("addPhotosBtn"),
-    toggleDisplayBtn: document.getElementById("toggleDisplayBtn"),
-    saveBtn: document.getElementById("saveBtn"),
-    loadBtn: document.getElementById("loadBtn"),
-    resetBtn: document.getElementById("resetBtn"),
-    shapeBtn: document.getElementById("shapeBtn"),
-    lockBtn: document.getElementById("lockBtn"),
-    unlockBtn: document.getElementById("unlockBtn"),
-    frontBtn: document.getElementById("frontBtn"),
-    deleteFrameBtn: document.getElementById("deleteFrameBtn"),
-    addFrameBtn: document.getElementById("addFrameBtn"),
-    uploadStateText: document.getElementById("uploadStateText"),
-    displayBackHint: document.getElementById("displayBackHint")
-  };
+      const $ = (id) => document.getElementById(id);
 
-  const FRAME_SPECS = {
-    square: {
-      label: "正方形",
-      ratio: 1467 / 1467,
-      bucket: "square",
-      artSrc: "frame_square.png",
-      artWidthPct: 1536 / 1467 * 100,
-      artHeightPct: 1536 / 1467 * 100,
-      artLeftPct: -(34 / 1467) * 100,
-      artTopPct: -(37 / 1467) * 100,
-      viewport: {
-        top: ((300 - 37) / 1467) * 100,
-        right: ((34 + 1467 - (299 + 926)) / 1467) * 100,
-        bottom: ((37 + 1467 - (300 + 926)) / 1467) * 100,
-        left: ((299 - 34) / 1467) * 100
-      }
-    },
-    vertical: {
-      label: "縦",
-      ratio: 1242 / 1483,
-      bucket: "vertical",
-      artSrc: "frame_vertical.png",
-      artWidthPct: 1536 / 1242 * 100,
-      artHeightPct: 1536 / 1483 * 100,
-      artLeftPct: -(145 / 1242) * 100,
-      artTopPct: -(30 / 1483) * 100,
-      viewport: {
-        top: ((252 - 30) / 1483) * 100,
-        right: ((145 + 1242 - (384 + 783)) / 1242) * 100,
-        bottom: ((30 + 1483 - (252 + 1043)) / 1483) * 100,
-        left: ((384 - 145) / 1242) * 100
-      }
-    },
-    horizontal: {
-      label: "横",
-      ratio: 1483 / 1242,
-      bucket: "horizontal",
-      artSrc: "frame_horizontal.png",
-      artWidthPct: 1536 / 1483 * 100,
-      artHeightPct: 1536 / 1242 * 100,
-      artLeftPct: -(30 / 1483) * 100,
-      artTopPct: -(149 / 1242) * 100,
-      viewport: {
-        top: ((369 - 149) / 1242) * 100,
-        right: ((30 + 1483 - (252 + 1043)) / 1483) * 100,
-        bottom: ((149 + 1242 - (369 + 783)) / 1242) * 100,
-        left: ((252 - 30) / 1483) * 100
-      }
-    },
-    oval: {
-      label: "楕円",
-      ratio: 957 / 1369,
-      bucket: "oval",
-      artSrc: "frame_oval.png",
-      artWidthPct: 1536 / 957 * 100,
-      artHeightPct: 1536 / 1369 * 100,
-      artLeftPct: -(301 / 957) * 100,
-      artTopPct: -(99 / 1369) * 100,
-      viewport: {
-        top: ((194 - 99) / 1369) * 100,
-        right: ((301 + 957 - (408 + 751)) / 957) * 100,
-        bottom: ((99 + 1369 - (194 + 1173)) / 1369) * 100,
-        left: ((408 - 301) / 957) * 100
-      },
-      oval: true
-    }
-  };
+      const els = {
+        app: $("app"),
+        viewport: $("viewport"),
+        stageWrap: $("stageWrap"),
+        stage: $("stage"),
+        toolbar: $("toolbar"),
+        photoInput: $("photoInput"),
+        addPhotosBtn: $("addPhotosBtn"),
+        framesBtn: $("framesBtn"),
+        photosBtn: $("photosBtn"),
+        displayBtn: $("displayBtn"),
+        zoomOutBtn: $("zoomOutBtn"),
+        zoomInBtn: $("zoomInBtn"),
+        fitBtn: $("fitBtn"),
+        moreBtn: $("moreBtn"),
+        saveBtn: $("saveBtn"),
+        loadBtn: $("loadBtn"),
+        resetBtn: $("resetBtn"),
+        moreMenu: $("moreMenu"),
+        framesMenu: $("framesMenu"),
+        statusMini: $("statusMini"),
+        selectionBar: $("selectionBar"),
+        toggleStyleBtn: $("toggleStyleBtn"),
+        toggleOvalBtn: $("toggleOvalBtn"),
+        pinPhotoBtn: $("pinPhotoBtn"),
+        unpinPhotoBtn: $("unpinPhotoBtn"),
+        openPhotosBtn: $("openPhotosBtn"),
+        selectionMeta: $("selectionMeta"),
+        photoSheet: $("photoSheet"),
+        closeSheetBtn: $("closeSheetBtn"),
+        thumbGrid: $("thumbGrid"),
+        sheetMeta: $("sheetMeta"),
+        toast: $("toast"),
+        displayHint: $("displayHint")
+      };
 
-  const SHAPE_ORDER = ["vertical", "horizontal", "square", "oval"];
-
-  const LAYOUTS = {
-    calm: [
-      { shape: "vertical",   x: 500,  y: 190,  w: 290, z: 1 },
-      { shape: "square",     x: 1340, y: 220,  w: 250, z: 2 },
-      { shape: "horizontal", x: 980,  y: 760,  w: 440, z: 1 }
-    ],
-    flow: [
-      { shape: "vertical",   x: 280,  y: 230,  w: 250, z: 1 },
-      { shape: "square",     x: 650,  y: 700,  w: 230, z: 2 },
-      { shape: "horizontal", x: 980,  y: 520,  w: 420, z: 1 },
-      { shape: "square",     x: 1540, y: 610,  w: 210, z: 2 },
-      { shape: "horizontal", x: 1180, y: 980,  w: 340, z: 1 }
-    ],
-    story: [
-      { shape: "square",     x: 210,  y: 180,  w: 250, z: 2 },
-      { shape: "horizontal", x: 720,  y: 170,  w: 420, z: 1 },
-      { shape: "square",     x: 1340, y: 190,  w: 210, z: 2 },
-      { shape: "vertical",   x: 1840, y: 150,  w: 250, z: 1 },
-      { shape: "horizontal", x: 520,  y: 790,  w: 360, z: 1 },
-      { shape: "square",     x: 1080, y: 720,  w: 250, z: 2 },
-      { shape: "horizontal", x: 1490, y: 820,  w: 340, z: 1 },
-      { shape: "vertical",   x: 1980, y: 700,  w: 220, z: 2 }
-    ],
-    scene: [
-      { shape: "square",     x: 170,  y: 160,  w: 240, z: 2 },
-      { shape: "horizontal", x: 520,  y: 150,  w: 380, z: 1 },
-      { shape: "square",     x: 1080, y: 170,  w: 210, z: 2 },
-      { shape: "vertical",   x: 1500, y: 120,  w: 240, z: 1 },
-      { shape: "square",     x: 1930, y: 180,  w: 210, z: 2 },
-      { shape: "horizontal", x: 250,  y: 760,  w: 340, z: 1 },
-      { shape: "square",     x: 760,  y: 700,  w: 220, z: 2 },
-      { shape: "horizontal", x: 1100, y: 760,  w: 340, z: 1 },
-      { shape: "square",     x: 1570, y: 700,  w: 210, z: 2 },
-      { shape: "horizontal", x: 1870, y: 820,  w: 300, z: 1 },
-      { shape: "vertical",   x: 2090, y: 380,  w: 190, z: 3 }
-    ]
-  };
-
-  const state = {
-    db: null,
-    mode: "edit",
-    layout: "story",
-    photos: [],
-    frames: [],
-    selectedFrameId: null,
-    selectedPhotoId: null,
-    holdTimer: null,
-    toastTimer: null,
-    isUploading: false
-  };
-
-  function uid(prefix = "id") {
-    return `${prefix}_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
-  }
-
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
-
-  function showToast(message) {
-    clearTimeout(state.toastTimer);
-    els.toast.textContent = message;
-    els.toast.classList.add("show");
-    state.toastTimer = setTimeout(() => {
-      els.toast.classList.remove("show");
-    }, 2200);
-  }
-
-  function setUploading(isUploading) {
-    state.isUploading = isUploading;
-    els.addPhotosBtn.disabled = isUploading;
-    els.photoInput.disabled = isUploading;
-    els.uploadStateText.textContent = isUploading
-      ? "写真を追加中…しばらくお待ちください"
-      : "サムネイルを押すと選択中フレームに固定";
-  }
-
-  function randomDelay() {
-    return SWITCH_MIN + Math.floor(Math.random() * (SWITCH_MAX - SWITCH_MIN + 1));
-  }
-
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, 1);
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(DB_STORE)) {
-          db.createObjectStore(DB_STORE, { keyPath: "id" });
+      const FRAME_SPECS = {
+        vertical: {
+          family: "vertical",
+          ratio: 1242 / 1483,
+          art: "frame_vertical.png",
+          fallback: "frame_vertical.png",
+          artWidthPct: 1536 / 1242 * 100,
+          artHeightPct: 1536 / 1483 * 100,
+          artLeftPct: -(145 / 1242) * 100,
+          artTopPct: -(30 / 1483) * 100,
+          viewport: {
+            top: ((252 - 30) / 1483) * 100,
+            right: ((145 + 1242 - (384 + 783)) / 1242) * 100,
+            bottom: ((30 + 1483 - (252 + 1043)) / 1483) * 100,
+            left: ((384 - 145) / 1242) * 100
+          }
+        },
+        vertical_simple: {
+          family: "vertical",
+          ratio: 1248 / 1496,
+          art: "frame_vertical_simple.png",
+          fallback: "frame_vertical.png",
+          artWidthPct: 1536 / 1248 * 100,
+          artHeightPct: 1536 / 1496 * 100,
+          artLeftPct: -(144 / 1248) * 100,
+          artTopPct: -(24 / 1496) * 100,
+          viewport: {
+            top: 14.9,
+            right: 17.2,
+            bottom: 16.8,
+            left: 17.2
+          }
+        },
+        horizontal: {
+          family: "horizontal",
+          ratio: 1483 / 1242,
+          art: "frame_horizontal.png",
+          fallback: "frame_horizontal.png",
+          artWidthPct: 1536 / 1483 * 100,
+          artHeightPct: 1536 / 1242 * 100,
+          artLeftPct: -(30 / 1483) * 100,
+          artTopPct: -(149 / 1242) * 100,
+          viewport: {
+            top: ((369 - 149) / 1242) * 100,
+            right: ((30 + 1483 - (252 + 1043)) / 1483) * 100,
+            bottom: ((149 + 1242 - (369 + 783)) / 1242) * 100,
+            left: ((252 - 30) / 1483) * 100
+          }
+        },
+        horizontal_simple: {
+          family: "horizontal",
+          ratio: 1496 / 1248,
+          art: "frame_horizontal_simple.png",
+          fallback: "frame_horizontal.png",
+          artWidthPct: 1536 / 1496 * 100,
+          artHeightPct: 1536 / 1248 * 100,
+          artLeftPct: -(24 / 1496) * 100,
+          artTopPct: -(144 / 1248) * 100,
+          viewport: {
+            top: 16.4,
+            right: 16.2,
+            bottom: 16.4,
+            left: 16.2
+          }
+        },
+        square: {
+          family: "square",
+          ratio: 1,
+          art: "frame_square.png",
+          fallback: "frame_square.png",
+          artWidthPct: 1536 / 1467 * 100,
+          artHeightPct: 1536 / 1467 * 100,
+          artLeftPct: -(34 / 1467) * 100,
+          artTopPct: -(37 / 1467) * 100,
+          viewport: {
+            top: ((300 - 37) / 1467) * 100,
+            right: ((34 + 1467 - (299 + 926)) / 1467) * 100,
+            bottom: ((37 + 1467 - (300 + 926)) / 1467) * 100,
+            left: ((299 - 34) / 1467) * 100
+          }
+        },
+        square_simple: {
+          family: "square",
+          ratio: 1,
+          art: "frame_square_simple.png",
+          fallback: "frame_square.png",
+          artWidthPct: 100,
+          artHeightPct: 100,
+          artLeftPct: 0,
+          artTopPct: 0,
+          viewport: {
+            top: 17,
+            right: 17,
+            bottom: 17,
+            left: 17
+          }
+        },
+        oval: {
+          family: "oval",
+          ratio: 957 / 1369,
+          art: "frame_oval.png",
+          fallback: "frame_vertical.png",
+          artWidthPct: 1536 / 957 * 100,
+          artHeightPct: 1536 / 1369 * 100,
+          artLeftPct: -(301 / 957) * 100,
+          artTopPct: -(99 / 1369) * 100,
+          viewport: {
+            top: ((194 - 99) / 1369) * 100,
+            right: ((301 + 957 - (408 + 751)) / 957) * 100,
+            bottom: ((99 + 1369 - (194 + 1173)) / 1369) * 100,
+            left: ((408 - 301) / 957) * 100
+          },
+          mask: true
         }
       };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
 
-  function dbPut(photo) {
-    return new Promise((resolve, reject) => {
-      const tx = state.db.transaction(DB_STORE, "readwrite");
-      tx.objectStore(DB_STORE).put(photo);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
+      const LAYOUTS = {
+        calm: [
+          { kind: "vertical", x: 469, y: 17, w: 684, z: 2 },
+          { kind: "square", x: 1225, y: 288, w: 547, z: 3 },
+          { kind: "horizontal", x: 838, y: 887, w: 713, z: 1 }
+        ],
+        flow: [
+          { kind: "vertical", x: 53, y: 489, w: 464, z: 1 },
+          { kind: "vertical", x: 564, y: 19, w: 632, z: 3 },
+          { kind: "square", x: 1244, y: 302, w: 461, z: 2 },
+          { kind: "horizontal", x: 717, y: 820, w: 744, z: 1 },
+          { kind: "horizontal_simple", x: 1751, y: 541, w: 522, z: 2 }
+        ],
+        story: [
+          { kind: "square_simple", x: 6, y: 321, w: 352, z: 1 },
+          { kind: "square", x: 267, y: 192, w: 408, z: 2 },
+          { kind: "vertical_simple", x: 569, y: 40, w: 356, z: 4 },
+          { kind: "vertical", x: 944, y: 248, w: 374, z: 2 },
+          { kind: "square_simple", x: 1210, y: 310, w: 372, z: 1 },
+          { kind: "square", x: 248, y: 481, w: 470, z: 2 },
+          { kind: "vertical", x: 941, y: 480, w: 378, z: 2 },
+          { kind: "horizontal", x: 577, y: 482, w: 509, z: 3 }
+        ],
+        scene: [
+          { kind: "square_simple", x: 24, y: 250, w: 377, z: 1 },
+          { kind: "square", x: 282, y: 176, w: 445, z: 2 },
+          { kind: "vertical_simple", x: 633, y: 22, w: 332, z: 4 },
+          { kind: "vertical", x: 585, y: 291, w: 474, z: 3 },
+          { kind: "vertical", x: 916, y: 208, w: 325, z: 2 },
+          { kind: "square_simple", x: 1152, y: 278, w: 325, z: 1 },
+          { kind: "square", x: 144, y: 480, w: 309, z: 1 },
+          { kind: "vertical_simple", x: 364, y: 480, w: 306, z: 1 },
+          { kind: "square", x: 617, y: 673, w: 376, z: 2 },
+          { kind: "horizontal", x: 912, y: 480, w: 520, z: 3 },
+          { kind: "square_simple", x: 1272, y: 480, w: 362, z: 2 }
+        ]
+      };
 
-  function dbDelete(id) {
-    return new Promise((resolve, reject) => {
-      const tx = state.db.transaction(DB_STORE, "readwrite");
-      tx.objectStore(DB_STORE).delete(id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
+      const FRAME_SET_LABELS = {
+        calm: "Calm 3",
+        flow: "Flow 5",
+        story: "Story 8",
+        scene: "Scene 11"
+      };
 
-  function dbGetAll() {
-    return new Promise((resolve, reject) => {
-      const tx = state.db.transaction(DB_STORE, "readonly");
-      const req = tx.objectStore(DB_STORE).getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  }
+      const state = {
+        db: null,
+        mode: "edit",
+        layout: "story",
+        photos: [],
+        frames: [],
+        selectedFrameId: null,
+        selectedPhotoId: null,
+        fitScale: 1,
+        editScale: 1,
+        isUploading: false,
+        sheetOpen: false,
+        holdTimer: null,
+        toastTimer: null
+      };
 
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-  }
-
-  function fileToDataUrl(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function fitWithin(width, height, maxLongEdge) {
-    const long = Math.max(width, height);
-    if (long <= maxLongEdge) return { width, height };
-    const scale = maxLongEdge / long;
-    return {
-      width: Math.round(width * scale),
-      height: Math.round(height * scale)
-    };
-  }
-
-  function bucketFromAspect(width, height) {
-    const ratio = width / height;
-    if (ratio > 1.05) return "horizontal";
-    if (ratio < 0.95) return "vertical";
-    return "square";
-  }
-
-  async function compressPhoto(file) {
-    const dataUrl = await fileToDataUrl(file);
-    const img = await loadImage(dataUrl);
-    const fitted = fitWithin(img.width, img.height, MAX_LONG_EDGE);
-    const canvas = document.createElement("canvas");
-    canvas.width = fitted.width;
-    canvas.height = fitted.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, fitted.width, fitted.height);
-    const compressed = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
-
-    return {
-      id: uid("photo"),
-      name: file.name,
-      width: fitted.width,
-      height: fitted.height,
-      dataUrl: compressed,
-      bucket: bucketFromAspect(fitted.width, fitted.height),
-      createdAt: Date.now()
-    };
-  }
-
-  function selectedFrame() {
-    return state.frames.find(frame => frame.id === state.selectedFrameId) || null;
-  }
-
-  function photoById(id) {
-    return state.photos.find(photo => photo.id === id) || null;
-  }
-
-  function frameHeight(frame) {
-    return frame.width / FRAME_SPECS[frame.shape].ratio;
-  }
-
-  function makeFrame(shape, x, y, width, z) {
-    return {
-      id: uid("frame"),
-      shape,
-      x,
-      y,
-      width,
-      z,
-      focusX: 50,
-      focusY: 50,
-      lockedPhotoId: null,
-      runtime: {
-        currentPhotoId: null,
-        previousPhotoId: null,
-        activeLayer: 0,
-        timer: null
+      function uid(prefix = "id") {
+        return `${prefix}_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
       }
-    };
-  }
 
-  function normalizeFrame(frame) {
-    const next = makeFrame(
-      frame.shape || "square",
-      Number(frame.x ?? 100),
-      Number(frame.y ?? 100),
-      Number(frame.width ?? frame.w ?? 260),
-      Number(frame.z ?? 1)
-    );
-    next.id = frame.id || uid("frame");
-    next.focusX = Number.isFinite(frame.focusX) ? frame.focusX : 50;
-    next.focusY = Number.isFinite(frame.focusY) ? frame.focusY : 50;
-    next.lockedPhotoId = frame.lockedPhotoId || null;
-    keepFrameInside(next);
-    return next;
-  }
-
-  function rectFor(frame) {
-    return {
-      left: frame.x,
-      top: frame.y,
-      right: frame.x + frame.width,
-      bottom: frame.y + frameHeight(frame)
-    };
-  }
-
-  function overlaps(a, b) {
-    return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
-  }
-
-  function keepFrameInside(frame) {
-    const h = frameHeight(frame);
-    frame.width = clamp(frame.width, MIN_FRAME_W, MAX_FRAME_W);
-    frame.x = clamp(frame.x, 60, WORLD_W - frame.width - 60);
-    frame.y = clamp(frame.y, 60, WORLD_H - h - 60);
-  }
-
-  function collides(candidate, ignoreId = null) {
-    const rect = rectFor(candidate);
-    return state.frames.some(frame => {
-      if (frame.id === ignoreId || frame.id === candidate.id) return false;
-      return overlaps(rect, rectFor(frame));
-    });
-  }
-
-  function getPoolForShape(shape) {
-    if (shape === "oval") {
-      const verticals = state.photos.filter(photo => photo.bucket === "vertical");
-      if (verticals.length) return verticals;
-      const squares = state.photos.filter(photo => photo.bucket === "square");
-      if (squares.length) return squares;
-      return state.photos.slice();
-    }
-
-    if (shape === "square") {
-      const squares = state.photos.filter(photo => photo.bucket === "square");
-      return squares.length ? squares : state.photos.slice();
-    }
-
-    const exact = state.photos.filter(photo => photo.bucket === FRAME_SPECS[shape].bucket);
-    return exact.length ? exact : state.photos.slice();
-  }
-
-  function visiblePhotoIdsExcluding(frameId) {
-    return new Set(
-      state.frames
-        .filter(frame => frame.id !== frameId)
-        .map(frame => frame.runtime.currentPhotoId)
-        .filter(Boolean)
-    );
-  }
-
-  function chooseNextPhoto(frame) {
-    if (frame.lockedPhotoId) {
-      return photoById(frame.lockedPhotoId) || null;
-    }
-
-    let pool = getPoolForShape(frame.shape);
-    if (!pool.length) pool = state.photos.slice();
-    if (!pool.length) return null;
-    if (pool.length === 1) return pool[0];
-
-    const current = frame.runtime.currentPhotoId;
-    const previous = frame.runtime.previousPhotoId;
-    const visibleIds = visiblePhotoIdsExcluding(frame.id);
-
-    let filtered = pool.filter(photo =>
-      photo.id !== current &&
-      photo.id !== previous &&
-      !visibleIds.has(photo.id)
-    );
-
-    if (!filtered.length) {
-      filtered = pool.filter(photo =>
-        photo.id !== current &&
-        !visibleIds.has(photo.id)
-      );
-    }
-
-    if (!filtered.length) {
-      filtered = pool.filter(photo => photo.id !== current);
-    }
-
-    if (!filtered.length) {
-      filtered = pool.slice();
-    }
-
-    return filtered[Math.floor(Math.random() * filtered.length)] || null;
-  }
-
-  function clearFrameTimer(frame) {
-    if (frame.runtime?.timer) clearTimeout(frame.runtime.timer);
-    frame.runtime.timer = null;
-  }
-
-  function clearAllTimers() {
-    state.frames.forEach(clearFrameTimer);
-  }
-
-  function ensureRuntimePhotos() {
-    state.frames.forEach(frame => {
-      if (frame.lockedPhotoId && !photoById(frame.lockedPhotoId)) {
-        frame.lockedPhotoId = null;
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
       }
-      if (frame.runtime.currentPhotoId && !photoById(frame.runtime.currentPhotoId)) {
-        frame.runtime.currentPhotoId = null;
+
+      function showToast(message, ms = 2200) {
+        clearTimeout(state.toastTimer);
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        state.toastTimer = setTimeout(() => {
+          els.toast.classList.remove("show");
+        }, ms);
       }
-      if (frame.runtime.previousPhotoId && !photoById(frame.runtime.previousPhotoId)) {
-        frame.runtime.previousPhotoId = null;
-      }
-    });
 
-    state.frames
-      .sort((a, b) => a.z - b.z)
-      .forEach(frame => {
-        if (!frame.runtime.currentPhotoId) {
-          const next = chooseNextPhoto(frame);
-          frame.runtime.currentPhotoId = next ? next.id : null;
-        }
-      });
-  }
-
-  function scheduleFrame(frame) {
-    clearFrameTimer(frame);
-    if (state.mode !== "display") return;
-
-    const pool = frame.lockedPhotoId ? [] : getPoolForShape(frame.shape);
-    if (!pool.length || pool.length <= 1) return;
-
-    frame.runtime.timer = setTimeout(() => {
-      rotateFrame(frame.id);
-    }, randomDelay());
-  }
-
-  function rotateFrame(frameId) {
-    const frame = state.frames.find(item => item.id === frameId);
-    if (!frame) return;
-
-    const next = chooseNextPhoto(frame);
-    if (!next) {
-      scheduleFrame(frame);
-      return;
-    }
-
-    if (frame.runtime.currentPhotoId === next.id) {
-      scheduleFrame(frame);
-      return;
-    }
-
-    frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
-    frame.runtime.currentPhotoId = next.id;
-    frame.runtime.activeLayer = frame.runtime.activeLayer === 0 ? 1 : 0;
-    renderFrame(frame.id);
-
-    setTimeout(() => {
-      frame.runtime.previousPhotoId = null;
-      renderFrame(frame.id);
-      saveState();
-    }, 1700);
-
-    scheduleFrame(frame);
-  }
-
-  function saveState() {
-    const payload = {
-      mode: state.mode,
-      layout: state.layout,
-      frames: state.frames.map(frame => ({
-        id: frame.id,
-        shape: frame.shape,
-        x: frame.x,
-        y: frame.y,
-        width: frame.width,
-        z: frame.z,
-        focusX: frame.focusX,
-        focusY: frame.focusY,
-        lockedPhotoId: frame.lockedPhotoId || null
-      }))
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }
-
-  function loadState() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-
-    try {
-      const parsed = JSON.parse(raw);
-      state.mode = parsed.mode === "display" ? "display" : "edit";
-      state.layout = parsed.layout || "story";
-      state.frames = (parsed.frames || []).map(normalizeFrame);
-      return !!state.frames.length;
-    } catch {
-      return false;
-    }
-  }
-
-  function maxZ() {
-    return state.frames.reduce((max, frame) => Math.max(max, frame.z), 0);
-  }
-
-  function applyLayout(layoutKey) {
-    clearAllTimers();
-    state.layout = layoutKey;
-    state.frames = (LAYOUTS[layoutKey] || LAYOUTS.story).map((item, index) => {
-      return normalizeFrame({
-        shape: item.shape,
-        x: item.x,
-        y: item.y,
-        width: item.w,
-        z: item.z ?? (index + 1)
-      });
-    });
-    state.selectedFrameId = null;
-    ensureRuntimePhotos();
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-  }
-
-  function resetCurrentLayout() {
-    applyLayout(state.layout);
-    showToast("現在セットを初期配置に戻しました");
-  }
-
-  function updateLayoutButtons() {
-    document.querySelectorAll(".frame-set-btn").forEach(button => {
-      button.classList.toggle("active", button.dataset.layout === state.layout);
-    });
-  }
-
-  function updateStatus() {
-    els.statusPill.textContent = state.photos.length
-      ? `写真 ${state.photos.length}枚`
-      : "写真を追加してください";
-
-    els.toggleDisplayBtn.textContent = state.mode === "edit" ? "表示モード" : "編集モード";
-
-    const frame = selectedFrame();
-    if (!frame) {
-      els.selectionInfo.textContent = "選択中：なし";
-    } else {
-      els.selectionInfo.textContent =
-        `選択中：${FRAME_SPECS[frame.shape].label} / ${Math.round(frame.width)}px / ` +
-        (frame.lockedPhotoId ? "写真固定" : "自動");
-    }
-  }
-
-  function updateDisplayScale() {
-    if (state.mode !== "display") {
-      els.wallStageWrap.style.transform = "";
-      els.wallScroll.scrollLeft = EDIT_SCROLL_LEFT;
-      els.wallScroll.scrollTop = EDIT_SCROLL_TOP;
-      return;
-    }
-
-    const scale = Math.min(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
-    els.wallStageWrap.style.transform = `scale(${scale})`;
-  }
-
-  function updateModeUI() {
-    document.body.classList.toggle("display-mode", state.mode === "display");
-    updateDisplayScale();
-  }
-
-  function renderThumbs() {
-    els.thumbGrid.innerHTML = "";
-
-    state.photos.forEach(photo => {
-      const isSelected = state.selectedPhotoId === photo.id;
-      const thumb = document.createElement("div");
-      thumb.className = `thumb${isSelected ? " active" : ""}`;
-      thumb.innerHTML = `
-        <button type="button" data-photo-id="${photo.id}">
-          <img src="${photo.dataUrl}" alt="">
-          <div class="thumb-meta">${photo.bucket === "horizontal" ? "横" : photo.bucket === "vertical" ? "縦" : "正"}</div>
-        </button>
-        <button type="button" class="thumb-delete" data-remove-id="${photo.id}">×</button>
-      `;
-
-      thumb.querySelector("[data-photo-id]").addEventListener("click", () => {
-        state.selectedPhotoId = photo.id;
-        const frame = selectedFrame();
-        if (frame) {
-          frame.lockedPhotoId = photo.id;
-          frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
-          frame.runtime.currentPhotoId = photo.id;
-          renderAll();
-          saveState();
-          startDisplayTimersIfNeeded();
-          showToast("写真を固定しました");
+      function setUploading(flag, current = 0, total = 0) {
+        state.isUploading = flag;
+        els.addPhotosBtn.disabled = flag;
+        els.photoInput.disabled = flag;
+        if (flag) {
+          els.statusMini.textContent = `${current} / ${total}`;
         } else {
-          renderThumbs();
+          els.statusMini.textContent = `写真 ${state.photos.length}枚`;
         }
-      });
-
-      thumb.querySelector("[data-remove-id]").addEventListener("click", async (event) => {
-        event.stopPropagation();
-        await removePhoto(photo.id);
-      });
-
-      els.thumbGrid.appendChild(thumb);
-    });
-  }
-
-  function renderFrame(frameId) {
-    const node = els.wallStage.querySelector(`.frame[data-id="${frameId}"]`);
-    const frame = state.frames.find(item => item.id === frameId);
-    if (!node || !frame) return;
-
-    const spec = FRAME_SPECS[frame.shape];
-    const h = frameHeight(frame);
-
-    node.style.left = `${frame.x}px`;
-    node.style.top = `${frame.y}px`;
-    node.style.width = `${frame.width}px`;
-    node.style.height = `${h}px`;
-    node.style.zIndex = String(frame.z);
-    node.dataset.shape = frame.shape;
-    node.classList.toggle("selected", state.mode === "edit" && state.selectedFrameId === frame.id);
-    node.classList.toggle("locked", !!frame.lockedPhotoId);
-
-    const viewport = node.querySelector(".photo-viewport");
-    viewport.style.setProperty("--pv-top", `${spec.viewport.top}%`);
-    viewport.style.setProperty("--pv-right", `${spec.viewport.right}%`);
-    viewport.style.setProperty("--pv-bottom", `${spec.viewport.bottom}%`);
-    viewport.style.setProperty("--pv-left", `${spec.viewport.left}%`);
-    viewport.classList.toggle("oval", !!spec.oval);
-
-    const art = node.querySelector(".frame-art");
-    art.src = spec.artSrc;
-    art.style.width = `${spec.artWidthPct}%`;
-    art.style.height = `${spec.artHeightPct}%`;
-    art.style.left = `${spec.artLeftPct}%`;
-    art.style.top = `${spec.artTopPct}%`;
-
-    const number = node.querySelector(".frame-number");
-    number.textContent = String(
-      [...state.frames].sort((a, b) => a.z - b.z).findIndex(item => item.id === frame.id) + 1
-    );
-
-    const lock = node.querySelector(".frame-lock");
-    lock.textContent = "固定";
-
-    const currentPhoto = photoById(frame.runtime.currentPhotoId);
-    const previousPhoto = photoById(frame.runtime.previousPhotoId);
-
-    const layer0 = node.querySelector(".layer-0");
-    const layer1 = node.querySelector(".layer-1");
-    const box0 = node.querySelector(".layer-0 .photo-box");
-    const box1 = node.querySelector(".layer-1 .photo-box");
-
-    if (frame.shape === "square") {
-      box0.style.backgroundSize = "cover";
-      box1.style.backgroundSize = "cover";
-    } else {
-      box0.style.backgroundSize = "cover";
-      box1.style.backgroundSize = "cover";
-    }
-
-    if (frame.runtime.activeLayer === 0) {
-      box0.style.backgroundImage = currentPhoto ? `url("${currentPhoto.dataUrl}")` : "none";
-      box1.style.backgroundImage = previousPhoto ? `url("${previousPhoto.dataUrl}")` : "none";
-      box0.style.setProperty("--photo-x", `${frame.focusX}%`);
-      box0.style.setProperty("--photo-y", `${frame.focusY}%`);
-      box1.style.setProperty("--photo-x", `${frame.focusX}%`);
-      box1.style.setProperty("--photo-y", `${frame.focusY}%`);
-      layer0.classList.add("active");
-      layer1.classList.remove("active");
-    } else {
-      box1.style.backgroundImage = currentPhoto ? `url("${currentPhoto.dataUrl}")` : "none";
-      box0.style.backgroundImage = previousPhoto ? `url("${previousPhoto.dataUrl}")` : "none";
-      box0.style.setProperty("--photo-x", `${frame.focusX}%`);
-      box0.style.setProperty("--photo-y", `${frame.focusY}%`);
-      box1.style.setProperty("--photo-x", `${frame.focusX}%`);
-      box1.style.setProperty("--photo-y", `${frame.focusY}%`);
-      layer1.classList.add("active");
-      layer0.classList.remove("active");
-    }
-  }
-
-  function createFrameNode(frame) {
-    const node = document.createElement("div");
-    node.className = "frame";
-    node.dataset.id = frame.id;
-    node.innerHTML = `
-      <div class="frame-inner">
-        <div class="selection-outline"></div>
-        <div class="photo-viewport">
-          <div class="photo-layer layer-0"><div class="photo-box"></div></div>
-          <div class="photo-layer layer-1"><div class="photo-box"></div></div>
-        </div>
-        <div class="frame-art-wrap">
-          <img class="frame-art" alt="">
-        </div>
-        <div class="frame-number" title="移動">1</div>
-        <div class="frame-lock">固定</div>
-        <div class="resize-handle" title="サイズ変更"></div>
-      </div>
-    `;
-    bindFrameEvents(node, frame.id);
-    return node;
-  }
-
-  function renderWall() {
-    els.wallStage.innerHTML = "";
-    const frames = [...state.frames].sort((a, b) => a.z - b.z);
-    frames.forEach(frame => {
-      const node = createFrameNode(frame);
-      els.wallStage.appendChild(node);
-      renderFrame(frame.id);
-    });
-  }
-
-  function renderAll() {
-    updateLayoutButtons();
-    updateStatus();
-    updateModeUI();
-    renderWall();
-    renderThumbs();
-  }
-
-  function startDisplayTimersIfNeeded() {
-    clearAllTimers();
-    if (state.mode !== "display") return;
-    ensureRuntimePhotos();
-    state.frames.forEach(frame => scheduleFrame(frame));
-  }
-
-  async function addPhotos(files) {
-    const list = Array.from(files || []);
-    if (!list.length || state.isUploading) return;
-
-    try {
-      setUploading(true);
-      showToast("写真を追加中です…");
-
-      for (const file of list) {
-        const photo = await compressPhoto(file);
-        state.photos.push(photo);
-        await dbPut(photo);
       }
 
-      state.photos.sort((a, b) => a.createdAt - b.createdAt);
-      ensureRuntimePhotos();
-      saveState();
-      renderAll();
-      startDisplayTimersIfNeeded();
-      showToast(`${list.length}枚追加しました`);
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  async function removePhoto(photoId) {
-    await dbDelete(photoId);
-    state.photos = state.photos.filter(photo => photo.id !== photoId);
-    state.selectedPhotoId = state.selectedPhotoId === photoId ? null : state.selectedPhotoId;
-
-    state.frames.forEach(frame => {
-      if (frame.lockedPhotoId === photoId) frame.lockedPhotoId = null;
-      if (frame.runtime.currentPhotoId === photoId) frame.runtime.currentPhotoId = null;
-      if (frame.runtime.previousPhotoId === photoId) frame.runtime.previousPhotoId = null;
-    });
-
-    ensureRuntimePhotos();
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-    showToast("写真を削除しました");
-  }
-
-  function toggleDisplayMode() {
-    state.mode = state.mode === "edit" ? "display" : "edit";
-    renderAll();
-    startDisplayTimersIfNeeded();
-  }
-
-  function addFrame() {
-    const frame = normalizeFrame({
-      shape: "square",
-      x: 1100,
-      y: 560,
-      width: 220,
-      z: maxZ() + 1
-    });
-
-    let found = false;
-    for (let i = 0; i < 50; i += 1) {
-      frame.x = 120 + i * 28;
-      frame.y = 120 + i * 18;
-      keepFrameInside(frame);
-      if (!collides(frame, frame.id)) {
-        found = true;
-        break;
+      function randomMs(min, max) {
+        return min + Math.floor(Math.random() * (max - min + 1));
       }
-    }
 
-    if (!found) {
-      showToast("置ける場所がありません");
-      return;
-    }
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(PHOTO_DB_NAME, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(PHOTO_STORE)) {
+              db.createObjectStore(PHOTO_STORE, { keyPath: "id" });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
 
-    state.frames.push(frame);
-    state.selectedFrameId = frame.id;
-    ensureRuntimePhotos();
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-  }
+      function dbPut(photo) {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(PHOTO_STORE, "readwrite");
+          tx.objectStore(PHOTO_STORE).put(photo);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
 
-  function cycleShape() {
-    const frame = selectedFrame();
-    if (!frame) {
-      showToast("先にフレームを選択してください");
-      return;
-    }
+      function dbDelete(photoId) {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(PHOTO_STORE, "readwrite");
+          tx.objectStore(PHOTO_STORE).delete(photoId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
 
-    const backup = { x: frame.x, y: frame.y, width: frame.width, shape: frame.shape };
-    const nextShape = SHAPE_ORDER[(SHAPE_ORDER.indexOf(frame.shape) + 1) % SHAPE_ORDER.length];
-    frame.shape = nextShape;
-    keepFrameInside(frame);
+      function dbGetAll() {
+        return new Promise((resolve, reject) => {
+          const tx = state.db.transaction(PHOTO_STORE, "readonly");
+          const req = tx.objectStore(PHOTO_STORE).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      }
 
-    if (collides(frame, frame.id)) {
-      frame.x = backup.x;
-      frame.y = backup.y;
-      frame.width = backup.width;
-      frame.shape = backup.shape;
-      showToast("その形だと重なります");
-      return;
-    }
+      function fileToDataURL(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
+        });
+      }
 
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-  }
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
 
-  function lockSelectedPhoto() {
-    const frame = selectedFrame();
-    if (!frame) {
-      showToast("先にフレームを選択してください");
-      return;
-    }
+      function fitWithin(width, height, maxLongEdge) {
+        const long = Math.max(width, height);
+        if (long <= maxLongEdge) return { width, height };
+        const scale = maxLongEdge / long;
+        return {
+          width: Math.round(width * scale),
+          height: Math.round(height * scale)
+        };
+      }
 
-    if (state.selectedPhotoId) {
-      frame.lockedPhotoId = state.selectedPhotoId;
-      frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
-      frame.runtime.currentPhotoId = state.selectedPhotoId;
-    } else if (frame.runtime.currentPhotoId) {
-      frame.lockedPhotoId = frame.runtime.currentPhotoId;
-    } else {
-      showToast("固定する写真がありません");
-      return;
-    }
+      function bucketFor(width, height) {
+        const ratio = width / height;
+        if (ratio > 1.05) return "horizontal";
+        if (ratio < 0.95) return "vertical";
+        return "square";
+      }
 
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-    showToast("写真を固定しました");
-  }
+      async function compressImage(file) {
+        const src = await fileToDataURL(file);
+        const img = await loadImage(src);
+        const fitted = fitWithin(img.width, img.height, MAX_LONG_EDGE);
+        const canvas = document.createElement("canvas");
+        canvas.width = fitted.width;
+        canvas.height = fitted.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, fitted.width, fitted.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
 
-  function unlockSelectedPhoto() {
-    const frame = selectedFrame();
-    if (!frame) {
-      showToast("先にフレームを選択してください");
-      return;
-    }
+        return {
+          id: uid("photo"),
+          name: file.name,
+          width: fitted.width,
+          height: fitted.height,
+          bucket: bucketFor(fitted.width, fitted.height),
+          dataUrl,
+          createdAt: Date.now()
+        };
+      }
 
-    frame.lockedPhotoId = null;
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-    showToast("固定を解除しました");
-  }
+      function frameHeight(frame) {
+        return frame.w / FRAME_SPECS[frame.kind].ratio;
+      }
 
-  function bringSelectedToFront() {
-    const frame = selectedFrame();
-    if (!frame) {
-      showToast("先にフレームを選択してください");
-      return;
-    }
+      function maxZ() {
+        return state.frames.reduce((m, frame) => Math.max(m, frame.z), 0);
+      }
 
-    frame.z = maxZ() + 1;
-    saveState();
-    renderAll();
-  }
+      function normalizeFrame(frame) {
+        const next = {
+          id: frame.id || uid("frame"),
+          kind: frame.kind,
+          baseKind: frame.baseKind || frame.kind,
+          x: Number(frame.x),
+          y: Number(frame.y),
+          w: Number(frame.w),
+          z: Number(frame.z || 1),
+          focusX: Number.isFinite(frame.focusX) ? frame.focusX : 50,
+          focusY: Number.isFinite(frame.focusY) ? frame.focusY : 50,
+          pinnedPhotoId: frame.pinnedPhotoId || null,
+          runtime: {
+            currentPhotoId: null,
+            previousPhotoId: null,
+            activeLayer: 0,
+            timer: null
+          }
+        };
+        fitFrameInside(next);
+        return next;
+      }
 
-  function deleteSelectedFrame() {
-    const frame = selectedFrame();
-    if (!frame) {
-      showToast("先にフレームを選択してください");
-      return;
-    }
+      function fitFrameInside(frame) {
+        frame.w = clamp(frame.w, MIN_SIZE, MAX_SIZE);
+        const h = frameHeight(frame);
+        frame.x = clamp(frame.x, EDGE_MARGIN, WORLD_W - frame.w - EDGE_MARGIN);
+        frame.y = clamp(frame.y, EDGE_MARGIN, WORLD_H - h - EDGE_MARGIN);
+      }
 
-    state.frames = state.frames.filter(item => item.id !== frame.id);
-    state.selectedFrameId = null;
-    saveState();
-    renderAll();
-    startDisplayTimersIfNeeded();
-    showToast("フレームを削除しました");
-  }
+      function rectOf(frame) {
+        return {
+          left: frame.x,
+          top: frame.y,
+          right: frame.x + frame.w,
+          bottom: frame.y + frameHeight(frame)
+        };
+      }
 
-  function loadSavedState() {
-    if (!loadState()) {
-      showToast("保存データがありません");
-      return;
-    }
-    ensureRuntimePhotos();
-    renderAll();
-    startDisplayTimersIfNeeded();
-    showToast("保存データを読み込みました");
-  }
+      function overlaps(a, b) {
+        return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+      }
 
-  function bindFrameEvents(node, frameId) {
-    if (state.mode !== "edit") return;
+      function collides(candidate, ignoreId = null) {
+        const rect = rectOf(candidate);
+        return state.frames.some((frame) => {
+          if (frame.id === candidate.id || frame.id === ignoreId) return false;
+          return overlaps(rect, rectOf(frame));
+        });
+      }
 
-    const frameNumber = node.querySelector(".frame-number");
-    const resizeHandle = node.querySelector(".resize-handle");
-    const photoViewport = node.querySelector(".photo-viewport");
+      function currentFrame() {
+        return state.frames.find((frame) => frame.id === state.selectedFrameId) || null;
+      }
 
-    node.addEventListener("click", (event) => {
-      if (event.target === frameNumber || event.target === resizeHandle) return;
-      state.selectedFrameId = frameId;
-      updateStatus();
-      renderWall();
-    });
+      function photoById(id) {
+        return state.photos.find((photo) => photo.id === id) || null;
+      }
 
-    frameNumber.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+      function clearFrameTimer(frame) {
+        if (frame.runtime?.timer) clearTimeout(frame.runtime.timer);
+        frame.runtime.timer = null;
+      }
 
-      const frame = state.frames.find(item => item.id === frameId);
-      if (!frame) return;
+      function clearAllTimers() {
+        state.frames.forEach(clearFrameTimer);
+      }
 
-      state.selectedFrameId = frameId;
-      renderAll();
-
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const before = { x: frame.x, y: frame.y };
-      frameNumber.setPointerCapture(event.pointerId);
-
-      const onMove = (moveEvent) => {
-        const dx = moveEvent.clientX - startX;
-        const dy = moveEvent.clientY - startY;
-        const next = { ...frame, x: before.x + dx, y: before.y + dy };
-        keepFrameInside(next);
-
-        if (!collides(next, frame.id)) {
-          frame.x = next.x;
-          frame.y = next.y;
-          renderFrame(frame.id);
+      function getPool(kind) {
+        const family = FRAME_SPECS[kind].family;
+        if (family === "vertical" || family === "oval") {
+          const verticals = state.photos.filter((p) => p.bucket === "vertical");
+          return verticals.length ? verticals : state.photos.slice();
         }
-      };
-
-      const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        saveState();
-      };
-
-      window.addEventListener("pointermove", onMove, { passive: true });
-      window.addEventListener("pointerup", onUp, { passive: true });
-    });
-
-    resizeHandle.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const frame = state.frames.find(item => item.id === frameId);
-      if (!frame) return;
-
-      state.selectedFrameId = frameId;
-      renderAll();
-
-      const startX = event.clientX;
-      const before = { width: frame.width };
-      resizeHandle.setPointerCapture(event.pointerId);
-
-      const onMove = (moveEvent) => {
-        const dx = moveEvent.clientX - startX;
-        const next = { ...frame, width: clamp(before.width + dx, MIN_FRAME_W, MAX_FRAME_W) };
-        keepFrameInside(next);
-
-        if (!collides(next, frame.id)) {
-          frame.width = next.width;
-          frame.x = next.x;
-          frame.y = next.y;
-          renderFrame(frame.id);
+        if (family === "horizontal") {
+          const horizontals = state.photos.filter((p) => p.bucket === "horizontal");
+          return horizontals.length ? horizontals : state.photos.slice();
         }
-      };
+        const squares = state.photos.filter((p) => p.bucket === "square");
+        return squares.length ? squares : state.photos.slice();
+      }
 
-      const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        saveState();
-      };
+      function visiblePhotoIdsExcluding(frameId) {
+        return new Set(
+          state.frames
+            .filter((frame) => frame.id !== frameId)
+            .map((frame) => frame.runtime.currentPhotoId)
+            .filter(Boolean)
+        );
+      }
 
-      window.addEventListener("pointermove", onMove, { passive: true });
-      window.addEventListener("pointerup", onUp, { passive: true });
-    });
+      function chooseNextPhoto(frame) {
+        if (frame.pinnedPhotoId) return photoById(frame.pinnedPhotoId) || null;
 
-    photoViewport.addEventListener("pointerdown", (event) => {
-      event.stopPropagation();
+        let pool = getPool(frame.kind);
+        if (!pool.length) pool = state.photos.slice();
+        if (!pool.length) return null;
+        if (pool.length === 1) return pool[0];
 
-      const frame = state.frames.find(item => item.id === frameId);
-      if (!frame) return;
+        const current = frame.runtime.currentPhotoId;
+        const previous = frame.runtime.previousPhotoId;
+        const visible = visiblePhotoIdsExcluding(frame.id);
 
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const beforeX = frame.focusX;
-      const beforeY = frame.focusY;
-      let adjusting = false;
+        let filtered = pool.filter((photo) => {
+          return photo.id !== current && photo.id !== previous && !visible.has(photo.id);
+        });
 
-      clearTimeout(state.holdTimer);
-      state.holdTimer = setTimeout(() => {
-        adjusting = true;
-        node.classList.add("adjusting");
-        photoViewport.setPointerCapture(event.pointerId);
-        showToast("写真位置を調整中");
-      }, HOLD_MS);
+        if (!filtered.length) {
+          filtered = pool.filter((photo) => photo.id !== current && !visible.has(photo.id));
+        }
+        if (!filtered.length) {
+          filtered = pool.filter((photo) => photo.id !== current);
+        }
+        if (!filtered.length) filtered = pool.slice();
 
-      const onMove = (moveEvent) => {
-        if (!adjusting) return;
-        const dx = moveEvent.clientX - startX;
-        const dy = moveEvent.clientY - startY;
-        frame.focusX = clamp(beforeX - dx * 0.12, 0, 100);
-        frame.focusY = clamp(beforeY - dy * 0.12, 0, 100);
+        return filtered[Math.floor(Math.random() * filtered.length)] || null;
+      }
+
+      function ensureRuntimePhotos() {
+        state.frames.forEach((frame) => {
+          if (frame.pinnedPhotoId && !photoById(frame.pinnedPhotoId)) frame.pinnedPhotoId = null;
+          if (frame.runtime.currentPhotoId && !photoById(frame.runtime.currentPhotoId)) frame.runtime.currentPhotoId = null;
+          if (frame.runtime.previousPhotoId && !photoById(frame.runtime.previousPhotoId)) frame.runtime.previousPhotoId = null;
+        });
+
+        state.frames
+          .slice()
+          .sort((a, b) => a.z - b.z)
+          .forEach((frame) => {
+            if (!frame.runtime.currentPhotoId) {
+              const next = chooseNextPhoto(frame);
+              frame.runtime.currentPhotoId = next ? next.id : null;
+            }
+          });
+      }
+
+      function scheduleFrame(frame) {
+        clearFrameTimer(frame);
+        if (state.mode !== "display") return;
+        if (frame.pinnedPhotoId) return;
+
+        const pool = getPool(frame.kind);
+        if (pool.length <= 1) return;
+
+        frame.runtime.timer = setTimeout(() => {
+          rotateFrame(frame.id);
+        }, randomMs(SWITCH_MIN_MS, SWITCH_MAX_MS));
+      }
+
+      function rotateFrame(frameId) {
+        const frame = state.frames.find((item) => item.id === frameId);
+        if (!frame) return;
+        const next = chooseNextPhoto(frame);
+        if (!next) {
+          scheduleFrame(frame);
+          return;
+        }
+        if (frame.runtime.currentPhotoId === next.id) {
+          scheduleFrame(frame);
+          return;
+        }
+
+        frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
+        frame.runtime.currentPhotoId = next.id;
+        frame.runtime.activeLayer = frame.runtime.activeLayer === 0 ? 1 : 0;
         renderFrame(frame.id);
-      };
-
-      const onUp = () => {
-        clearTimeout(state.holdTimer);
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        if (adjusting) {
-          node.classList.remove("adjusting");
+        setTimeout(() => {
+          frame.runtime.previousPhotoId = null;
+          renderFrame(frame.id);
           saveState();
-        }
-      };
+        }, FADE_MS + 120);
 
-      window.addEventListener("pointermove", onMove, { passive: true });
-      window.addEventListener("pointerup", onUp, { passive: true });
-    });
-  }
+        scheduleFrame(frame);
+      }
 
-  function bindUI() {
-    document.querySelectorAll(".frame-set-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        applyLayout(button.dataset.layout);
-      });
-    });
-
-    els.addPhotosBtn.addEventListener("click", () => {
-      if (state.isUploading) return;
-      els.photoInput.click();
-    });
-
-    els.photoInput.addEventListener("change", async (event) => {
-      await addPhotos(event.target.files);
-      event.target.value = "";
-    });
-
-    els.toggleDisplayBtn.addEventListener("click", toggleDisplayMode);
-    els.saveBtn.addEventListener("click", () => {
-      saveState();
-      showToast("配置を保存しました");
-    });
-    els.loadBtn.addEventListener("click", loadSavedState);
-    els.resetBtn.addEventListener("click", resetCurrentLayout);
-
-    els.shapeBtn.addEventListener("click", cycleShape);
-    els.lockBtn.addEventListener("click", lockSelectedPhoto);
-    els.unlockBtn.addEventListener("click", unlockSelectedPhoto);
-    els.frontBtn.addEventListener("click", bringSelectedToFront);
-    els.deleteFrameBtn.addEventListener("click", deleteSelectedFrame);
-    els.addFrameBtn.addEventListener("click", addFrame);
-
-    window.addEventListener("resize", () => {
-      updateDisplayScale();
-    });
-
-    els.wallStage.addEventListener("click", () => {
-      if (state.mode === "display") {
-        state.mode = "edit";
-        renderAll();
+      function startDisplayTimers() {
         clearAllTimers();
-        showToast("編集モードに戻りました");
+        if (state.mode !== "display") return;
+        ensureRuntimePhotos();
+        state.frames.forEach(scheduleFrame);
       }
-    });
 
-    document.addEventListener("keydown", (event) => {
-      if (state.mode !== "edit") return;
+      function saveState() {
+        const payload = {
+          mode: state.mode,
+          layout: state.layout,
+          editScale: state.editScale,
+          frames: state.frames.map((frame) => ({
+            id: frame.id,
+            kind: frame.kind,
+            baseKind: frame.baseKind,
+            x: frame.x,
+            y: frame.y,
+            w: frame.w,
+            z: frame.z,
+            focusX: frame.focusX,
+            focusY: frame.focusY,
+            pinnedPhotoId: frame.pinnedPhotoId || null
+          }))
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }
 
-      const frame = selectedFrame();
-      if (!frame) return;
+      function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        try {
+          const parsed = JSON.parse(raw);
+          state.mode = parsed.mode === "display" ? "display" : "edit";
+          state.layout = parsed.layout || "story";
+          state.frames = (parsed.frames || []).map(normalizeFrame);
+          state.editScale = Number(parsed.editScale || 1);
+          return !!state.frames.length;
+        } catch {
+          return false;
+        }
+      }
 
-      const step = event.shiftKey ? 12 : 4;
-      let changed = false;
-
-      if (event.key === "ArrowLeft") {
-        const next = { ...frame, x: frame.x - step };
-        keepFrameInside(next);
-        if (!collides(next, frame.id)) {
-          frame.x = next.x;
-          changed = true;
-        }
-      } else if (event.key === "ArrowRight") {
-        const next = { ...frame, x: frame.x + step };
-        keepFrameInside(next);
-        if (!collides(next, frame.id)) {
-          frame.x = next.x;
-          changed = true;
-        }
-      } else if (event.key === "ArrowUp") {
-        const next = { ...frame, y: frame.y - step };
-        keepFrameInside(next);
-        if (!collides(next, frame.id)) {
-          frame.y = next.y;
-          changed = true;
-        }
-      } else if (event.key === "ArrowDown") {
-        const next = { ...frame, y: frame.y + step };
-        keepFrameInside(next);
-        if (!collides(next, frame.id)) {
-          frame.y = next.y;
-          changed = true;
-        }
-      } else if (event.key === "Escape") {
+      function applyLayout(layoutKey) {
+        clearAllTimers();
+        state.layout = layoutKey;
+        state.frames = LAYOUTS[layoutKey].map((item) => normalizeFrame(item));
         state.selectedFrameId = null;
-        renderAll();
-      }
-
-      if (changed) {
+        state.selectedPhotoId = null;
+        ensureRuntimePhotos();
+        fitEditToScreen(true);
         saveState();
-        renderFrame(frame.id);
+        renderAll();
+        startDisplayTimers();
       }
-    });
-  }
 
-  async function init() {
-    state.db = await openDB();
-    state.photos = (await dbGetAll()).sort((a, b) => a.createdAt - b.createdAt);
+      function togglePhotoSheet(force) {
+        state.sheetOpen = typeof force === "boolean" ? force : !state.sheetOpen;
+        els.photoSheet.classList.toggle("open", state.sheetOpen && state.mode === "edit");
+      }
 
-    if (!loadState()) {
-      state.frames = (LAYOUTS.story || []).map((item, index) => normalizeFrame({
-        shape: item.shape,
-        x: item.x,
-        y: item.y,
-        width: item.w,
-        z: item.z ?? index + 1
-      }));
-      state.layout = "story";
-      state.mode = "edit";
-    }
+      function setMode(nextMode) {
+        state.mode = nextMode;
+        document.body.classList.toggle("display-mode", nextMode === "display");
+        if (nextMode === "display") {
+          togglePhotoSheet(false);
+          showDisplayHint();
+          fitDisplayToScreen();
+        } else {
+          fitEditToScreen(false);
+        }
+        renderAll();
+        startDisplayTimers();
+        saveState();
+      }
 
-    ensureRuntimePhotos();
-    bindUI();
-    renderAll();
-    startDisplayTimersIfNeeded();
+      function showDisplayHint() {
+        els.displayHint.classList.add("show");
+        setTimeout(() => {
+          els.displayHint.classList.remove("show");
+        }, 1800);
+      }
 
-    els.wallScroll.scrollLeft = EDIT_SCROLL_LEFT;
-    els.wallScroll.scrollTop = EDIT_SCROLL_TOP;
-  }
+      function getViewportSize() {
+        const rect = els.viewport.getBoundingClientRect();
+        return { w: rect.width, h: rect.height };
+      }
 
-  init().catch((error) => {
-    console.error(error);
-    showToast("初期化に失敗しました");
-  });
-})();
-</script>
+      function fitEditToScreen(resetZoom = false) {
+        const vp = getViewportSize();
+        const pad = 28;
+        const scale = Math.min(
+          (vp.w - pad) / WORLD_W,
+          (vp.h - pad) / WORLD_H
+        );
+        state.fitScale = clamp(scale, 0.18, 1);
+        if (resetZoom) {
+          state.editScale = state.fitScale;
+        } else {
+          state.editScale = clamp(state.editScale, state.fitScale, EDIT_MAX_ZOOM);
+        }
+        updateStageTransform();
+        centerIfWholeFits();
+      }
+
+      function fitDisplayToScreen() {
+        updateStageTransform();
+      }
+
+      function updateStageTransform() {
+        if (state.mode === "display") {
+          const vp = getViewportSize();
+          const scale = Math.min(vp.w / WORLD_W, vp.h / WORLD_H);
+          const left = (vp.w - WORLD_W * scale) / 2;
+          const top = (vp.h - WORLD_H * scale) / 2;
+          els.stageWrap.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
+          els.stageWrap.style.width = `${WORLD_W}px`;
+          els.stageWrap.style.height = `${WORLD_H}px`;
+        } else {
+          const scale = state.editScale;
+          els.stageWrap.style.transform = `scale(${scale})`;
+          els.stageWrap.style.width = `${WORLD_W}px`;
+          els.stageWrap.style.height = `${WORLD_H}px`;
+        }
+      }
+
+      function centerIfWholeFits() {
+        if (state.mode !== "edit") return;
+        const vp = getViewportSize();
+        const scaledW = WORLD_W * state.editScale;
+        const scaledH = WORLD_H * state.editScale;
+        els.viewport.scrollLeft = Math.max(0, (scaledW - vp.w) / 2);
+        els.viewport.scrollTop = Math.max(0, (scaledH - vp.h) / 2);
+      }
+
+      function renderMenus() {
+        els.framesMenu.innerHTML = "";
+        Object.entries(FRAME_SET_LABELS).forEach(([key, label]) => {
+          const btn = document.createElement("button");
+          btn.className = `menu-item${state.layout === key ? " active" : ""}`;
+          btn.textContent = label;
+          btn.addEventListener("click", () => {
+            els.framesMenu.classList.remove("open");
+            applyLayout(key);
+          });
+          els.framesMenu.appendChild(btn);
+        });
+      }
+
+      function renderToolbarStatus() {
+        if (!state.isUploading) {
+          els.statusMini.textContent = `写真 ${state.photos.length}枚`;
+        }
+        els.displayBtn.textContent = state.mode === "edit" ? "▶ 表示" : "編集";
+      }
+
+      function renderSelectionBar() {
+        const frame = currentFrame();
+        if (state.mode !== "edit" || !frame) {
+          els.selectionBar.classList.add("hidden");
+          return;
+        }
+        els.selectionBar.classList.remove("hidden");
+        const label = frame.kind.includes("simple") ? "シンプル" : "装飾";
+        const ovalText = frame.kind === "oval" ? "四角に戻す" : "楕円";
+        els.toggleStyleBtn.textContent = `${label}切替`;
+        els.toggleOvalBtn.textContent = ovalText;
+        els.selectionMeta.textContent =
+          `${FRAME_SET_LABELS[state.layout]} / ${frame.kind} / ${Math.round(frame.w)}px` +
+          (frame.pinnedPhotoId ? " / 固定中" : "");
+      }
+
+      function renderPhotoSheet() {
+        els.sheetMeta.textContent = `${state.photos.length}枚`;
+        els.thumbGrid.innerHTML = "";
+
+        state.photos.forEach((photo) => {
+          const card = document.createElement("div");
+          card.className = `thumb${state.selectedPhotoId === photo.id ? " selected" : ""}`;
+          const thumbBtn = document.createElement("button");
+          thumbBtn.type = "button";
+          thumbBtn.innerHTML = `<img src="${photo.dataUrl}" alt="" />`;
+
+          thumbBtn.addEventListener("click", () => {
+            state.selectedPhotoId = photo.id;
+            const frame = currentFrame();
+            if (frame) {
+              frame.pinnedPhotoId = photo.id;
+              frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
+              frame.runtime.currentPhotoId = photo.id;
+              renderAll();
+              startDisplayTimers();
+              saveState();
+              showToast("写真を固定しました");
+            } else {
+              renderPhotoSheet();
+            }
+          });
+
+          const badge = document.createElement("div");
+          badge.className = "thumb-badge";
+          badge.textContent = photo.bucket === "horizontal" ? "横" : photo.bucket === "vertical" ? "縦" : "正";
+
+          const del = document.createElement("button");
+          del.className = "thumb-delete";
+          del.type = "button";
+          del.textContent = "×";
+          del.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            await removePhoto(photo.id);
+          });
+
+          card.appendChild(thumbBtn);
+          card.appendChild(badge);
+          card.appendChild(del);
+          els.thumbGrid.appendChild(card);
+        });
+      }
+
+      function renderFrame(frameId) {
+        const frame = state.frames.find((item) => item.id === frameId);
+        const node = els.stage.querySelector(`.frame[data-id="${frameId}"]`);
+        if (!frame || !node) return;
+
+        const spec = FRAME_SPECS[frame.kind];
+        const h = frameHeight(frame);
+        node.style.left = `${frame.x}px`;
+        node.style.top = `${frame.y}px`;
+        node.style.width = `${frame.w}px`;
+        node.style.height = `${h}px`;
+        node.style.zIndex = String(frame.z);
+        node.classList.toggle("selected", state.selectedFrameId === frame.id && state.mode === "edit");
+        node.classList.toggle("locked", !!frame.pinnedPhotoId);
+
+        const viewport = node.querySelector(".photo-viewport");
+        viewport.style.setProperty("--pv-top", `${spec.viewport.top}%`);
+        viewport.style.setProperty("--pv-right", `${spec.viewport.right}%`);
+        viewport.style.setProperty("--pv-bottom", `${spec.viewport.bottom}%`);
+        viewport.style.setProperty("--pv-left", `${spec.viewport.left}%`);
+        viewport.classList.toggle("oval", !!spec.mask);
+
+        const art = node.querySelector(".frame-art");
+        art.src = spec.art;
+        art.onerror = () => {
+          if (art.dataset.fallbackTried === "1") return;
+          art.dataset.fallbackTried = "1";
+          art.src = spec.fallback;
+        };
+        art.style.width = `${spec.artWidthPct}%`;
+        art.style.height = `${spec.artHeightPct}%`;
+        art.style.left = `${spec.artLeftPct}%`;
+        art.style.top = `${spec.artTopPct}%`;
+
+        const currentPhoto = photoById(frame.runtime.currentPhotoId);
+        const previousPhoto = photoById(frame.runtime.previousPhotoId);
+
+        const layer0 = node.querySelector(".layer-0");
+        const layer1 = node.querySelector(".layer-1");
+        const box0 = node.querySelector(".layer-0 .photo-box");
+        const box1 = node.querySelector(".layer-1 .photo-box");
+
+        box0.style.setProperty("--photo-x", `${frame.focusX}%`);
+        box0.style.setProperty("--photo-y", `${frame.focusY}%`);
+        box1.style.setProperty("--photo-x", `${frame.focusX}%`);
+        box1.style.setProperty("--photo-y", `${frame.focusY}%`);
+
+        if (frame.runtime.activeLayer === 0) {
+          box0.style.backgroundImage = currentPhoto ? `url("${currentPhoto.dataUrl}")` : "none";
+          box1.style.backgroundImage = previousPhoto ? `url("${previousPhoto.dataUrl}")` : "none";
+          layer0.classList.add("active");
+          layer1.classList.remove("active");
+        } else {
+          box1.style.backgroundImage = currentPhoto ? `url("${currentPhoto.dataUrl}")` : "none";
+          box0.style.backgroundImage = previousPhoto ? `url("${previousPhoto.dataUrl}")` : "none";
+          layer1.classList.add("active");
+          layer0.classList.remove("active");
+        }
+
+        node.querySelector(".empty-state").classList.toggle("hidden", !!currentPhoto);
+      }
+
+      function createFrameNode(frame, index) {
+        const node = document.createElement("div");
+        node.className = "frame";
+        node.dataset.id = frame.id;
+        node.innerHTML = `
+          <div class="selection-outline"></div>
+          <div class="photo-viewport">
+            <div class="photo-layer layer-0"><div class="photo-box"></div></div>
+            <div class="photo-layer layer-1"><div class="photo-box"></div></div>
+            <div class="empty-state"><span>＋ 写真追加</span></div>
+          </div>
+          <div class="frame-art-wrap">
+            <img class="frame-art" alt="">
+          </div>
+          <button class="frame-badge" type="button">${index + 1}</button>
+          <div class="frame-pin">固定</div>
+          <div class="resize-handle"></div>
+        `;
+        bindFrameEvents(node, frame.id);
+        return node;
+      }
+
+      function renderStage() {
+        els.stage.innerHTML = "";
+        state.frames
+          .slice()
+          .sort((a, b) => a.z - b.z)
+          .forEach((frame, index) => {
+            const node = createFrameNode(frame, index);
+            els.stage.appendChild(node);
+            renderFrame(frame.id);
+          });
+      }
+
+      function renderAll() {
+        renderMenus();
+        renderToolbarStatus();
+        renderStage();
+        renderPhotoSheet();
+        renderSelectionBar();
+        togglePhotoSheet(state.sheetOpen);
+        updateStageTransform();
+      }
+
+      function pickDefaultBaseKindForOval(frame) {
+        return frame.baseKind && frame.baseKind !== "oval" ? frame.baseKind : "vertical";
+      }
+
+      function toggleOval() {
+        const frame = currentFrame();
+        if (!frame) return;
+
+        if (frame.kind === "oval") {
+          frame.kind = pickDefaultBaseKindForOval(frame);
+        } else {
+          frame.baseKind = frame.kind;
+          frame.kind = "oval";
+        }
+        fitFrameInside(frame);
+        if (collides(frame, frame.id)) {
+          if (frame.kind === "oval") {
+            frame.kind = pickDefaultBaseKindForOval(frame);
+          } else {
+            frame.kind = frame.baseKind || frame.kind;
+          }
+          showToast("その形だと重なります");
+          return;
+        }
+        saveState();
+        renderAll();
+        startDisplayTimers();
+      }
+
+      function toggleStyle() {
+        const frame = currentFrame();
+        if (!frame) return;
+        if (frame.kind === "oval") {
+          showToast("楕円中は装飾切替できません");
+          return;
+        }
+
+        const map = {
+          vertical: "vertical_simple",
+          vertical_simple: "vertical",
+          horizontal: "horizontal_simple",
+          horizontal_simple: "horizontal",
+          square: "square_simple",
+          square_simple: "square"
+        };
+
+        const next = map[frame.kind];
+        if (!next) return;
+
+        const prev = frame.kind;
+        frame.kind = next;
+        frame.baseKind = next;
+        fitFrameInside(frame);
+
+        if (collides(frame, frame.id)) {
+          frame.kind = prev;
+          frame.baseKind = prev;
+          showToast("その切替だと重なります");
+          return;
+        }
+
+        saveState();
+        renderAll();
+        startDisplayTimers();
+      }
+
+      function pinCurrentPhoto() {
+        const frame = currentFrame();
+        if (!frame) return;
+        if (state.selectedPhotoId) {
+          frame.pinnedPhotoId = state.selectedPhotoId;
+          frame.runtime.previousPhotoId = frame.runtime.currentPhotoId;
+          frame.runtime.currentPhotoId = state.selectedPhotoId;
+        } else if (frame.runtime.currentPhotoId) {
+          frame.pinnedPhotoId = frame.runtime.currentPhotoId;
+        } else {
+          showToast("固定する写真がありません");
+          return;
+        }
+        saveState();
+        renderAll();
+        startDisplayTimers();
+        showToast("写真を固定しました");
+      }
+
+      function unpinCurrentPhoto() {
+        const frame = currentFrame();
+        if (!frame) return;
+        frame.pinnedPhotoId = null;
+        saveState();
+        renderAll();
+        startDisplayTimers();
+        showToast("固定を解除しました");
+      }
+
+      async function addPhotos(files) {
+        const list = Array.from(files || []);
+        if (!list.length || state.isUploading) return;
+
+        setUploading(true, 0, list.length);
+        try {
+          for (let i = 0; i < list.length; i += 1) {
+            setUploading(true, i + 1, list.length);
+            const photo = await compressImage(list[i]);
+            state.photos.push(photo);
+            await dbPut(photo);
+          }
+
+          state.photos.sort((a, b) => a.createdAt - b.createdAt);
+          ensureRuntimePhotos();
+          saveState();
+          renderAll();
+          startDisplayTimers();
+          showToast(`${list.length}枚追加しました`);
+        } finally {
+          setUploading(false);
+        }
+      }
+
+      async function removePhoto(photoId) {
+        await dbDelete(photoId);
+        state.photos = state.photos.filter((photo) => photo.id !== photoId);
+        if (state.selectedPhotoId === photoId) state.selectedPhotoId = null;
+
+        state.frames.forEach((frame) => {
+          if (frame.pinnedPhotoId === photoId) frame.pinnedPhotoId = null;
+          if (frame.runtime.currentPhotoId === photoId) frame.runtime.currentPhotoId = null;
+          if (frame.runtime.previousPhotoId === photoId) frame.runtime.previousPhotoId = null;
+        });
+
+        ensureRuntimePhotos();
+        saveState();
+        renderAll();
+        startDisplayTimers();
+        showToast("写真を削除しました");
+      }
+
+      function bindFrameEvents(node, frameId) {
+        if (state.mode !== "edit") return;
+
+        const badge = node.querySelector(".frame-badge");
+        const handle = node.querySelector(".resize-handle");
+        const viewport = node.querySelector(".photo-viewport");
+
+        node.addEventListener("click", (event) => {
+          if (event.target === badge || event.target === handle) return;
+          state.selectedFrameId = frameId;
+          renderAll();
+        });
+
+        viewport.addEventListener("dblclick", () => {
+          state.selectedFrameId = frameId;
+          togglePhotoSheet(true);
+        });
+
+        badge.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const frame = state.frames.find((item) => item.id === frameId);
+          if (!frame) return;
+
+          state.selectedFrameId = frameId;
+          renderAll();
+
+          const startX = event.clientX;
+          const startY = event.clientY;
+          const before = { x: frame.x, y: frame.y };
+          badge.setPointerCapture(event.pointerId);
+
+          const onMove = (moveEvent) => {
+            const dx = (moveEvent.clientX - startX) / state.editScale;
+            const dy = (moveEvent.clientY - startY) / state.editScale;
+            const next = { ...frame, x: before.x + dx, y: before.y + dy };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.x = next.x;
+              frame.y = next.y;
+              renderFrame(frame.id);
+            }
+          };
+
+          const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            saveState();
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+
+        handle.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const frame = state.frames.find((item) => item.id === frameId);
+          if (!frame) return;
+
+          state.selectedFrameId = frameId;
+          renderAll();
+
+          const startX = event.clientX;
+          const before = { w: frame.w };
+          handle.setPointerCapture(event.pointerId);
+
+          const onMove = (moveEvent) => {
+            const dx = (moveEvent.clientX - startX) / state.editScale;
+            const next = { ...frame, w: clamp(before.w + dx, MIN_SIZE, MAX_SIZE) };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.w = next.w;
+              frame.x = next.x;
+              frame.y = next.y;
+              renderFrame(frame.id);
+            }
+          };
+
+          const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            saveState();
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+
+        viewport.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+          const frame = state.frames.find((item) => item.id === frameId);
+          if (!frame) return;
+
+          const startX = event.clientX;
+          const startY = event.clientY;
+          const beforeX = frame.focusX;
+          const beforeY = frame.focusY;
+          let adjusting = false;
+
+          clearTimeout(state.holdTimer);
+          state.holdTimer = setTimeout(() => {
+            adjusting = true;
+            viewport.setPointerCapture(event.pointerId);
+            state.selectedFrameId = frameId;
+            renderAll();
+            showToast("写真位置を調整中");
+          }, HOLD_MS);
+
+          const onMove = (moveEvent) => {
+            if (!adjusting) return;
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+            frame.focusX = clamp(beforeX - dx * 0.12, 0, 100);
+            frame.focusY = clamp(beforeY - dy * 0.12, 0, 100);
+            renderFrame(frame.id);
+          };
+
+          const onUp = () => {
+            clearTimeout(state.holdTimer);
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            if (adjusting) saveState();
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+      }
+
+      function resetCurrentLayout() {
+        applyLayout(state.layout);
+        showToast("現在のセットを初期配置に戻しました");
+      }
+
+      function closeMenus() {
+        els.moreMenu.classList.remove("open");
+        els.framesMenu.classList.remove("open");
+      }
+
+      function bindUI() {
+        els.addPhotosBtn.addEventListener("click", () => {
+          els.photoInput.click();
+        });
+
+        els.photoInput.addEventListener("change", async (event) => {
+          await addPhotos(event.target.files);
+          event.target.value = "";
+        });
+
+        els.framesBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          els.moreMenu.classList.remove("open");
+          els.framesMenu.classList.toggle("open");
+        });
+
+        els.photosBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          togglePhotoSheet();
+        });
+
+        els.openPhotosBtn.addEventListener("click", () => {
+          togglePhotoSheet(true);
+        });
+
+        els.closeSheetBtn.addEventListener("click", () => {
+          togglePhotoSheet(false);
+        });
+
+        els.moreBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          els.framesMenu.classList.remove("open");
+          els.moreMenu.classList.toggle("open");
+        });
+
+        els.displayBtn.addEventListener("click", () => {
+          setMode(state.mode === "edit" ? "display" : "edit");
+        });
+
+        els.zoomOutBtn.addEventListener("click", () => {
+          if (state.mode !== "edit") return;
+          state.editScale = clamp(state.editScale - EDIT_STEP, state.fitScale, EDIT_MAX_ZOOM);
+          updateStageTransform();
+        });
+
+        els.zoomInBtn.addEventListener("click", () => {
+          if (state.mode !== "edit") return;
+          state.editScale = clamp(state.editScale + EDIT_STEP, state.fitScale, EDIT_MAX_ZOOM);
+          updateStageTransform();
+        });
+
+        els.fitBtn.addEventListener("click", () => {
+          if (state.mode !== "edit") return;
+          fitEditToScreen(true);
+          saveState();
+        });
+
+        els.saveBtn.addEventListener("click", () => {
+          closeMenus();
+          saveState();
+          showToast("保存しました");
+        });
+
+        els.loadBtn.addEventListener("click", () => {
+          closeMenus();
+          if (!loadState()) {
+            showToast("保存データがありません");
+            return;
+          }
+          ensureRuntimePhotos();
+          if (state.mode === "edit") fitEditToScreen(false);
+          renderAll();
+          startDisplayTimers();
+          showToast("読み込みました");
+        });
+
+        els.resetBtn.addEventListener("click", () => {
+          closeMenus();
+          resetCurrentLayout();
+        });
+
+        els.toggleStyleBtn.addEventListener("click", toggleStyle);
+        els.toggleOvalBtn.addEventListener("click", toggleOval);
+        els.pinPhotoBtn.addEventListener("click", pinCurrentPhoto);
+        els.unpinPhotoBtn.addEventListener("click", unpinCurrentPhoto);
+
+        window.addEventListener("resize", () => {
+          if (state.mode === "display") {
+            fitDisplayToScreen();
+          } else {
+            fitEditToScreen(false);
+          }
+        });
+
+        document.addEventListener("click", (event) => {
+          const insideMenu = event.target.closest(".more-menu") || event.target.closest(".frames-menu") || event.target.closest(".toolbar");
+          if (!insideMenu) closeMenus();
+        });
+
+        els.stage.addEventListener("click", (event) => {
+          if (state.mode === "display") {
+            setMode("edit");
+            showToast("編集モードに戻りました");
+            return;
+          }
+          if (!event.target.closest(".frame")) {
+            state.selectedFrameId = null;
+            renderAll();
+          }
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (state.mode !== "edit") return;
+          const frame = currentFrame();
+          if (!frame) return;
+
+          const step = event.shiftKey ? 12 : 4;
+          let changed = false;
+
+          if (event.key === "ArrowLeft") {
+            const next = { ...frame, x: frame.x - step };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.x = next.x;
+              changed = true;
+            }
+          } else if (event.key === "ArrowRight") {
+            const next = { ...frame, x: frame.x + step };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.x = next.x;
+              changed = true;
+            }
+          } else if (event.key === "ArrowUp") {
+            const next = { ...frame, y: frame.y - step };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.y = next.y;
+              changed = true;
+            }
+          } else if (event.key === "ArrowDown") {
+            const next = { ...frame, y: frame.y + step };
+            fitFrameInside(next);
+            if (!collides(next, frame.id)) {
+              frame.y = next.y;
+              changed = true;
+            }
+          } else if (event.key === "Escape") {
+            state.selectedFrameId = null;
+            renderAll();
+          }
+
+          if (changed) {
+            renderFrame(frame.id);
+            saveState();
+          }
+        });
+      }
+
+      async function init() {
+        state.db = await openDB();
+        state.photos = (await dbGetAll()).sort((a, b) => a.createdAt - b.createdAt);
+
+        if (!loadState()) {
+          state.layout = "story";
+          state.frames = LAYOUTS.story.map(normalizeFrame);
+          state.mode = "edit";
+        }
+
+        ensureRuntimePhotos();
+        bindUI();
+        fitEditToScreen(true);
+        renderAll();
+        startDisplayTimers();
+      }
+
+      init().catch((error) => {
+        console.error(error);
+        showToast("初期化に失敗しました");
+      });
+    })();
+  </script>
 </body>
 </html>
