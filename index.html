@@ -1,63 +1,115 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>KABEPIC</title>
 
 <style>
 
-html,body{
+body{
 margin:0;
-padding:0;
-background:#f4efe6;
+background:#111;
+color:white;
+font-family:sans-serif;
 overflow:hidden;
-font-family:-apple-system,BlinkMacSystemFont;
 }
 
-#stage{
+#topbar{
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:60px;
+background:#000;
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+z-index:1000;
+}
+
+button{
+padding:8px 12px;
+font-size:14px;
+}
+
+#canvasWrap{
+position:absolute;
+top:60px;
+bottom:120px;
+left:0;
+right:0;
+overflow:auto;
+touch-action:none;
+}
+
+#canvas{
 position:relative;
-width:1600px;
-height:900px;
+width:2000px;
+height:2000px;
 margin:auto;
-background:#f4efe6;
-overflow:hidden;
 }
 
 .frame{
 position:absolute;
 touch-action:none;
-cursor:grab;
 }
 
-.frame.dragging{
-cursor:grabbing;
-}
-
-.frame img{
+.frame img.frameArt{
+position:absolute;
 width:100%;
 height:100%;
-object-fit:fill;
 pointer-events:none;
 }
 
-.photo{
+.photoLayer{
 position:absolute;
-top:0;
-left:0;
+overflow:hidden;
+}
+
+.photoLayer img{
 width:100%;
 height:100%;
 object-fit:cover;
 pointer-events:none;
 }
 
-/* Safari長押し対策 */
+#photoPanel{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:120px;
+background:#000;
+overflow-x:auto;
+display:flex;
+gap:8px;
+padding:8px;
+}
 
-.frame,
-.frame *{
--webkit-touch-callout:none;
--webkit-user-select:none;
-user-select:none;
+.thumb{
+height:100px;
+}
+
+.thumb img{
+height:100%;
+}
+
+.progress{
+position:fixed;
+top:60px;
+left:0;
+right:0;
+height:4px;
+background:#333;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#0f0;
 }
 
 </style>
@@ -65,92 +117,203 @@ user-select:none;
 
 <body>
 
-<div id="stage"></div>
+<div id="topbar">
+
+<button id="editModeBtn">配置編集 OFF</button>
+
+<button id="addPhotosBtn">
+写真追加
+</button>
+
+<button id="viewBtn">
+表示モード
+</button>
+
+<input type="file"
+id="fileInput"
+multiple
+accept="image/*"
+style="display:none">
+
+</div>
+
+<div class="progress">
+<div class="bar" id="progressBar"></div>
+</div>
+
+<div id="canvasWrap">
+<div id="canvas"></div>
+</div>
+
+<div id="photoPanel"></div>
 
 <script>
 
-const stage=document.getElementById("stage")
+let editMode=false
+let frames=[]
+let photos=[]
+let currentPhotoIndex=0
+let canvas=document.getElementById("canvas")
+let progressBar=document.getElementById("progressBar")
 
-const frames=[
-{x:200,y:100,w:260,h:360,frame:"frame_vertical.png"},
-{x:600,y:140,w:240,h:240,frame:"frame_square.png"},
-{x:900,y:400,w:360,h:240,frame:"frame_horizontal.png"}
-]
+document.getElementById("editModeBtn").onclick=()=>{
+editMode=!editMode
+document.getElementById("editModeBtn").innerText=
+editMode?"配置編集 ON":"配置編集 OFF"
+}
+
+document.getElementById("addPhotosBtn").onclick=()=>{
+document.getElementById("fileInput").click()
+}
+
+document.getElementById("fileInput").onchange=(e)=>{
+
+let files=[...e.target.files]
+
+files.forEach((file,i)=>{
+
+let reader=new FileReader()
+
+reader.onload=()=>{
+
+if(!photos.includes(reader.result)){
+
+photos.push(reader.result)
+
+addThumb(reader.result)
+
+}
+
+progressBar.style.width=
+((i+1)/files.length*100)+"%"
+
+}
+
+reader.readAsDataURL(file)
+
+})
+
+setTimeout(()=>{
+progressBar.style.width="0%"
+},800)
+
+}
+
+function addThumb(src){
+
+let div=document.createElement("div")
+div.className="thumb"
+
+let img=document.createElement("img")
+img.src=src
+
+div.appendChild(img)
+
+document.getElementById("photoPanel")
+.appendChild(div)
+
+}
+
+function createFrame(x,y,w,h,mask){
+
+let frame=document.createElement("div")
+frame.className="frame"
+frame.style.left=x+"px"
+frame.style.top=y+"px"
+frame.style.width=w+"px"
+frame.style.height=h+"px"
+
+let photo=document.createElement("div")
+photo.className="photoLayer"
+
+photo.style.left="10%"
+photo.style.top="10%"
+photo.style.width="80%"
+photo.style.height="80%"
+
+if(mask=="oval"){
+
+photo.style.borderRadius="50%"
+
+}
+
+let img=document.createElement("img")
+photo.appendChild(img)
+
+let art=document.createElement("img")
+art.className="frameArt"
+
+frame.appendChild(photo)
+frame.appendChild(art)
+
+canvas.appendChild(frame)
+
+let dragging=false
+let startX,startY
+
+frame.addEventListener("pointerdown",(e)=>{
+
+if(!editMode)return
+
+dragging=true
+startX=e.clientX
+startY=e.clientY
+
+})
+
+window.addEventListener("pointermove",(e)=>{
+
+if(!dragging)return
+
+let dx=e.clientX-startX
+let dy=e.clientY-startY
+
+frame.style.left=
+(frame.offsetLeft+dx)+"px"
+
+frame.style.top=
+(frame.offsetTop+dy)+"px"
+
+startX=e.clientX
+startY=e.clientY
+
+})
+
+window.addEventListener("pointerup",()=>{
+
+dragging=false
+
+})
+
+frames.push({
+frame,
+photo,
+img
+})
+
+}
+
+function nextPhoto(){
+
+if(photos.length==0)return
 
 frames.forEach((f,i)=>{
 
-const el=document.createElement("div")
-el.className="frame"
-el.style.left=f.x+"px"
-el.style.top=f.y+"px"
-el.style.width=f.w+"px"
-el.style.height=f.h+"px"
+let index=(currentPhotoIndex+i)%photos.length
 
-const photo=document.createElement("img")
-photo.className="photo"
-photo.src="photo1.jpg"
-
-const frame=document.createElement("img")
-frame.src=f.frame
-
-el.appendChild(photo)
-el.appendChild(frame)
-
-stage.appendChild(el)
+f.img.src=photos[index]
 
 })
 
-let dragging=null
-let offsetX=0
-let offsetY=0
+currentPhotoIndex++
 
-document.querySelectorAll(".frame").forEach(frame=>{
+}
 
-frame.addEventListener("pointerdown",e=>{
+setInterval(nextPhoto,4000)
 
-e.preventDefault()
-
-dragging=frame
-
-const rect=frame.getBoundingClientRect()
-
-offsetX=e.clientX-rect.left
-offsetY=e.clientY-rect.top
-
-frame.classList.add("dragging")
-
-})
-
-})
-
-document.addEventListener("pointermove",e=>{
-
-if(!dragging)return
-
-dragging.style.left=(e.clientX-offsetX)+"px"
-dragging.style.top=(e.clientY-offsetY)+"px"
-
-})
-
-document.addEventListener("pointerup",()=>{
-
-if(!dragging)return
-
-dragging.classList.remove("dragging")
-
-dragging=null
-
-})
-
-/* Safari長押し完全無効 */
-
-document.addEventListener("contextmenu",e=>{
-e.preventDefault()
-})
-
-document.addEventListener("selectstart",e=>{
-e.preventDefault()
-})
+createFrame(100,100,400,600)
+createFrame(600,100,400,400)
+createFrame(1100,100,600,400)
 
 </script>
 
