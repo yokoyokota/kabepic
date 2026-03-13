@@ -67,6 +67,11 @@
       cursor: pointer;
     }
 
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -205,7 +210,7 @@
     .menu.frames {
       right: auto;
       left: 120px;
-      min-width: 200px;
+      min-width: 220px;
     }
 
     .menu-item {
@@ -640,6 +645,60 @@
       font-weight: 900;
     }
 
+    .progress-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 4500;
+      background: rgba(255,255,255,0.62);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .progress-overlay.show {
+      display: flex;
+    }
+
+    .progress-card {
+      width: min(90vw, 360px);
+      background: rgba(255,255,255,0.98);
+      border: 1px solid var(--panel-line);
+      box-shadow: var(--shadow-lg);
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      text-align: center;
+    }
+
+    .progress-title {
+      font-size: 1rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #ece6db;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
     #displayHint {
       position: fixed;
       top: calc(var(--safe-top) + 14px);
@@ -764,6 +823,16 @@
       <img id="viewerImage" alt="" />
     </div>
 
+    <div id="progressOverlay" class="progress-overlay">
+      <div class="progress-card">
+        <div class="progress-title">写真を追加中…</div>
+        <div id="progressText" class="progress-text">0 / 0</div>
+        <div class="progress-bar">
+          <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="displayHint">タップで編集に戻る</div>
     <div id="toast"></div>
   </div>
@@ -772,8 +841,8 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "kabepic_static_mvp_v7_full";
-      const DB_NAME = "kabepic_static_photos_v7_full";
+      const STORAGE_KEY = "kabepic_static_mvp_v8_full";
+      const DB_NAME = "kabepic_static_photos_v8_full";
       const STORE_NAME = "photos";
 
       const WORLD_W = 2400;
@@ -821,6 +890,9 @@
         viewer: $("viewer"),
         viewerImage: $("viewerImage"),
         viewerClose: $("viewerClose"),
+        progressOverlay: $("progressOverlay"),
+        progressText: $("progressText"),
+        progressBarFill: $("progressBarFill"),
         displayHint: $("displayHint"),
         toast: $("toast")
       };
@@ -933,11 +1005,15 @@
         selectedPhotoId: null,
         fitScale: 1,
         editScale: 1,
+        panX: 0,
+        panY: 0,
         sheetOpen: false,
         viewerOpen: false,
         isUploading: false,
         toastTimer: null,
-        holdTimer: null
+        holdTimer: null,
+        pinchStartDistance: 0,
+        pinchStartScale: 1
       };
 
       function uid(prefix = "id") {
@@ -965,9 +1041,14 @@
         state.isUploading = flag;
         els.addPhotosBtn.disabled = flag;
         els.photoInput.disabled = flag;
+        els.progressOverlay.classList.toggle("show", flag);
         if (flag) {
+          els.progressText.textContent = `${current} / ${total}`;
+          const percent = total ? Math.round((current / total) * 100) : 0;
+          els.progressBarFill.style.width = `${percent}%`;
           els.statusMini.textContent = `${current} / ${total}`;
         } else {
+          els.progressBarFill.style.width = "0%";
           els.statusMini.textContent = `写真 ${state.photos.length}枚`;
         }
       }
@@ -1018,6 +1099,8 @@
           mode: state.mode,
           layout: state.layout,
           editScale: state.editScale,
+          panX: state.panX,
+          panY: state.panY,
           frames: state.frames.map((frame) => ({
             id: frame.id,
             kind: frame.kind,
@@ -1045,6 +1128,8 @@
           state.mode = parsed.mode === "display" ? "display" : "edit";
           state.layout = parsed.layout || "story";
           state.editScale = Number(parsed.editScale || 1);
+          state.panX = Number(parsed.panX || 0);
+          state.panY = Number(parsed.panY || 0);
           state.frames = (parsed.frames || []).map(normalizeFrame);
           return state.frames.length > 0;
         } catch {
@@ -1360,11 +1445,12 @@
         state.fitScale = clamp(scale, 0.18, 1);
         if (resetScale) {
           state.editScale = state.fitScale;
+          state.panX = 0;
+          state.panY = 0;
         } else {
-          state.editScale = clamp(state.editScale, state.fitScale, 2.6);
+          state.editScale = clamp(state.editScale, state.fitScale, 3.2);
         }
         updateWorldTransform();
-        centerIfFits();
       }
 
       function updateWorldTransform() {
@@ -1375,17 +1461,8 @@
           const y = (vp.height - WORLD_H * scale) / 2;
           els.world.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
         } else {
-          els.world.style.transform = `scale(${state.editScale})`;
+          els.world.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.editScale})`;
         }
-      }
-
-      function centerIfFits() {
-        if (state.mode !== "edit") return;
-        const vp = els.viewport.getBoundingClientRect();
-        const scaledW = WORLD_W * state.editScale;
-        const scaledH = WORLD_H * state.editScale;
-        els.viewport.scrollLeft = Math.max(0, (scaledW - vp.width) / 2);
-        els.viewport.scrollTop = Math.max(0, (scaledH - vp.height) / 2);
       }
 
       function setMode(mode) {
@@ -1436,6 +1513,8 @@
         els.selectionBar.classList.remove("hidden");
         els.toggleStyleBtn.textContent = frame.kind.includes("simple") ? "装飾に戻す" : "シンプルにする";
         els.toggleOvalBtn.textContent = frame.kind === "oval" ? "四角に戻す" : "楕円にする";
+        els.pinPhotoBtn.textContent = frame.pinnedPhotoId ? "写真固定中" : "写真固定";
+        els.unpinPhotoBtn.textContent = frame.pinnedPhotoId ? "固定解除" : "固定なし";
         els.selectionMeta.textContent =
           `${FRAME_SET_LABELS[state.layout]} / ${frame.kind}` +
           (frame.pinnedPhotoId ? " / 固定中" : "");
@@ -1866,6 +1945,10 @@
       function unpinCurrentPhoto() {
         const frame = getCurrentFrame();
         if (!frame) return;
+        if (!frame.pinnedPhotoId) {
+          showToast("固定されていません");
+          return;
+        }
         frame.pinnedPhotoId = null;
         saveState();
         renderAll();
@@ -1923,6 +2006,80 @@
       function resetCurrentLayout() {
         applyLayout(state.layout);
         showToast("現在のセットを初期配置に戻しました");
+      }
+
+      function bindBackgroundPanAndZoom() {
+        let dragging = false;
+        let startX = 0;
+        let startY = 0;
+        let startPanX = 0;
+        let startPanY = 0;
+
+        els.viewport.addEventListener("pointerdown", (e) => {
+          if (state.mode !== "edit") return;
+          if (e.target.closest(".frame")) return;
+          dragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startPanX = state.panX;
+          startPanY = state.panY;
+        });
+
+        window.addEventListener("pointermove", (e) => {
+          if (!dragging || state.mode !== "edit") return;
+          state.panX = startPanX + (e.clientX - startX);
+          state.panY = startPanY + (e.clientY - startY);
+          updateWorldTransform();
+        });
+
+        window.addEventListener("pointerup", () => {
+          if (!dragging) return;
+          dragging = false;
+          saveState();
+        });
+
+        els.viewport.addEventListener("wheel", (e) => {
+          if (state.mode !== "edit") return;
+          e.preventDefault();
+          const delta = e.deltaY < 0 ? 0.1 : -0.1;
+          state.editScale = clamp(state.editScale + delta, state.fitScale, 3.2);
+          updateWorldTransform();
+          saveState();
+        }, { passive: false });
+
+        let touchCache = [];
+        els.viewport.addEventListener("touchstart", (e) => {
+          if (state.mode !== "edit") return;
+          touchCache = Array.from(e.touches);
+          if (touchCache.length === 2) {
+            const dx = touchCache[0].clientX - touchCache[1].clientX;
+            const dy = touchCache[0].clientY - touchCache[1].clientY;
+            state.pinchStartDistance = Math.hypot(dx, dy);
+            state.pinchStartScale = state.editScale;
+          }
+        }, { passive: true });
+
+        els.viewport.addEventListener("touchmove", (e) => {
+          if (state.mode !== "edit") return;
+          if (e.touches.length === 2) {
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            const dx = t1.clientX - t2.clientX;
+            const dy = t1.clientY - t2.clientY;
+            const dist = Math.hypot(dx, dy);
+            if (state.pinchStartDistance > 0) {
+              const next = state.pinchStartScale * (dist / state.pinchStartDistance);
+              state.editScale = clamp(next, state.fitScale, 3.2);
+              updateWorldTransform();
+            }
+          }
+        }, { passive: true });
+
+        els.viewport.addEventListener("touchend", () => {
+          state.pinchStartDistance = 0;
+          state.pinchStartScale = state.editScale;
+          saveState();
+        }, { passive: true });
       }
 
       function bindUI() {
@@ -2076,6 +2233,8 @@
             saveState();
           }
         });
+
+        bindBackgroundPanAndZoom();
       }
 
       async function init() {
