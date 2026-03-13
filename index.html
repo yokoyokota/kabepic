@@ -11,7 +11,7 @@
   <style>
     :root {
       --wall-bg: #f2ede3;
-      --panel-bg: rgba(255, 255, 255, 0.94);
+      --panel-bg: rgba(255, 255, 255, 0.95);
       --panel-line: rgba(0, 0, 0, 0.08);
       --text: #1d1d1d;
       --muted: #6f685f;
@@ -31,6 +31,7 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     html,
@@ -65,11 +66,6 @@
       background: none;
       color: inherit;
       cursor: pointer;
-    }
-
-    img {
-      display: block;
-      max-width: 100%;
     }
 
     .hidden {
@@ -192,7 +188,7 @@
       top: calc(var(--safe-top) + 78px);
       right: 12px;
       z-index: 2900;
-      min-width: 190px;
+      min-width: 210px;
       padding: 8px;
       border-radius: 18px;
       background: rgba(255,255,255,0.98);
@@ -236,21 +232,15 @@
     .viewport {
       position: absolute;
       inset: 0;
-      padding-top: calc(var(--safe-top) + 82px);
-      padding-bottom: calc(var(--safe-bottom) + 16px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y;
-    }
-
-    body.display-mode .viewport {
-      padding: 0;
       overflow: hidden;
       touch-action: none;
+      background: var(--wall-bg);
     }
 
     .world {
-      position: relative;
+      position: absolute;
+      left: 0;
+      top: 0;
       width: calc(var(--world-w) * 1px);
       height: calc(var(--world-h) * 1px);
       transform-origin: top left;
@@ -288,10 +278,10 @@
       z-index: 1;
       user-select: none;
       transition:
-        left 280ms ease,
-        top 280ms ease,
-        width 280ms ease,
-        height 280ms ease,
+        left 240ms ease,
+        top 240ms ease,
+        width 240ms ease,
+        height 240ms ease,
         filter 180ms ease;
     }
 
@@ -322,13 +312,13 @@
       left: var(--pv-left);
       z-index: 2;
       overflow: hidden;
-      touch-action: none;
       background: transparent;
+      touch-action: none;
     }
 
     .photo-viewport.oval {
+      border-radius: 9999px;
       clip-path: ellipse(50% 50% at 50% 50%);
-      border-radius: 999px;
     }
 
     .photo-layer {
@@ -345,10 +335,27 @@
     .photo-box {
       position: absolute;
       inset: 0;
-      background-repeat: no-repeat;
-      background-image: none;
-      background-position: var(--focus-x, 50%) var(--focus-y, 50%);
-      background-size: cover;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .photo-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: top left;
+      will-change: transform, width, height;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .photo-inner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
     }
 
     .frame-art-wrap {
@@ -371,8 +378,8 @@
       position: absolute;
       top: -16px;
       left: -16px;
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 999px;
       display: flex;
       align-items: center;
@@ -380,16 +387,12 @@
       background: rgba(16, 24, 44, 0.96);
       color: #fff;
       border: 2px solid rgba(255,255,255,0.16);
-      font-size: 0.96rem;
+      font-size: 0.94rem;
       font-weight: 900;
       box-shadow: 0 10px 18px rgba(0,0,0,0.20);
       z-index: 7;
       cursor: grab;
       touch-action: none;
-    }
-
-    .frame-badge:active {
-      cursor: grabbing;
     }
 
     .resize-handle {
@@ -457,6 +460,7 @@
       background: rgba(255,255,255,0.82);
       border: 1px dashed rgba(0,0,0,0.14);
       box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      font-size: 12px;
     }
 
     body.display-mode .empty-state {
@@ -493,7 +497,7 @@
       left: 12px;
       right: 12px;
       bottom: calc(var(--safe-bottom) + 12px);
-      z-index: 2500;
+      z-index: 2700;
       background: rgba(255,255,255,0.98);
       border: 1px solid var(--panel-line);
       box-shadow: var(--shadow-lg);
@@ -536,15 +540,15 @@
 
     .sheet-body {
       padding: 14px;
+      max-height: min(52vh, 500px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
       gap: 10px;
-      max-height: min(42vh, 360px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .thumb-card {
@@ -555,6 +559,7 @@
       border: 1px solid var(--panel-line);
       background: #f7f4ee;
       box-shadow: var(--shadow-md);
+      min-height: 96px;
     }
 
     .thumb-card.selected {
@@ -841,8 +846,8 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "kabepic_static_mvp_v8_full";
-      const DB_NAME = "kabepic_static_photos_v8_full";
+      const STORAGE_KEY = "kabepic_static_v11";
+      const DB_NAME = "kabepic_static_photos_v11";
       const STORE_NAME = "photos";
 
       const WORLD_W = 2400;
@@ -904,93 +909,101 @@
         scene: "Scene 11"
       };
 
+      /*
+        配置はここだけ直せばよいように独立。
+        今回は直近の配置資料ベースで固定しています。
+      */
       const LAYOUTS = {
         calm: [
-          { kind: "vertical",          x: 472,  y: 24,   w: 676 },
-          { kind: "square",            x: 1232, y: 290,  w: 538 },
-          { kind: "horizontal",        x: 840,  y: 894,  w: 706 }
+          { slot: 1, kind: "vertical",          x: 520,  y: 90,   w: 540 },
+          { slot: 2, kind: "square",            x: 1200, y: 260,  w: 400 },
+          { slot: 3, kind: "horizontal",        x: 760,  y: 830,  w: 680 }
         ],
         flow: [
-          { kind: "vertical",          x: 62,   y: 498,  w: 452 },
-          { kind: "vertical",          x: 572,  y: 28,   w: 616 },
-          { kind: "square",            x: 1252, y: 306,  w: 452 },
-          { kind: "horizontal",        x: 724,  y: 828,  w: 736 },
-          { kind: "horizontal_simple", x: 1758, y: 546,  w: 516 }
+          { slot: 1, kind: "vertical",          x: 110,  y: 420,  w: 380 },
+          { slot: 2, kind: "vertical",          x: 590,  y: 70,   w: 540 },
+          { slot: 3, kind: "square",            x: 1220, y: 210,  w: 380 },
+          { slot: 4, kind: "square_simple",     x: 1780, y: 310,  w: 320 },
+          { slot: 5, kind: "horizontal",        x: 720,  y: 790,  w: 700 }
         ],
         story: [
-          { kind: "vertical",          x: 12,   y: 506,  w: 340 },
-          { kind: "square",            x: 428,  y: 304,  w: 396 },
-          { kind: "vertical_simple",   x: 895,  y: 68,   w: 530 },
-          { kind: "vertical",          x: 1478, y: 392,  w: 370 },
-          { kind: "horizontal",        x: 392,  y: 760,  w: 460 },
-          { kind: "horizontal_simple", x: 948,  y: 762,  w: 496 },
-          { kind: "vertical",          x: 1479, y: 756,  w: 368 },
-          { kind: "square_simple",     x: 1895, y: 490,  w: 496 }
+          { slot: 1, kind: "vertical",          x: 70,   y: 460,  w: 300 },
+          { slot: 2, kind: "square",            x: 470,  y: 250,  w: 380 },
+          { slot: 3, kind: "vertical_simple",   x: 930,  y: 70,   w: 520 },
+          { slot: 4, kind: "vertical",          x: 1500, y: 240,  w: 360 },
+          { slot: 5, kind: "horizontal_simple", x: 1820, y: 500,  w: 500 },
+          { slot: 6, kind: "square",            x: 420,  y: 770,  w: 330 },
+          { slot: 7, kind: "vertical",          x: 1280, y: 720,  w: 360 },
+          { slot: 8, kind: "square_simple",     x: 1740, y: 720,  w: 360 }
         ],
         scene: [
-          { kind: "square_simple",     x: 40,   y: 398,  w: 360 },
-          { kind: "square",            x: 448,  y: 280,  w: 420 },
-          { kind: "vertical_simple",   x: 998,  y: 40,   w: 310 },
-          { kind: "vertical",          x: 918,  y: 460,  w: 464 },
-          { kind: "vertical",          x: 1434, y: 328,  w: 316 },
-          { kind: "square_simple",     x: 1805, y: 444,  w: 328 },
-          { kind: "square",            x: 234,  y: 754,  w: 290 },
-          { kind: "vertical_simple",   x: 576,  y: 760,  w: 292 },
-          { kind: "square",            x: 970,  y: 1060, w: 366 },
-          { kind: "horizontal",        x: 1434, y: 760,  w: 504 },
-          { kind: "square_simple",     x: 1990, y: 760,  w: 356 }
+          { slot: 1,  kind: "square_simple",     x: 60,   y: 170,  w: 340 },
+          { slot: 2,  kind: "square",            x: 480,  y: 100,  w: 420 },
+          { slot: 3,  kind: "vertical_simple",   x: 1010, y: 40,   w: 300 },
+          { slot: 4,  kind: "vertical",          x: 930,  y: 470,  w: 450 },
+          { slot: 5,  kind: "vertical",          x: 1450, y: 210,  w: 300 },
+          { slot: 6,  kind: "square_simple",     x: 1810, y: 260,  w: 290 },
+          { slot: 7,  kind: "square",            x: 230,  y: 760,  w: 280 },
+          { slot: 8,  kind: "vertical_simple",   x: 570,  y: 720,  w: 300 },
+          { slot: 9,  kind: "square",            x: 980,  y: 1070, w: 340 },
+          { slot: 10, kind: "horizontal",        x: 1430, y: 760,  w: 500 },
+          { slot: 11, kind: "square_simple",     x: 1970, y: 760,  w: 290 }
         ]
       };
 
+      /*
+        ratio と inset は frame.png の見た目から合わせる前提。
+        ここは Claude 案の考え方だけ使い、数値は整え直し。
+      */
       const FRAME_SPECS = {
         vertical: {
           family: "vertical",
-          ratio: 0.84,
+          ratio: 0.72,
           art: "frame_vertical.png",
           fallback: "frame_vertical.png",
-          inset: { top: 15.0, right: 17.2, bottom: 16.0, left: 17.2 }
+          inset: { top: 16.2, right: 22.2, bottom: 16.2, left: 22.2 }
         },
         vertical_simple: {
           family: "vertical",
-          ratio: 0.84,
+          ratio: 0.72,
           art: "frame_vertical_simple.png",
           fallback: "frame_vertical.png",
-          inset: { top: 15.2, right: 17.2, bottom: 16.2, left: 17.2 }
+          inset: { top: 16.0, right: 19.8, bottom: 16.0, left: 19.8 }
         },
         horizontal: {
           family: "horizontal",
-          ratio: 1.20,
+          ratio: 1.28,
           art: "frame_horizontal.png",
           fallback: "frame_horizontal.png",
-          inset: { top: 17.0, right: 16.0, bottom: 17.0, left: 16.0 }
+          inset: { top: 18.6, right: 16.4, bottom: 18.6, left: 16.4 }
         },
         horizontal_simple: {
           family: "horizontal",
-          ratio: 1.20,
+          ratio: 1.28,
           art: "frame_horizontal_simple.png",
           fallback: "frame_horizontal.png",
-          inset: { top: 17.0, right: 16.0, bottom: 17.0, left: 16.0 }
+          inset: { top: 17.0, right: 15.0, bottom: 17.0, left: 15.0 }
         },
         square: {
           family: "square",
           ratio: 1,
           art: "frame_square.png",
           fallback: "frame_square.png",
-          inset: { top: 18.0, right: 18.0, bottom: 18.0, left: 18.0 }
+          inset: { top: 18.2, right: 18.2, bottom: 18.2, left: 18.2 }
         },
         square_simple: {
           family: "square",
           ratio: 1,
           art: "frame_square_simple.png",
           fallback: "frame_square.png",
-          inset: { top: 16.8, right: 16.8, bottom: 16.8, left: 16.8 }
+          inset: { top: 15.2, right: 15.2, bottom: 15.2, left: 15.2 }
         },
         oval: {
           family: "vertical",
-          ratio: 0.70,
+          ratio: 0.78,
           art: "frame_oval.png",
-          fallback: "frame_vertical.png",
-          inset: { top: 8.5, right: 10.0, bottom: 8.5, left: 10.0 },
+          fallback: "frame_oval.png",
+          inset: { top: 12.5, right: 20.0, bottom: 12.5, left: 20.0 },
           oval: true
         }
       };
@@ -1013,7 +1026,11 @@
         toastTimer: null,
         holdTimer: null,
         pinchStartDistance: 0,
-        pinchStartScale: 1
+        pinchStartScale: 1,
+        pinchStartPanX: 0,
+        pinchStartPanY: 0,
+        pinchWorldX: 0,
+        pinchWorldY: 0
       };
 
       function uid(prefix = "id") {
@@ -1103,6 +1120,7 @@
           panY: state.panY,
           frames: state.frames.map((frame) => ({
             id: frame.id,
+            slot: frame.slot,
             kind: frame.kind,
             baseKind: frame.baseKind,
             x: frame.x,
@@ -1122,7 +1140,6 @@
       function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return false;
-
         try {
           const parsed = JSON.parse(raw);
           state.mode = parsed.mode === "display" ? "display" : "edit";
@@ -1237,6 +1254,7 @@
       function normalizeFrame(frame) {
         const next = {
           id: frame.id || uid("frame"),
+          slot: frame.slot || 0,
           kind: frame.kind,
           baseKind: frame.baseKind || frame.kind,
           x: Number(frame.x),
@@ -1254,6 +1272,24 @@
         };
         fitFrameInside(next);
         return next;
+      }
+
+      function createLayoutFrames(layoutKey) {
+        return LAYOUTS[layoutKey].map((item) => normalizeFrame({
+          id: uid("frame"),
+          slot: item.slot,
+          kind: item.kind,
+          baseKind: item.kind,
+          x: item.x,
+          y: item.y,
+          w: item.w,
+          focusX: 50,
+          focusY: 50,
+          pinnedPhotoId: null,
+          currentPhotoId: null,
+          queue: [],
+          queueIndex: 0
+        }));
       }
 
       function closeMenus() {
@@ -1436,31 +1472,77 @@
         scheduleSwitch(frame);
       }
 
+      function viewportRect() {
+        return els.viewport.getBoundingClientRect();
+      }
+
       function fitEditToScreen(resetScale = false) {
-        const vp = els.viewport.getBoundingClientRect();
-        const scale = Math.min(
-          (vp.width - 28) / WORLD_W,
-          (vp.height - 28) / WORLD_H
-        );
-        state.fitScale = clamp(scale, 0.18, 1);
+        const vp = viewportRect();
+        const availableW = vp.width - 28;
+        const availableH = vp.height - (12 + 62 + 20) - 28;
+        const scale = Math.min(availableW / WORLD_W, availableH / WORLD_H);
+        state.fitScale = clamp(scale, 0.12, 1);
+
         if (resetScale) {
           state.editScale = state.fitScale;
-          state.panX = 0;
-          state.panY = 0;
         } else {
           state.editScale = clamp(state.editScale, state.fitScale, 3.2);
         }
+
+        const worldW = WORLD_W * state.editScale;
+        const worldH = WORLD_H * state.editScale;
+        const centerX = (vp.width - worldW) / 2;
+        const centerY = (vp.height - worldH) / 2;
+        state.panX = centerX;
+        state.panY = centerY;
         updateWorldTransform();
+      }
+
+      function worldToScreen(x, y) {
+        return {
+          x: state.panX + x * state.editScale,
+          y: state.panY + y * state.editScale
+        };
+      }
+
+      function screenToWorld(x, y) {
+        return {
+          x: (x - state.panX) / state.editScale,
+          y: (y - state.panY) / state.editScale
+        };
+      }
+
+      function clampPan() {
+        const vp = viewportRect();
+        const worldW = WORLD_W * state.editScale;
+        const worldH = WORLD_H * state.editScale;
+
+        if (worldW <= vp.width) {
+          state.panX = (vp.width - worldW) / 2;
+        } else {
+          const minX = vp.width - worldW;
+          const maxX = 0;
+          state.panX = clamp(state.panX, minX, maxX);
+        }
+
+        if (worldH <= vp.height) {
+          state.panY = (vp.height - worldH) / 2;
+        } else {
+          const minY = vp.height - worldH;
+          const maxY = 0;
+          state.panY = clamp(state.panY, minY, maxY);
+        }
       }
 
       function updateWorldTransform() {
         if (state.mode === "display") {
-          const vp = els.viewport.getBoundingClientRect();
+          const vp = viewportRect();
           const scale = Math.min(vp.width / WORLD_W, vp.height / WORLD_H);
           const x = (vp.width - WORLD_W * scale) / 2;
           const y = (vp.height - WORLD_H * scale) / 2;
           els.world.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
         } else {
+          clampPan();
           els.world.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.editScale})`;
         }
       }
@@ -1472,9 +1554,8 @@
         if (mode === "display") {
           togglePhotoSheet(false);
           showDisplayHint();
-          updateWorldTransform();
         } else {
-          fitEditToScreen(false);
+          fitEditToScreen(true);
         }
 
         renderAll();
@@ -1505,7 +1586,7 @@
 
       function buildSelectionBar() {
         const frame = getCurrentFrame();
-        if (state.mode !== "edit" || !frame) {
+        if (state.mode !== "edit" || !frame || state.sheetOpen) {
           els.selectionBar.classList.add("hidden");
           return;
         }
@@ -1516,7 +1597,7 @@
         els.pinPhotoBtn.textContent = frame.pinnedPhotoId ? "写真固定中" : "写真固定";
         els.unpinPhotoBtn.textContent = frame.pinnedPhotoId ? "固定解除" : "固定なし";
         els.selectionMeta.textContent =
-          `${FRAME_SET_LABELS[state.layout]} / ${frame.kind}` +
+          `${FRAME_SET_LABELS[state.layout]} / #${frame.slot} / ${frame.kind}` +
           (frame.pinnedPhotoId ? " / 固定中" : "");
       }
 
@@ -1540,6 +1621,7 @@
               frame.pinnedPhotoId = photo.id;
               frame.previousPhotoId = frame.currentPhotoId;
               frame.currentPhotoId = photo.id;
+              frame.activeLayer = frame.activeLayer === 0 ? 1 : 0;
               renderAll();
               startDisplayTimers();
               saveState();
@@ -1572,6 +1654,7 @@
       function togglePhotoSheet(force) {
         state.sheetOpen = typeof force === "boolean" ? force : !state.sheetOpen;
         els.photoSheet.classList.toggle("open", state.sheetOpen && state.mode === "edit");
+        buildSelectionBar();
       }
 
       function openViewer(src) {
@@ -1593,6 +1676,54 @@
         els.displayBtn.textContent = state.mode === "edit" ? "▶ 表示" : "編集";
       }
 
+      function applyPhotoFit(layerEl, photo, frame) {
+        const box = layerEl.querySelector(".photo-box");
+        box.innerHTML = "";
+
+        if (!photo) return;
+
+        const spec = FRAME_SPECS[frame.kind];
+        const inner = document.createElement("div");
+        inner.className = "photo-inner";
+
+        const img = document.createElement("img");
+        img.src = photo.dataUrl;
+        img.alt = "";
+
+        inner.appendChild(img);
+        box.appendChild(inner);
+
+        const rect = box.getBoundingClientRect();
+        const vw = rect.width || (frame.w * (1 - (spec.inset.left + spec.inset.right) / 100));
+        const vh = rect.height || (frameHeight(frame) * (1 - (spec.inset.top + spec.inset.bottom) / 100));
+
+        const pw = photo.width;
+        const ph = photo.height;
+        const isSquareFamily = familyForKind(frame.kind) === "square";
+
+        let drawW;
+        let drawH;
+
+        if (isSquareFamily) {
+          const scale = Math.min(vw / pw, vh / ph);
+          drawW = pw * scale;
+          drawH = ph * scale;
+        } else {
+          const scale = Math.max(vw / pw, vh / ph);
+          drawW = pw * scale;
+          drawH = ph * scale;
+        }
+
+        const maxX = Math.max(0, drawW - vw);
+        const maxY = Math.max(0, drawH - vh);
+        const offsetX = -maxX * (frame.focusX / 100);
+        const offsetY = -maxY * (frame.focusY / 100);
+
+        inner.style.width = `${drawW}px`;
+        inner.style.height = `${drawH}px`;
+        inner.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      }
+
       function renderFrame(frameId) {
         const frame = state.frames.find((f) => f.id === frameId);
         const node = els.stage.querySelector(`.frame[data-id="${frameId}"]`);
@@ -1605,7 +1736,6 @@
         node.style.top = `${frame.y}px`;
         node.style.width = `${frame.w}px`;
         node.style.height = `${h}px`;
-
         node.classList.toggle("selected", state.selectedFrameId === frame.id && state.mode === "edit");
         node.classList.toggle("locked", !!frame.pinnedPhotoId);
 
@@ -1625,25 +1755,17 @@
 
         const current = photoById(frame.currentPhotoId);
         const previous = photoById(frame.previousPhotoId);
-
         const layer0 = node.querySelector(".layer-0");
         const layer1 = node.querySelector(".layer-1");
-        const box0 = node.querySelector(".layer-0 .photo-box");
-        const box1 = node.querySelector(".layer-1 .photo-box");
-
-        box0.style.setProperty("--focus-x", `${frame.focusX}%`);
-        box0.style.setProperty("--focus-y", `${frame.focusY}%`);
-        box1.style.setProperty("--focus-x", `${frame.focusX}%`);
-        box1.style.setProperty("--focus-y", `${frame.focusY}%`);
 
         if (frame.activeLayer === 0) {
-          box0.style.backgroundImage = current ? `url("${current.dataUrl}")` : "none";
-          box1.style.backgroundImage = previous ? `url("${previous.dataUrl}")` : "none";
+          applyPhotoFit(layer0, current, frame);
+          applyPhotoFit(layer1, previous, frame);
           layer0.classList.add("active");
           layer1.classList.remove("active");
         } else {
-          box1.style.backgroundImage = current ? `url("${current.dataUrl}")` : "none";
-          box0.style.backgroundImage = previous ? `url("${previous.dataUrl}")` : "none";
+          applyPhotoFit(layer1, current, frame);
+          applyPhotoFit(layer0, previous, frame);
           layer1.classList.add("active");
           layer0.classList.remove("active");
         }
@@ -1677,8 +1799,6 @@
           const startX = e.clientX;
           const startY = e.clientY;
           const before = { x: frame.x, y: frame.y };
-
-          badge.setPointerCapture(e.pointerId);
 
           const onMove = (moveEvent) => {
             const dx = (moveEvent.clientX - startX) / state.editScale;
@@ -1722,11 +1842,8 @@
           const startX = e.clientX;
           const before = { w: frame.w };
 
-          handle.setPointerCapture(e.pointerId);
-
           const onMove = (moveEvent) => {
             const dx = (moveEvent.clientX - startX) / state.editScale;
-
             const next = {
               ...frame,
               w: clamp(before.w + dx, MIN_WIDTH, MAX_WIDTH)
@@ -1767,7 +1884,6 @@
           clearTimeout(state.holdTimer);
           state.holdTimer = setTimeout(() => {
             adjusting = true;
-            viewport.setPointerCapture(e.pointerId);
             state.selectedFrameId = frameId;
             renderAll();
             showToast("写真位置を調整中");
@@ -1777,8 +1893,8 @@
             if (!adjusting) return;
             const dx = moveEvent.clientX - startX;
             const dy = moveEvent.clientY - startY;
-            frame.focusX = clamp(beforeX - dx * 0.10, 0, 100);
-            frame.focusY = clamp(beforeY - dy * 0.10, 0, 100);
+            frame.focusX = clamp(beforeX - dx * 0.12, 0, 100);
+            frame.focusY = clamp(beforeY - dy * 0.12, 0, 100);
             renderFrame(frame.id);
           };
 
@@ -1794,7 +1910,7 @@
         });
       }
 
-      function createFrameNode(frame, index) {
+      function createFrameNode(frame) {
         const node = document.createElement("div");
         node.className = "frame";
         node.dataset.id = frame.id;
@@ -1808,7 +1924,7 @@
           <div class="frame-art-wrap">
             <img class="frame-art" alt="">
           </div>
-          <button class="frame-badge" type="button">${index + 1}</button>
+          <button class="frame-badge" type="button">${frame.slot}</button>
           <div class="frame-pin">固定</div>
           <div class="resize-handle"></div>
         `;
@@ -1818,8 +1934,8 @@
 
       function renderStage() {
         els.stage.innerHTML = "";
-        state.frames.forEach((frame, index) => {
-          const node = createFrameNode(frame, index);
+        state.frames.forEach((frame) => {
+          const node = createFrameNode(frame);
           els.stage.appendChild(node);
           renderFrame(frame.id);
         });
@@ -1831,7 +1947,7 @@
         buildPhotoSheet();
         renderToolbar();
         renderStage();
-        togglePhotoSheet(state.sheetOpen);
+        els.photoSheet.classList.toggle("open", state.sheetOpen && state.mode === "edit");
         updateWorldTransform();
       }
 
@@ -1840,20 +1956,7 @@
         state.layout = layoutKey;
         state.selectedFrameId = null;
         state.selectedPhotoId = null;
-        state.frames = LAYOUTS[layoutKey].map((item) => normalizeFrame({
-          id: uid("frame"),
-          kind: item.kind,
-          baseKind: item.kind,
-          x: item.x,
-          y: item.y,
-          w: item.w,
-          focusX: 50,
-          focusY: 50,
-          pinnedPhotoId: null,
-          currentPhotoId: null,
-          queue: [],
-          queueIndex: 0
-        }));
+        state.frames = createLayoutFrames(layoutKey);
         rebuildFrameQueues();
         ensureCurrentPhotos();
         fitEditToScreen(true);
@@ -1929,6 +2032,7 @@
           frame.pinnedPhotoId = state.selectedPhotoId;
           frame.previousPhotoId = frame.currentPhotoId;
           frame.currentPhotoId = state.selectedPhotoId;
+          frame.activeLayer = frame.activeLayer === 0 ? 1 : 0;
         } else if (frame.currentPhotoId) {
           frame.pinnedPhotoId = frame.currentPhotoId;
         } else {
@@ -1950,6 +2054,7 @@
           return;
         }
         frame.pinnedPhotoId = null;
+        state.selectedPhotoId = null;
         saveState();
         renderAll();
         startDisplayTimers();
@@ -2038,44 +2143,54 @@
           saveState();
         });
 
-        els.viewport.addEventListener("wheel", (e) => {
-          if (state.mode !== "edit") return;
-          e.preventDefault();
-          const delta = e.deltaY < 0 ? 0.1 : -0.1;
-          state.editScale = clamp(state.editScale + delta, state.fitScale, 3.2);
-          updateWorldTransform();
-          saveState();
-        }, { passive: false });
-
-        let touchCache = [];
         els.viewport.addEventListener("touchstart", (e) => {
           if (state.mode !== "edit") return;
-          touchCache = Array.from(e.touches);
-          if (touchCache.length === 2) {
-            const dx = touchCache[0].clientX - touchCache[1].clientX;
-            const dy = touchCache[0].clientY - touchCache[1].clientY;
-            state.pinchStartDistance = Math.hypot(dx, dy);
-            state.pinchStartScale = state.editScale;
-          }
+          if (e.touches.length !== 2) return;
+
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const cx = (t1.clientX + t2.clientX) / 2;
+          const cy = (t1.clientY + t2.clientY) / 2;
+          const dx = t1.clientX - t2.clientX;
+          const dy = t1.clientY - t2.clientY;
+
+          state.pinchStartDistance = Math.hypot(dx, dy);
+          state.pinchStartScale = state.editScale;
+          state.pinchStartPanX = state.panX;
+          state.pinchStartPanY = state.panY;
+
+          const worldX = (cx - state.panX) / state.editScale;
+          const worldY = (cy - state.panY) / state.editScale;
+          state.pinchWorldX = worldX;
+          state.pinchWorldY = worldY;
         }, { passive: true });
 
         els.viewport.addEventListener("touchmove", (e) => {
           if (state.mode !== "edit") return;
-          if (e.touches.length === 2) {
-            const t1 = e.touches[0];
-            const t2 = e.touches[1];
-            const dx = t1.clientX - t2.clientX;
-            const dy = t1.clientY - t2.clientY;
-            const dist = Math.hypot(dx, dy);
-            if (state.pinchStartDistance > 0) {
-              const next = state.pinchStartScale * (dist / state.pinchStartDistance);
-              state.editScale = clamp(next, state.fitScale, 3.2);
-              updateWorldTransform();
-            }
-          }
+          if (e.touches.length !== 2 || state.pinchStartDistance <= 0) return;
+
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const cx = (t1.clientX + t2.clientX) / 2;
+          const cy = (t1.clientY + t2.clientY) / 2;
+          const dx = t1.clientX - t2.clientX;
+          const dy = t1.clientY - t2.clientY;
+          const dist = Math.hypot(dx, dy);
+
+          const nextScale = clamp(
+            state.pinchStartScale * (dist / state.pinchStartDistance),
+            state.fitScale,
+            3.2
+          );
+
+          state.editScale = nextScale;
+          state.panX = cx - state.pinchWorldX * state.editScale;
+          state.panY = cy - state.pinchWorldY * state.editScale;
+          updateWorldTransform();
         }, { passive: true });
 
         els.viewport.addEventListener("touchend", () => {
+          if (state.mode !== "edit") return;
           state.pinchStartDistance = 0;
           state.pinchStartScale = state.editScale;
           saveState();
@@ -2141,7 +2256,7 @@
           }
           rebuildFrameQueues();
           ensureCurrentPhotos();
-          if (state.mode === "edit") fitEditToScreen(false);
+          fitEditToScreen(true);
           renderAll();
           startDisplayTimers();
           showToast("読み込みました");
@@ -2170,7 +2285,6 @@
         els.stage.addEventListener("click", (e) => {
           if (state.mode === "display") {
             setMode("edit");
-            showToast("編集モードに戻りました");
             return;
           }
           if (!e.target.closest(".frame")) {
@@ -2183,7 +2297,7 @@
           if (state.mode === "display") {
             updateWorldTransform();
           } else {
-            fitEditToScreen(false);
+            fitEditToScreen(true);
           }
         });
 
@@ -2243,20 +2357,7 @@
 
         if (!loadState()) {
           state.layout = "story";
-          state.frames = LAYOUTS.story.map((item) => normalizeFrame({
-            id: uid("frame"),
-            kind: item.kind,
-            baseKind: item.kind,
-            x: item.x,
-            y: item.y,
-            w: item.w,
-            focusX: 50,
-            focusY: 50,
-            pinnedPhotoId: null,
-            currentPhotoId: null,
-            queue: [],
-            queueIndex: 0
-          }));
+          state.frames = createLayoutFrames("story");
         }
 
         rebuildFrameQueues();
