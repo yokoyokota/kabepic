@@ -6,31 +6,39 @@
   <title>KABEPIC Editor</title>
   <style>
     :root{
-      --bg:#efe9dd;
-      --panel:#f7f4ee;
-      --panel-strong:#ffffff;
-      --line:rgba(20,20,20,.08);
-      --line-strong:rgba(20,20,20,.14);
-      --text:#181818;
-      --muted:#7b766e;
-      --blue:#3b67e8;
-      --blue-soft:rgba(59,103,232,.12);
-      --danger:#c95757;
-      --canvas-bg:#ddd8cf;
-      --shadow:0 10px 30px rgba(0,0,0,.08);
-      --radius-xl:24px;
-      --radius-lg:18px;
-      --radius-md:14px;
+      --bg: #ece6da;
+      --bg-2: #f3eee5;
+      --panel: rgba(255,255,255,0.72);
+      --panel-solid: #f7f3ec;
+      --surface: #ffffff;
+      --line: rgba(24,24,24,.08);
+      --line-strong: rgba(24,24,24,.14);
+      --text: #191919;
+      --muted: #7c766d;
+      --blue: #3f67e8;
+      --blue-soft: rgba(63,103,232,.12);
+      --blue-line: rgba(63,103,232,.22);
+      --danger: #c85a5a;
+      --canvas-bg: #d7d2c8;
+      --shadow-lg: 0 16px 40px rgba(0,0,0,.08);
+      --shadow-md: 0 8px 20px rgba(0,0,0,.05);
+      --r-xl: 28px;
+      --r-lg: 22px;
+      --r-md: 16px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
     html,body{
       margin:0;
-      background:var(--bg);
+      min-height:100%;
+      background:linear-gradient(180deg,var(--bg),var(--bg-2));
       color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-      min-height:100%;
     }
 
     body{
@@ -50,35 +58,36 @@
       top:0;
       z-index:20;
       padding:14px 14px 10px;
-      background:linear-gradient(to bottom, rgba(239,233,221,.98), rgba(239,233,221,.90));
+      background:linear-gradient(to bottom, rgba(236,230,218,.95), rgba(236,230,218,.82));
       backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
     }
 
     .topCard{
-      background:rgba(255,255,255,.72);
+      background:var(--panel);
       border:1px solid var(--line);
-      border-radius:28px;
-      box-shadow:var(--shadow);
-      padding:14px;
+      border-radius:32px;
+      box-shadow:var(--shadow-lg);
+      padding:16px;
     }
 
     .brandRow{
       display:flex;
-      align-items:center;
+      align-items:baseline;
       gap:10px;
-      margin-bottom:12px;
+      margin-bottom:14px;
     }
 
     .brand{
-      font-size:30px;
+      font-size:34px;
       font-weight:900;
-      letter-spacing:.02em;
+      letter-spacing:.01em;
     }
 
     .subbrand{
-      color:var(--muted);
       font-size:16px;
       font-weight:700;
+      color:var(--muted);
     }
 
     .seg{
@@ -88,20 +97,20 @@
     }
 
     .seg button{
-      min-height:56px;
-      border-radius:18px;
+      min-height:58px;
+      border-radius:20px;
       border:1px solid var(--line-strong);
-      background:#fff;
+      background:rgba(255,255,255,.92);
       color:var(--text);
-      font-size:17px;
+      font-size:18px;
       font-weight:900;
-      box-shadow:0 3px 8px rgba(0,0,0,.03) inset;
+      box-shadow:0 2px 6px rgba(0,0,0,.02) inset;
       cursor:pointer;
     }
 
     .seg button.active{
       background:var(--blue-soft);
-      border-color:rgba(59,103,232,.26);
+      border-color:var(--blue-line);
       color:var(--blue);
     }
 
@@ -110,10 +119,10 @@
     }
 
     .card{
-      background:var(--panel);
+      background:rgba(247,243,236,.94);
       border:1px solid var(--line);
-      border-radius:30px;
-      box-shadow:var(--shadow);
+      border-radius:32px;
+      box-shadow:var(--shadow-lg);
       padding:16px;
     }
 
@@ -129,17 +138,17 @@
       align-items:center;
     }
 
-    .pill,
     button,
     select,
     input[type="text"]{
-      border-radius:18px;
-      border:1px solid var(--line-strong);
-      background:#fff;
-      color:var(--text);
       min-height:54px;
       padding:0 16px;
+      border-radius:18px;
+      border:1px solid var(--line-strong);
+      background:rgba(255,255,255,.96);
+      color:var(--text);
       font-size:16px;
+      box-shadow:var(--shadow-md);
     }
 
     button{
@@ -150,11 +159,13 @@
     button.primary{
       background:var(--blue-soft);
       color:var(--blue);
-      border-color:rgba(59,103,232,.20);
+      border-color:var(--blue-line);
+      box-shadow:none;
     }
 
     button.ghost{
-      background:#fff;
+      background:rgba(255,255,255,.96);
+      color:var(--text);
     }
 
     button.danger{
@@ -162,8 +173,8 @@
     }
 
     select{
-      min-width:110px;
-      font-weight:800;
+      min-width:116px;
+      font-weight:900;
     }
 
     .codeLabel{
@@ -174,7 +185,7 @@
     }
 
     .codeInput{
-      width:140px;
+      width:150px;
       text-align:center;
       letter-spacing:.22em;
       font-weight:900;
@@ -182,23 +193,23 @@
 
     .hint{
       color:var(--muted);
-      line-height:1.6;
+      line-height:1.7;
       font-size:14px;
       margin-top:4px;
     }
 
     #canvasWrap{
       margin-top:14px;
-      background:#ede8df;
-      border-radius:28px;
+      border-radius:30px;
       border:1px solid var(--line);
+      background:rgba(255,255,255,.30);
       padding:14px;
     }
 
     #canvas{
       position:relative;
       width:100%;
-      aspect-ratio:16/9;
+      aspect-ratio:16 / 9;
       background:var(--canvas-bg);
       border-radius:24px;
       overflow:hidden;
@@ -212,7 +223,7 @@
     }
 
     .frame.selected{
-      outline:4px solid rgba(59,103,232,.92);
+      outline:4px solid rgba(63,103,232,.95);
       outline-offset:4px;
       border-radius:8px;
     }
@@ -282,7 +293,7 @@
 
     .selectedTitle strong{
       display:block;
-      font-size:17px;
+      font-size:18px;
       margin-bottom:4px;
     }
 
@@ -301,11 +312,11 @@
     .thumb{
       width:94px;
       flex:0 0 auto;
-      border-radius:16px;
+      border-radius:18px;
       border:1px solid var(--line);
       overflow:hidden;
       background:#fff;
-      box-shadow:0 6px 14px rgba(0,0,0,.05);
+      box-shadow:var(--shadow-md);
     }
 
     .thumb img{
@@ -327,12 +338,13 @@
       padding:0 8px;
       font-size:11px;
       border-radius:12px;
+      box-shadow:none;
     }
 
     .thumb button.primary{
       background:var(--blue-soft);
       color:var(--blue);
-      border-color:rgba(59,103,232,.18);
+      border-color:var(--blue-line);
     }
 
     #panelTray{
@@ -355,7 +367,8 @@
       padding:0 16px;
       border-radius:18px;
       border:1px solid var(--line-strong);
-      background:#fff;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--shadow-md);
       font-size:16px;
       font-weight:900;
       cursor:pointer;
@@ -374,12 +387,12 @@
 
     .tile{
       position:relative;
-      aspect-ratio:1/1;
+      aspect-ratio:1 / 1;
       border:1px solid var(--line);
-      border-radius:18px;
+      border-radius:20px;
       overflow:hidden;
       background:#fff;
-      box-shadow:0 6px 14px rgba(0,0,0,.04);
+      box-shadow:var(--shadow-md);
       cursor:pointer;
       user-select:none;
       touch-action:none;
@@ -429,10 +442,11 @@
     }
 
     @media (max-width: 760px){
-      .brand{font-size:24px}
+      .brand{font-size:26px}
       .subbrand{font-size:14px}
       .controlRow{gap:8px}
       button, select, input[type="text"]{font-size:15px}
+      .seg button{font-size:17px}
     }
   </style>
 </head>
