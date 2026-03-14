@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KABEPIC Layout Test</title>
+<title>KABEPIC Layout</title>
 
 <style>
 
@@ -15,15 +15,15 @@ justify-content:center;
 align-items:center;
 height:100vh;
 overflow:hidden;
-font-family:sans-serif;
 }
 
-#stage{
+/* 壁 */
+
+#wall{
 position:relative;
-width:900px;
-height:600px;
+width:100vw;
+height:100vh;
 background:white;
-box-shadow:0 0 20px rgba(0,0,0,0.1);
 overflow:hidden;
 }
 
@@ -31,11 +31,12 @@ overflow:hidden;
 
 .frame{
 position:absolute;
-background-size:cover;
+background-size:contain;
+background-repeat:no-repeat;
 background-position:center;
 }
 
-/* 内側写真 */
+/* 写真 */
 
 .photo{
 position:absolute;
@@ -49,81 +50,48 @@ object-fit:cover;
 
 <body>
 
-<div id="stage"></div>
+<div id="wall"></div>
 
 <script>
 
-/* Story8 配置（配置図ベース） */
+/* =========================
+基準キャンバス
+========================= */
+
+const BASE_W = 2400
+const BASE_H = 1500
+
+const scale = window.innerWidth / BASE_W
+
+/* =========================
+Story8 フレーム配置
+========================= */
 
 const frames = [
 
-{
-type:"vertical",
-x:40,
-y:40,
-w:140,
-h:220
-},
+{type:"vertical",x:240,y:520,w:200,h:300},
 
-{
-type:"square",
-x:200,
-y:40,
-w:160,
-h:160
-},
+{type:"square",x:520,y:420,w:320,h:320},
 
-{
-type:"horizontal",
-x:380,
-y:40,
-w:220,
-h:140
-},
+{type:"vertical",x:940,y:260,w:320,h:460},
 
-{
-type:"vertical",
-x:640,
-y:40,
-w:140,
-h:220
-},
+{type:"square",x:1340,y:420,w:320,h:320},
 
-{
-type:"square",
-x:40,
-y:300,
-w:160,
-h:160
-},
+{type:"horizontal",x:1720,y:420,w:420,h:300},
 
-{
-type:"horizontal",
-x:220,
-y:300,
-w:220,
-h:140
-},
+{type:"horizontal",x:480,y:800,w:420,h:300},
 
-{
-type:"vertical",
-x:480,
-y:260,
-w:140,
-h:220
-},
+{type:"square",x:940,y:820,w:320,h:320},
 
-{
-type:"horizontal",
-x:640,
-y:300,
-w:220,
-h:140
-}
+{type:"vertical",x:1400,y:760,w:220,h:340}
 
 ]
 
-const stage = document.getElementById("stage")
+/* =========================
+描画
+========================= */
+
+const wall = document.getElementById("wall")
 
 frames.forEach(f=>{
 
@@ -131,21 +99,22 @@ const frame = document.createElement("div")
 
 frame.className="frame"
 
-frame.style.left=f.x+"px"
-frame.style.top=f.y+"px"
-frame.style.width=f.w+"px"
-frame.style.height=f.h+"px"
+frame.style.left = f.x * scale + "px"
+frame.style.top = f.y * scale + "px"
+frame.style.width = f.w * scale + "px"
+frame.style.height = f.h * scale + "px"
 
-frame.style.backgroundImage=`url(images/frame_${f.type}.png)`
+frame.style.backgroundImage =
+`url(frame_${f.type}.png)`
 
-const img=document.createElement("img")
+const img = document.createElement("img")
 
-img.src="https://picsum.photos/400?random="+Math.random()
 img.className="photo"
+img.src="https://picsum.photos/600?random="+Math.random()
 
 frame.appendChild(img)
 
-stage.appendChild(frame)
+wall.appendChild(frame)
 
 })
 
