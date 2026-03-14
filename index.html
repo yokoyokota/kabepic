@@ -10,8 +10,9 @@
   <meta name="description" content="思い出を、暮らしの背景に。" />
   <style>
     :root {
-      --wall-bg: #f2ede3;
-      --panel-bg: rgba(255, 255, 255, 0.94);
+      --edit-bg: #f2ede3;
+      --display-bg: #f6f6f6;
+      --panel-bg: rgba(255, 255, 255, 0.96);
       --panel-line: rgba(0, 0, 0, 0.08);
       --text: #1d1d1d;
       --muted: #6f685f;
@@ -22,24 +23,22 @@
       --shadow-md: 0 10px 18px rgba(0, 0, 0, 0.10);
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --world-w: 1600;
+      --world-h: 900;
       --fade-ms: 1200ms;
-      --wall-w: 1600;
-      --wall-h: 900;
+      --bottom-bar-h: 72px;
     }
 
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--wall-bg);
       color: var(--text);
       font-family:
         -apple-system,
@@ -49,22 +48,14 @@
         "Hiragino Sans",
         "Noto Sans JP",
         sans-serif;
+      background: var(--edit-bg);
     }
 
     body.display-mode {
-      background: var(--wall-bg);
+      background: var(--display-bg);
     }
 
-    body.layout-edit .frame-badge {
-      cursor: grab;
-    }
-
-    body.layout-edit .frame-badge:active {
-      cursor: grabbing;
-    }
-
-    button,
-    input {
+    button, input {
       font: inherit;
     }
 
@@ -76,11 +67,10 @@
     }
 
     img {
+      display: block;
+      max-width: 100%;
       -webkit-user-drag: none;
       user-select: none;
-      -webkit-user-select: none;
-      pointer-events: none;
-      display: block;
     }
 
     .hidden {
@@ -91,21 +81,26 @@
       position: fixed;
       inset: 0;
       overflow: hidden;
-      background: var(--wall-bg);
+      background: var(--edit-bg);
     }
 
-    .toolbar {
+    body.display-mode #app {
+      background: var(--display-bg);
+    }
+
+    .topbar {
       position: fixed;
       top: calc(var(--safe-top) + 12px);
       left: 12px;
       right: 12px;
-      z-index: 3000;
+      z-index: 3200;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
-      min-height: 62px;
-      padding: 8px 10px;
-      border-radius: 22px;
+      min-height: 56px;
+      padding: 8px 12px;
+      border-radius: 20px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-line);
       box-shadow: var(--shadow-lg);
@@ -114,33 +109,15 @@
     }
 
     .brand {
-      flex-shrink: 0;
       font-weight: 900;
-      font-size: 1.04rem;
       letter-spacing: 0.04em;
-      white-space: nowrap;
-      padding: 0 4px 0 2px;
     }
 
-    .toolbar-scroll {
-      flex: 1;
+    .topbar-right {
       display: flex;
       align-items: center;
       gap: 8px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scrollbar-width: none;
-    }
-
-    .toolbar-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .toolbar-right {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      min-width: 0;
     }
 
     .status-mini {
@@ -150,8 +127,8 @@
       white-space: nowrap;
     }
 
-    .btn {
-      min-height: 40px;
+    .chip-btn {
+      min-height: 38px;
       padding: 0 12px;
       border-radius: 999px;
       background: rgba(255,255,255,0.96);
@@ -159,120 +136,49 @@
       box-shadow: var(--shadow-md);
       font-weight: 900;
       white-space: nowrap;
-      transition:
-        transform 140ms ease,
-        background 140ms ease,
-        color 140ms ease,
-        opacity 140ms ease;
     }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn.primary {
+    .chip-btn.primary {
       background: var(--accent);
       color: #fff;
       border-color: transparent;
-    }
-
-    .btn.soft {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: rgba(47, 91, 218, 0.12);
       box-shadow: none;
     }
 
-    .btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: transparent;
-    }
-
-    .btn.danger {
-      color: var(--danger);
-    }
-
-    .btn[disabled] {
-      opacity: 0.55;
-      pointer-events: none;
-    }
-
-    .menu {
-      position: fixed;
-      top: calc(var(--safe-top) + 78px);
-      right: 12px;
-      z-index: 2900;
-      min-width: 220px;
-      padding: 8px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.98);
-      border: 1px solid var(--panel-line);
-      box-shadow: var(--shadow-lg);
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .menu.open {
-      display: flex;
-    }
-
-    .menu.frames {
-      right: auto;
-      left: 120px;
-      min-width: 220px;
-    }
-
-    .menu-item {
-      min-height: 42px;
-      padding: 0 12px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-weight: 900;
-    }
-
-    .menu-item.active {
+    .chip-btn.soft {
       background: var(--accent-soft);
       color: var(--accent);
-    }
-
-    .menu-item.danger {
-      color: var(--danger);
+      border-color: rgba(47,91,218,0.12);
+      box-shadow: none;
     }
 
     .viewport {
       position: absolute;
       inset: 0;
-      padding-top: calc(var(--safe-top) + 84px);
-      padding-bottom: calc(var(--safe-bottom) + 16px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y;
-    }
-
-    body.display-mode .viewport {
-      padding: 0;
+      padding-top: calc(var(--safe-top) + 80px);
+      padding-bottom: calc(var(--bottom-bar-h) + var(--safe-bottom) + 18px);
       overflow: hidden;
       touch-action: none;
     }
 
+    body.display-mode .viewport {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
     .world {
       position: relative;
-      width: calc(var(--wall-w) * 1px);
-      height: calc(var(--wall-h) * 1px);
+      width: calc(var(--world-w) * 1px);
+      height: calc(var(--world-h) * 1px);
       transform-origin: top left;
       will-change: transform;
     }
 
     .stage {
       position: relative;
-      width: calc(var(--wall-w) * 1px);
-      height: calc(var(--wall-h) * 1px);
-      background: var(--wall-bg);
+      width: calc(var(--world-w) * 1px);
+      height: calc(var(--world-h) * 1px);
+      background: transparent;
       overflow: visible;
     }
 
@@ -282,17 +188,8 @@
       inset: 0;
       pointer-events: none;
       background:
-        radial-gradient(circle at 14% 10%, rgba(255,255,255,0.18), transparent 26%),
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.02));
-    }
-
-    body.display-mode .toolbar,
-    body.display-mode .menu,
-    body.display-mode .selection-bar,
-    body.display-mode .photo-sheet {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+        radial-gradient(circle at 14% 10%, rgba(255,255,255,0.16), transparent 26%),
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
     }
 
     .frame {
@@ -300,10 +197,10 @@
       z-index: 1;
       user-select: none;
       transition:
-        left 220ms ease,
-        top 220ms ease,
-        width 220ms ease,
-        height 220ms ease,
+        left 180ms ease,
+        top 180ms ease,
+        width 180ms ease,
+        height 180ms ease,
         filter 180ms ease;
     }
 
@@ -316,7 +213,7 @@
       position: absolute;
       inset: -8px;
       border-radius: 18px;
-      border: 3px solid rgba(47, 91, 218, 0.18);
+      border: 3px solid rgba(47,91,218,0.18);
       opacity: 0;
       pointer-events: none;
       z-index: 1;
@@ -332,15 +229,15 @@
       right: var(--pv-right);
       bottom: var(--pv-bottom);
       left: var(--pv-left);
-      z-index: 2;
       overflow: hidden;
+      z-index: 2;
       background: transparent;
       pointer-events: none;
     }
 
     .photo-viewport.oval {
-      clip-path: ellipse(50% 50% at 50% 50%);
       border-radius: 999px;
+      clip-path: ellipse(50% 50% at 50% 50%);
     }
 
     .photo-layer {
@@ -361,6 +258,12 @@
       background-image: none;
       background-position: var(--photo-x, 50%) var(--photo-y, 50%);
       background-size: cover;
+      background-color: transparent;
+    }
+
+    .photo-box.contain {
+      background-size: contain;
+      background-position: center center;
     }
 
     .frame-art-wrap {
@@ -375,9 +278,8 @@
       width: 100%;
       height: 100%;
       object-fit: fill;
-      pointer-events: none;
-      user-select: none;
       display: block;
+      pointer-events: none;
     }
 
     .frame-badge {
@@ -387,22 +289,17 @@
       width: 42px;
       height: 42px;
       border-radius: 999px;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(16, 24, 44, 0.96);
+      background: rgba(16,24,44,0.96);
       color: #fff;
       border: 2px solid rgba(255,255,255,0.16);
       font-size: 0.92rem;
       font-weight: 900;
       box-shadow: 0 10px 18px rgba(0,0,0,0.20);
       z-index: 7;
-      cursor: grab;
       touch-action: none;
-    }
-
-    .frame-badge:active {
-      cursor: grabbing;
     }
 
     .resize-handle {
@@ -413,15 +310,11 @@
       height: 24px;
       border-radius: 999px;
       background: rgba(255,255,255,0.98);
-      border: 3px solid rgba(47, 91, 218, 0.92);
+      border: 3px solid rgba(47,91,218,0.92);
       box-shadow: 0 8px 16px rgba(0,0,0,0.14);
       z-index: 7;
       touch-action: none;
       display: none;
-    }
-
-    body.layout-edit .frame.selected .resize-handle {
-      display: block;
     }
 
     .frame-pin {
@@ -448,11 +341,9 @@
       display: inline-flex;
     }
 
-    body.display-mode .frame-outline,
-    body.display-mode .frame-badge,
-    body.display-mode .resize-handle,
-    body.display-mode .frame-pin {
-      display: none !important;
+    body.edit-enabled .frame.selected .frame-badge,
+    body.edit-enabled .frame.selected .resize-handle {
+      display: flex;
     }
 
     .empty-state {
@@ -478,61 +369,81 @@
       font-size: 12px;
     }
 
-    body.display-mode .empty-state {
-      display: none !important;
-    }
-
-    .selection-bar {
+    .bottom-nav {
       position: fixed;
       left: 12px;
       right: 12px;
       bottom: calc(var(--safe-bottom) + 12px);
-      z-index: 2600;
-      display: flex;
-      align-items: center;
+      z-index: 3300;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 10px 12px;
+      padding: 8px;
       border-radius: 22px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-line);
       box-shadow: var(--shadow-lg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      scrollbar-width: none;
     }
 
-    .selection-bar::-webkit-scrollbar {
-      display: none;
+    .nav-btn {
+      min-height: 52px;
+      border-radius: 16px;
+      font-weight: 900;
+      background: transparent;
+      border: 1px solid transparent;
     }
 
-    .photo-sheet {
+    .nav-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(47,91,218,0.12);
+    }
+
+    body.display-mode .topbar,
+    body.display-mode .bottom-nav,
+    body.display-mode .sheet,
+    body.display-mode .panel {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .sheet, .panel {
       position: fixed;
       left: 12px;
       right: 12px;
-      bottom: calc(var(--safe-bottom) + 12px);
-      z-index: 2500;
+      z-index: 3250;
       background: rgba(255,255,255,0.98);
       border: 1px solid var(--panel-line);
       box-shadow: var(--shadow-lg);
       border-radius: 24px;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
       transform: translateY(calc(100% + 20px));
       opacity: 0;
       pointer-events: none;
       transition: transform 220ms ease, opacity 220ms ease;
-      overflow: hidden;
     }
 
-    .photo-sheet.open {
+    .sheet.open, .panel.open {
       transform: translateY(0);
       opacity: 1;
       pointer-events: auto;
     }
 
-    .sheet-head {
+    .sheet {
+      bottom: calc(var(--safe-bottom) + 90px);
+    }
+
+    .panel {
+      bottom: calc(var(--safe-bottom) + 90px);
+      max-height: 62vh;
+    }
+
+    .sheet-head, .panel-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -541,25 +452,31 @@
       border-bottom: 1px solid var(--panel-line);
     }
 
-    .sheet-title {
-      font-size: 1.1rem;
+    .sheet-title, .panel-title {
+      font-size: 1.08rem;
       font-weight: 900;
     }
 
     .sheet-meta {
       color: var(--muted);
       font-weight: 800;
-      margin-top: 2px;
-      font-size: 0.9rem;
+      margin-top: 3px;
+      font-size: 0.92rem;
     }
 
-    .sheet-body {
+    .sheet-body, .panel-body {
       padding: 14px;
+    }
+
+    .sheet-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .thumb-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       max-height: min(44vh, 380px);
       overflow: auto;
@@ -577,7 +494,7 @@
     }
 
     .thumb-card.selected {
-      outline: 3px solid rgba(47, 91, 218, 0.22);
+      outline: 3px solid rgba(47,91,218,0.22);
       outline-offset: 2px;
     }
 
@@ -625,6 +542,36 @@
       color: var(--danger);
       font-weight: 900;
       z-index: 2;
+    }
+
+    .menu-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu-item {
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 900;
+      border: 1px solid var(--panel-line);
+      background: rgba(255,255,255,0.9);
+    }
+
+    .menu-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(47,91,218,0.12);
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .viewer {
@@ -687,7 +634,7 @@
 
     #toast {
       position: fixed;
-      top: calc(var(--safe-top) + 86px);
+      top: calc(var(--safe-top) + 82px);
       left: 50%;
       transform: translateX(-50%) translateY(-8px);
       z-index: 5000;
@@ -763,16 +710,6 @@
       .brand {
         display: none;
       }
-
-      .menu.frames {
-        left: 12px;
-        right: 12px;
-        min-width: auto;
-      }
-
-      .thumb-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
     }
   </style>
 </head>
@@ -780,32 +717,12 @@
   <div id="app">
     <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
 
-    <div id="toolbar" class="toolbar">
+    <div id="topbar" class="topbar">
       <div class="brand">KABEPIC</div>
-
-      <div class="toolbar-scroll">
-        <button id="addPhotosBtn" class="btn primary">＋写真追加</button>
-        <button id="framesBtn" class="btn">Frames</button>
-        <button id="layoutEditBtn" class="btn soft">配置編集OFF</button>
-        <button id="photosBtn" class="btn">写真一覧</button>
-        <button id="displayBtn" class="btn">▶ 表示</button>
-        <button id="zoomOutBtn" class="btn soft">−</button>
-        <button id="fitBtn" class="btn soft">全体</button>
-        <button id="zoomInBtn" class="btn soft">＋</button>
+      <div class="topbar-right">
+        <div id="modeText" class="status-mini">編集</div>
+        <button id="fitBtn" class="chip-btn soft">全体</button>
       </div>
-
-      <div class="toolbar-right">
-        <div id="statusMini" class="status-mini">写真 0枚</div>
-        <button id="moreBtn" class="btn">⋯</button>
-      </div>
-    </div>
-
-    <div id="framesMenu" class="menu frames"></div>
-
-    <div id="moreMenu" class="menu">
-      <button id="saveBtn" class="menu-item">保存</button>
-      <button id="loadBtn" class="menu-item">読込</button>
-      <button id="resetBtn" class="menu-item danger">現在セットを初期位置に戻す</button>
     </div>
 
     <div id="viewport" class="viewport">
@@ -814,24 +731,77 @@
       </div>
     </div>
 
-    <div id="selectionBar" class="selection-bar hidden">
-      <button id="toggleStyleBtn" class="btn">装飾切替</button>
-      <button id="toggleOvalBtn" class="btn">楕円にする</button>
-      <button id="pinPhotoBtn" class="btn soft">写真固定</button>
-      <button id="openPhotosBtn" class="btn soft">写真一覧を開く</button>
-      <div id="selectionMeta" class="status-mini">選択なし</div>
+    <div id="bottomNav" class="bottom-nav">
+      <button id="navPhoto" class="nav-btn active">Photo</button>
+      <button id="navFrames" class="nav-btn">Frames</button>
+      <button id="navEdit" class="nav-btn">Edit</button>
+      <button id="navDisplay" class="nav-btn">Display</button>
     </div>
 
-    <div id="photoSheet" class="photo-sheet">
+    <div id="photoSheet" class="sheet">
       <div class="sheet-head">
         <div>
           <div class="sheet-title">写真一覧</div>
-          <div id="sheetMeta" class="sheet-meta">0枚</div>
+          <div id="sheetMeta" class="sheet-meta">写真 0 / 100<br>残り 100 枚</div>
         </div>
-        <button id="closeSheetBtn" class="btn">閉じる</button>
+        <div class="sheet-actions">
+          <button id="addInSheetBtn" class="chip-btn primary">追加</button>
+          <button id="closePhotoSheetBtn" class="chip-btn">閉じる</button>
+        </div>
       </div>
       <div class="sheet-body">
         <div id="thumbGrid" class="thumb-grid"></div>
+      </div>
+    </div>
+
+    <div id="framesPanel" class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Frames</div>
+        <button id="closeFramesPanelBtn" class="chip-btn">閉じる</button>
+      </div>
+      <div class="panel-body">
+        <div id="framesList" class="menu-list"></div>
+      </div>
+    </div>
+
+    <div id="editPanel" class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Edit</div>
+        <button id="closeEditPanelBtn" class="chip-btn">閉じる</button>
+      </div>
+      <div class="panel-body">
+        <div class="menu-list">
+          <button id="toggleEditBtn" class="menu-item">
+            <span>配置編集</span>
+            <span id="toggleEditLabel">OFF</span>
+          </button>
+        </div>
+        <div style="height:10px;"></div>
+        <div class="subgrid">
+          <button class="menu-item" data-add-kind="square">正方形を追加</button>
+          <button class="menu-item" data-add-kind="horizontal">横長を追加</button>
+          <button class="menu-item" data-add-kind="vertical">縦長を追加</button>
+          <button class="menu-item" data-add-kind="oval">楕円を追加</button>
+        </div>
+        <div style="height:10px;"></div>
+        <div class="menu-list">
+          <button id="toggleStyleBtn" class="menu-item">
+            <span>装飾切替</span>
+            <span>選択中</span>
+          </button>
+          <button id="toggleOvalBtn" class="menu-item">
+            <span>楕円切替</span>
+            <span>選択中</span>
+          </button>
+          <button id="pinPhotoBtn" class="menu-item">
+            <span>写真固定</span>
+            <span>選択中</span>
+          </button>
+          <button id="deleteFrameBtn" class="menu-item">
+            <span style="color:#c84a4a;">フレーム削除</span>
+            <span>選択中</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -858,16 +828,18 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "kabepic_html_static_v12";
-      const DB_NAME = "kabepic_photo_db_v12";
+      const STORAGE_KEY = "kabepic_html_ui_v20";
+      const DB_NAME = "kabepic_photo_db_v20";
       const STORE_NAME = "photos";
 
       const WALL_W = 1600;
       const WALL_H = 900;
-      const GRID = 10;
+      const MAX_PHOTOS = 100;
 
       const MIN_WIDTH = 120;
       const MAX_WIDTH = 700;
+      const EDGE_MARGIN = 20;
+
       const SWITCH_MIN_MS = 25000;
       const SWITCH_MAX_MS = 35000;
       const FADE_MS = 1200;
@@ -881,46 +853,44 @@
         world: $("world"),
         stage: $("stage"),
         photoInput: $("photoInput"),
-        addPhotosBtn: $("addPhotosBtn"),
-        framesBtn: $("framesBtn"),
-        layoutEditBtn: $("layoutEditBtn"),
-        photosBtn: $("photosBtn"),
-        displayBtn: $("displayBtn"),
-        zoomOutBtn: $("zoomOutBtn"),
+
+        topbar: $("topbar"),
+        modeText: $("modeText"),
         fitBtn: $("fitBtn"),
-        zoomInBtn: $("zoomInBtn"),
-        moreBtn: $("moreBtn"),
-        saveBtn: $("saveBtn"),
-        loadBtn: $("loadBtn"),
-        resetBtn: $("resetBtn"),
-        framesMenu: $("framesMenu"),
-        moreMenu: $("moreMenu"),
-        statusMini: $("statusMini"),
-        selectionBar: $("selectionBar"),
+
+        navPhoto: $("navPhoto"),
+        navFrames: $("navFrames"),
+        navEdit: $("navEdit"),
+        navDisplay: $("navDisplay"),
+
+        photoSheet: $("photoSheet"),
+        closePhotoSheetBtn: $("closePhotoSheetBtn"),
+        addInSheetBtn: $("addInSheetBtn"),
+        thumbGrid: $("thumbGrid"),
+        sheetMeta: $("sheetMeta"),
+
+        framesPanel: $("framesPanel"),
+        closeFramesPanelBtn: $("closeFramesPanelBtn"),
+        framesList: $("framesList"),
+
+        editPanel: $("editPanel"),
+        closeEditPanelBtn: $("closeEditPanelBtn"),
+        toggleEditBtn: $("toggleEditBtn"),
+        toggleEditLabel: $("toggleEditLabel"),
         toggleStyleBtn: $("toggleStyleBtn"),
         toggleOvalBtn: $("toggleOvalBtn"),
         pinPhotoBtn: $("pinPhotoBtn"),
-        openPhotosBtn: $("openPhotosBtn"),
-        selectionMeta: $("selectionMeta"),
-        photoSheet: $("photoSheet"),
-        closeSheetBtn: $("closeSheetBtn"),
-        thumbGrid: $("thumbGrid"),
-        sheetMeta: $("sheetMeta"),
+        deleteFrameBtn: $("deleteFrameBtn"),
+
         viewer: $("viewer"),
         viewerImage: $("viewerImage"),
         viewerClose: $("viewerClose"),
+
         displayHint: $("displayHint"),
         toast: $("toast"),
         progressOverlay: $("progressOverlay"),
         progressMeta: $("progressMeta"),
         progressFill: $("progressFill")
-      };
-
-      const SET_LABELS = {
-        calm: "Calm 3",
-        flow: "Flow 5",
-        story: "Story 8",
-        scene: "Scene 11"
       };
 
       const FRAME_SPECS = {
@@ -929,42 +899,48 @@
           ratio: 0.72,
           art: "frame_vertical.png",
           fallback: "frame_vertical.png",
-          inset: { top: 10, right: 14, bottom: 13, left: 14 }
+          inset: { top: 10, right: 14, bottom: 13, left: 14 },
+          contain: false
         },
         vertical_simple: {
           family: "vertical",
           ratio: 0.72,
           art: "frame_vertical_simple.png",
           fallback: "frame_vertical.png",
-          inset: { top: 10, right: 14, bottom: 13, left: 14 }
+          inset: { top: 10, right: 14, bottom: 13, left: 14 },
+          contain: false
         },
         horizontal: {
           family: "horizontal",
           ratio: 1.24,
           art: "frame_horizontal.png",
           fallback: "frame_horizontal.png",
-          inset: { top: 14, right: 10, bottom: 14, left: 10 }
+          inset: { top: 14, right: 10, bottom: 14, left: 10 },
+          contain: false
         },
         horizontal_simple: {
           family: "horizontal",
           ratio: 1.24,
           art: "frame_horizontal_simple.png",
           fallback: "frame_horizontal.png",
-          inset: { top: 14, right: 10, bottom: 14, left: 10 }
+          inset: { top: 14, right: 10, bottom: 14, left: 10 },
+          contain: false
         },
         square: {
           family: "square",
           ratio: 1,
           art: "frame_square.png",
           fallback: "frame_square.png",
-          inset: { top: 16, right: 16, bottom: 16, left: 16 }
+          inset: { top: 16, right: 16, bottom: 16, left: 16 },
+          contain: true
         },
         square_simple: {
           family: "square",
           ratio: 1,
           art: "frame_square_simple.png",
           fallback: "frame_square.png",
-          inset: { top: 14, right: 14, bottom: 14, left: 14 }
+          inset: { top: 14, right: 14, bottom: 14, left: 14 },
+          contain: true
         },
         oval: {
           family: "vertical",
@@ -972,53 +948,55 @@
           art: "frame_oval.png",
           fallback: "frame_oval.png",
           inset: { top: 8, right: 8, bottom: 8, left: 8 },
+          contain: false,
           oval: true
         }
       };
 
       const LAYOUTS = {
         calm: [
-          { id: 1, kind: "vertical", x: 32, y: 2,  w: 38 },
-          { id: 2, kind: "square",   x: 76, y: 10, w: 31 },
-          { id: 3, kind: "horizontal", x: 53, y: 53, w: 41 }
+          { id: 1, kind: "vertical", x: 320, y: 20,  w: 380 },
+          { id: 2, kind: "square",   x: 760, y: 100, w: 310 },
+          { id: 3, kind: "horizontal", x: 530, y: 530, w: 410 }
         ],
         flow: [
-          { id: 1, kind: "vertical", x: 2,   y: 26, w: 24 },
-          { id: 2, kind: "vertical", x: 34,  y: 5,  w: 34 },
-          { id: 3, kind: "square",   x: 78,  y: 13, w: 26 },
-          { id: 4, kind: "square_simple", x: 112, y: 28, w: 24 },
-          { id: 5, kind: "horizontal", x: 49, y: 47, w: 40 }
+          { id: 1, kind: "vertical", x: 20,   y: 260, w: 240 },
+          { id: 2, kind: "vertical", x: 340,  y: 50,  w: 340 },
+          { id: 3, kind: "square",   x: 780,  y: 130, w: 260 },
+          { id: 4, kind: "square_simple", x: 1120, y: 280, w: 240 },
+          { id: 5, kind: "horizontal", x: 490, y: 470, w: 400 }
         ],
         story: [
-          { id: 1, kind: "vertical", x: 2,   y: 23, w: 21 },
-          { id: 2, kind: "square",   x: 29,  y: 12, w: 29 },
-          { id: 3, kind: "vertical_simple", x: 61, y: 2,  w: 34 },
-          { id: 4, kind: "square_simple", x: 98, y: 15, w: 24 },
-          { id: 5, kind: "horizontal", x: 126, y: 21, w: 34 },
-          { id: 6, kind: "square", x: 28, y: 50, w: 28 },
-          { id: 7, kind: "vertical_simple", x: 57, y: 52, w: 18 },
-          { id: 8, kind: "horizontal", x: 103, y: 50, w: 38 }
+          { id: 1, kind: "vertical", x: 20,   y: 230, w: 210 },
+          { id: 2, kind: "square",   x: 290,  y: 120, w: 290 },
+          { id: 3, kind: "vertical_simple", x: 610, y: 20,  w: 340 },
+          { id: 4, kind: "square_simple", x: 980, y: 150, w: 240 },
+          { id: 5, kind: "horizontal", x: 1260, y: 210, w: 300 },
+          { id: 6, kind: "square", x: 280, y: 500, w: 280 },
+          { id: 7, kind: "vertical_simple", x: 570, y: 520, w: 180 },
+          { id: 8, kind: "horizontal", x: 1030, y: 500, w: 380 }
         ],
         scene: [
-          { id: 1, kind: "square_simple", x: 1,   y: 14, w: 24 },
-          { id: 2, kind: "square", x: 28,  y: 9,  w: 29 },
-          { id: 3, kind: "vertical_simple", x: 70, y: 0,  w: 21 },
-          { id: 4, kind: "vertical", x: 62, y: 28, w: 33 },
-          { id: 5, kind: "vertical", x: 97, y: 15, w: 21 },
-          { id: 6, kind: "square_simple", x: 121, y: 18, w: 17 },
-          { id: 7, kind: "square_simple", x: 18, y: 50, w: 16 },
-          { id: 8, kind: "vertical", x: 38, y: 49, w: 18 },
-          { id: 9, kind: "vertical_simple", x: 69, y: 65, w: 21 },
-          { id: 10, kind: "horizontal", x: 103, y: 49, w: 36 },
-          { id: 11, kind: "square_simple", x: 143, y: 50, w: 18 }
+          { id: 1, kind: "square_simple", x: 10,   y: 140, w: 240 },
+          { id: 2, kind: "square", x: 280,  y: 90,  w: 290 },
+          { id: 3, kind: "vertical_simple", x: 700, y: 0,  w: 210 },
+          { id: 4, kind: "vertical", x: 620, y: 280, w: 330 },
+          { id: 5, kind: "vertical", x: 970, y: 150, w: 210 },
+          { id: 6, kind: "square_simple", x: 1210, y: 180, w: 170 },
+          { id: 7, kind: "square_simple", x: 180, y: 500, w: 160 },
+          { id: 8, kind: "vertical", x: 380, y: 490, w: 180 },
+          { id: 9, kind: "vertical_simple", x: 690, y: 650, w: 210 },
+          { id: 10, kind: "horizontal", x: 1030, y: 490, w: 360 },
+          { id: 11, kind: "square_simple", x: 1430, y: 500, w: 150 }
         ]
       };
 
       const state = {
         db: null,
         mode: "edit",
+        activeTab: "photo",
         layoutKey: "story",
-        layoutEditMode: false,
+        editEnabled: false,
         photos: [],
         photoFingerprints: new Set(),
         frames: [],
@@ -1026,7 +1004,8 @@
         selectedPhotoId: null,
         zoom: 1,
         fitZoom: 1,
-        sheetOpen: false,
+        panX: 0,
+        panY: 0,
         toastTimer: null,
         isUploading: false
       };
@@ -1054,8 +1033,8 @@
 
       function setProgress(open, current = 0, total = 0) {
         state.isUploading = open;
-        els.addPhotosBtn.disabled = open;
         els.photoInput.disabled = open;
+        els.addInSheetBtn.disabled = open;
         els.progressOverlay.classList.toggle("open", open);
         if (open) {
           els.progressMeta.textContent = `${current} / ${total}`;
@@ -1065,7 +1044,6 @@
           els.progressMeta.textContent = "0 / 0";
           els.progressFill.style.width = "0%";
         }
-        renderToolbar();
       }
 
       function openDB() {
@@ -1111,10 +1089,13 @@
 
       function saveState() {
         const payload = {
-          layoutKey: state.layoutKey,
           mode: state.mode,
+          activeTab: state.activeTab,
+          layoutKey: state.layoutKey,
+          editEnabled: state.editEnabled,
           zoom: state.zoom,
-          layoutEditMode: state.layoutEditMode,
+          panX: state.panX,
+          panY: state.panY,
           frames: state.frames.map((frame) => ({
             uid: frame.uid,
             fixedId: frame.fixedId,
@@ -1123,6 +1104,8 @@
             x: frame.x,
             y: frame.y,
             w: frame.w,
+            photoX: frame.photoX,
+            photoY: frame.photoY,
             pinnedPhotoId: frame.pinnedPhotoId || null,
             currentPhotoId: frame.currentPhotoId || null,
             queue: frame.queue || [],
@@ -1137,10 +1120,13 @@
         if (!raw) return false;
         try {
           const parsed = JSON.parse(raw);
-          state.layoutKey = parsed.layoutKey || "story";
           state.mode = parsed.mode === "display" ? "display" : "edit";
+          state.activeTab = parsed.activeTab || "photo";
+          state.layoutKey = parsed.layoutKey || "story";
+          state.editEnabled = !!parsed.editEnabled;
           state.zoom = Number(parsed.zoom || 1);
-          state.layoutEditMode = !!parsed.layoutEditMode;
+          state.panX = Number(parsed.panX || 0);
+          state.panY = Number(parsed.panY || 0);
           state.frames = (parsed.frames || []).map(normalizeFrame);
           return state.frames.length > 0;
         } catch {
@@ -1239,6 +1225,13 @@
           if (frame.uid === ignoreUid) return false;
           return overlaps(rect, frameRect(frame));
         });
+      }
+
+      function fitFrameInside(frame) {
+        frame.w = clamp(frame.w, MIN_WIDTH, MAX_WIDTH);
+        const h = frameHeight(frame);
+        frame.x = clamp(frame.x, EDGE_MARGIN, WALL_W - frame.w - EDGE_MARGIN);
+        frame.y = clamp(frame.y, EDGE_MARGIN, WALL_H - h - EDGE_MARGIN);
       }
 
       function photoById(id) {
@@ -1428,14 +1421,16 @@
       }
 
       function normalizeFrame(frame) {
-        return {
+        const next = {
           uid: frame.uid || uid("frame"),
-          fixedId: frame.fixedId,
+          fixedId: frame.fixedId ?? null,
           kind: frame.kind,
           fallbackKind: frame.fallbackKind || frame.kind,
           x: Number(frame.x),
           y: Number(frame.y),
           w: Number(frame.w),
+          photoX: Number.isFinite(frame.photoX) ? frame.photoX : 50,
+          photoY: Number.isFinite(frame.photoY) ? frame.photoY : 50,
           pinnedPhotoId: frame.pinnedPhotoId || null,
           currentPhotoId: frame.currentPhotoId || null,
           previousPhotoId: null,
@@ -1444,6 +1439,8 @@
           queue: Array.isArray(frame.queue) ? frame.queue.slice() : [],
           queueIndex: Number(frame.queueIndex || 0)
         };
+        fitFrameInside(next);
+        return next;
       }
 
       function createLayout(layoutKey) {
@@ -1452,9 +1449,9 @@
           fixedId: item.id,
           kind: item.kind,
           fallbackKind: item.kind,
-          x: item.x * GRID,
-          y: item.y * GRID,
-          w: item.w * GRID,
+          x: item.x,
+          y: item.y,
+          w: item.w,
           pinnedPhotoId: null,
           currentPhotoId: null,
           queue: [],
@@ -1462,55 +1459,58 @@
         }));
       }
 
-      function renderToolbar() {
-        if (!state.isUploading) {
-          els.statusMini.textContent = `写真 ${state.photos.length}枚`;
-        }
-        els.displayBtn.textContent = state.mode === "edit" ? "▶ 表示" : "編集";
-        els.layoutEditBtn.textContent = state.layoutEditMode ? "配置編集ON" : "配置編集OFF";
-        els.layoutEditBtn.classList.toggle("active", state.layoutEditMode);
-        document.body.classList.toggle("layout-edit", state.layoutEditMode && state.mode === "edit");
+      function renderTopBar() {
+        els.modeText.textContent =
+          state.mode === "display"
+            ? "表示"
+            : state.editEnabled
+              ? "編集ON"
+              : "編集OFF";
+
+        document.body.classList.toggle("display-mode", state.mode === "display");
+        document.body.classList.toggle("edit-enabled", state.mode === "edit" && state.editEnabled);
       }
 
-      function buildFramesMenu() {
-        els.framesMenu.innerHTML = "";
-        Object.entries(SET_LABELS).forEach(([key, label]) => {
+      function renderBottomNav() {
+        els.navPhoto.classList.toggle("active", state.activeTab === "photo" && state.mode === "edit");
+        els.navFrames.classList.toggle("active", state.activeTab === "frames" && state.mode === "edit");
+        els.navEdit.classList.toggle("active", state.activeTab === "edit" && state.mode === "edit");
+        els.navDisplay.classList.toggle("active", state.mode === "display");
+      }
+
+      function renderPanels() {
+        els.photoSheet.classList.toggle("open", state.mode === "edit" && state.activeTab === "photo");
+        els.framesPanel.classList.toggle("open", state.mode === "edit" && state.activeTab === "frames");
+        els.editPanel.classList.toggle("open", state.mode === "edit" && state.activeTab === "edit");
+
+        els.toggleEditLabel.textContent = state.editEnabled ? "ON" : "OFF";
+      }
+
+      function buildFramesPanel() {
+        els.framesList.innerHTML = "";
+        const labels = {
+          calm: "Calm (3)",
+          flow: "Flow (5)",
+          story: "Story (8)",
+          scene: "Scene (11)"
+        };
+
+        Object.entries(labels).forEach(([key, label]) => {
           const btn = document.createElement("button");
           btn.className = `menu-item${state.layoutKey === key ? " active" : ""}`;
-          btn.textContent = label;
+          btn.type = "button";
+          btn.innerHTML = `<span>${label}</span><span>${state.layoutKey === key ? "選択中" : ""}</span>`;
           btn.addEventListener("click", () => {
-            closeMenus();
             applyLayout(key);
           });
-          els.framesMenu.appendChild(btn);
+          els.framesList.appendChild(btn);
         });
       }
 
-      function buildSelectionBar() {
-        const frame = getSelectedFrame();
-        if (state.mode !== "edit" || !frame) {
-          els.selectionBar.classList.add("hidden");
-          return;
-        }
-
-        els.selectionBar.classList.remove("hidden");
-
-        const isSimple = frame.kind.includes("simple");
-        const isOval = frame.kind === "oval";
-        const isPinned = !!frame.pinnedPhotoId;
-
-        els.toggleStyleBtn.textContent = isSimple ? "装飾に戻す" : "シンプルにする";
-        els.toggleStyleBtn.disabled = isOval;
-
-        els.toggleOvalBtn.textContent = isOval ? "四角に戻す" : "楕円にする";
-        els.pinPhotoBtn.textContent = isPinned ? "固定解除" : "写真固定";
-
-        els.selectionMeta.textContent =
-          `${SET_LABELS[state.layoutKey]} / #${frame.fixedId} / ${frame.kind}${isPinned ? " / 固定中" : ""}`;
-      }
-
       function buildPhotoSheet() {
-        els.sheetMeta.textContent = `${state.photos.length}枚`;
+        const current = state.photos.length;
+        const remaining = Math.max(0, MAX_PHOTOS - current);
+        els.sheetMeta.innerHTML = `写真 ${current} / ${MAX_PHOTOS}<br>残り ${remaining} 枚`;
         els.thumbGrid.innerHTML = "";
 
         state.photos.forEach((photo) => {
@@ -1521,7 +1521,6 @@
           preview.className = "preview";
           preview.type = "button";
           preview.innerHTML = `<img src="${photo.dataUrl}" alt="">`;
-
           preview.addEventListener("click", () => {
             const frame = getSelectedFrame();
             if (frame) {
@@ -1559,11 +1558,6 @@
         });
       }
 
-      function togglePhotoSheet(force) {
-        state.sheetOpen = typeof force === "boolean" ? force : !state.sheetOpen;
-        els.photoSheet.classList.toggle("open", state.sheetOpen && state.mode === "edit");
-      }
-
       function openViewer(src) {
         els.viewerImage.src = src;
         els.viewer.classList.add("open");
@@ -1574,12 +1568,7 @@
         els.viewerImage.src = "";
       }
 
-      function closeMenus() {
-        els.moreMenu.classList.remove("open");
-        els.framesMenu.classList.remove("open");
-      }
-
-      function fitZoomToViewport() {
+      function fitZoomToViewport(resetPan = true) {
         const vp = els.viewport.getBoundingClientRect();
         const scale = Math.min(
           (vp.width - 20) / WALL_W,
@@ -1587,8 +1576,13 @@
         );
         state.fitZoom = clamp(scale, 0.1, 1);
         state.zoom = state.fitZoom;
+        if (resetPan) {
+          const scaledW = WALL_W * state.zoom;
+          const scaledH = WALL_H * state.zoom;
+          state.panX = (vp.width - scaledW) / 2;
+          state.panY = (vp.height - scaledH) / 2;
+        }
         updateWorldTransform();
-        centerWorld();
       }
 
       function updateWorldTransform() {
@@ -1599,42 +1593,45 @@
           const y = (vp.height - WALL_H * scale) / 2;
           els.world.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
         } else {
-          els.world.style.transform = `scale(${state.zoom})`;
+          els.world.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
         }
       }
 
-      function centerWorld() {
-        if (state.mode !== "edit") return;
-        const vp = els.viewport.getBoundingClientRect();
-        const scaledW = WALL_W * state.zoom;
-        const scaledH = WALL_H * state.zoom;
-        els.viewport.scrollLeft = Math.max(0, (scaledW - vp.width) / 2);
-        els.viewport.scrollTop = Math.max(0, (scaledH - vp.height) / 2);
-      }
+      function applyEditZoom(nextZoom, anchorX = null, anchorY = null) {
+        const oldZoom = state.zoom;
+        const newZoom = clamp(nextZoom, state.fitZoom, 3.2);
+        if (newZoom === oldZoom) return;
 
-      function applyEditZoom(nextZoom) {
-        state.zoom = clamp(nextZoom, state.fitZoom, 3.2);
+        if (anchorX == null || anchorY == null) {
+          const vp = els.viewport.getBoundingClientRect();
+          anchorX = vp.width / 2;
+          anchorY = vp.height / 2;
+        }
+
+        const wx = (anchorX - state.panX) / oldZoom;
+        const wy = (anchorY - state.panY) / oldZoom;
+
+        state.zoom = newZoom;
+        state.panX = anchorX - wx * newZoom;
+        state.panY = anchorY - wy * newZoom;
         updateWorldTransform();
-        centerWorld();
         saveState();
       }
 
-      function setMode(mode) {
-        state.mode = mode;
-        document.body.classList.toggle("display-mode", mode === "display");
-
-        if (mode === "display") {
-          togglePhotoSheet(false);
-          state.layoutEditMode = false;
-          updateWorldTransform();
-          showDisplayHint();
-        } else {
-          fitZoomToViewport();
-        }
-
+      function openTab(tab) {
+        state.mode = "edit";
+        state.activeTab = tab;
         renderAll();
         startDisplayTimers();
         saveState();
+      }
+
+      function setDisplayMode() {
+        state.mode = "display";
+        renderAll();
+        startDisplayTimers();
+        saveState();
+        showDisplayHint();
       }
 
       function showDisplayHint() {
@@ -1682,6 +1679,14 @@
         const box0 = node.querySelector(".layer-0 .photo-box");
         const box1 = node.querySelector(".layer-1 .photo-box");
 
+        box0.classList.toggle("contain", !!spec.contain);
+        box1.classList.toggle("contain", !!spec.contain);
+
+        box0.style.setProperty("--photo-x", `${frame.photoX}%`);
+        box0.style.setProperty("--photo-y", `${frame.photoY}%`);
+        box1.style.setProperty("--photo-x", `${frame.photoX}%`);
+        box1.style.setProperty("--photo-y", `${frame.photoY}%`);
+
         if (frame.activeLayer === 0) {
           box0.style.backgroundImage = current ? `url("${current.dataUrl}")` : "none";
           box1.style.backgroundImage = previous ? `url("${previous.dataUrl}")` : "none";
@@ -1701,20 +1706,24 @@
         const badge = node.querySelector(".frame-badge");
         const handle = node.querySelector(".resize-handle");
 
-        node.addEventListener("contextmenu", (e) => {
-          e.preventDefault();
-        });
-
         node.addEventListener("click", (e) => {
-          if (e.target === badge || e.target === handle) return;
           if (state.mode !== "edit") return;
+          if (e.target === badge || e.target === handle) return;
           state.selectedFrameUid = frameUid;
           renderAll();
         });
 
-        badge.addEventListener("pointerdown", (e) => {
+        node.addEventListener("dblclick", () => {
           if (state.mode !== "edit") return;
-          if (!state.layoutEditMode) return;
+          const frame = state.frames.find((item) => item.uid === frameUid);
+          if (!frame) return;
+          if (!frame.currentPhotoId) {
+            openTab("photo");
+          }
+        });
+
+        badge.addEventListener("pointerdown", (e) => {
+          if (state.mode !== "edit" || !state.editEnabled) return;
           e.preventDefault();
           e.stopPropagation();
 
@@ -1727,16 +1736,19 @@
           const startX = e.clientX;
           const startY = e.clientY;
           const before = { x: frame.x, y: frame.y };
+
           badge.setPointerCapture(e.pointerId);
 
           const onMove = (moveEvent) => {
             const dx = (moveEvent.clientX - startX) / state.zoom;
             const dy = (moveEvent.clientY - startY) / state.zoom;
+
             const next = {
               ...frame,
-              x: clamp(Math.round(before.x + dx), 0, WALL_W - frame.w),
-              y: clamp(Math.round(before.y + dy), 0, WALL_H - frameHeight(frame))
+              x: Math.round(before.x + dx),
+              y: Math.round(before.y + dy)
             };
+            fitFrameInside(next);
 
             if (!collides(next, frame.uid)) {
               frame.x = next.x;
@@ -1756,8 +1768,7 @@
         });
 
         handle.addEventListener("pointerdown", (e) => {
-          if (state.mode !== "edit") return;
-          if (!state.layoutEditMode) return;
+          if (state.mode !== "edit" || !state.editEnabled) return;
           e.preventDefault();
           e.stopPropagation();
 
@@ -1769,20 +1780,21 @@
 
           const startX = e.clientX;
           const beforeW = frame.w;
+
           handle.setPointerCapture(e.pointerId);
 
           const onMove = (moveEvent) => {
             const dx = (moveEvent.clientX - startX) / state.zoom;
             const next = {
               ...frame,
-              w: clamp(Math.round(beforeW + dx), MIN_WIDTH, MAX_WIDTH)
+              w: Math.round(beforeW + dx)
             };
-
-            if (frame.x + next.w > WALL_W) return;
-            if (frame.y + frameHeight(next) > WALL_H) return;
+            fitFrameInside(next);
 
             if (!collides(next, frame.uid)) {
               frame.w = next.w;
+              frame.x = next.x;
+              frame.y = next.y;
               renderFrame(frame.uid);
             }
           };
@@ -1791,6 +1803,44 @@
             window.removeEventListener("pointermove", onMove);
             window.removeEventListener("pointerup", onUp);
             saveState();
+          };
+
+          window.addEventListener("pointermove", onMove, { passive: true });
+          window.addEventListener("pointerup", onUp, { passive: true });
+        });
+
+        node.addEventListener("pointerdown", (e) => {
+          if (state.mode !== "edit") return;
+          if (state.editEnabled) return;
+          if (e.target === badge || e.target === handle) return;
+
+          const frame = state.frames.find((item) => item.uid === frameUid);
+          if (!frame || !frame.currentPhotoId) return;
+
+          let moved = false;
+          const startX = e.clientX;
+          const startY = e.clientY;
+          const beforeX = frame.photoX;
+          const beforeY = frame.photoY;
+
+          const onMove = (moveEvent) => {
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+            if (!moved) return;
+
+            frame.photoX = clamp(beforeX - dx * 0.10, 0, 100);
+            frame.photoY = clamp(beforeY - dy * 0.10, 0, 100);
+            renderFrame(frame.uid);
+          };
+
+          const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            if (moved) {
+              saveState();
+              showToast("写真位置を調整しました", 1000);
+            }
           };
 
           window.addEventListener("pointermove", onMove, { passive: true });
@@ -1810,9 +1860,9 @@
             <div class="empty-state"><span>＋ 写真追加</span></div>
           </div>
           <div class="frame-art-wrap">
-            <img class="frame-art" alt="" draggable="false">
+            <img class="frame-art" alt="">
           </div>
-          <button class="frame-badge" type="button">${frame.fixedId}</button>
+          <button class="frame-badge" type="button">${frame.fixedId ?? "＋"}</button>
           <div class="frame-pin">固定</div>
           <div class="resize-handle"></div>
         `;
@@ -1830,12 +1880,12 @@
       }
 
       function renderAll() {
-        renderToolbar();
-        buildFramesMenu();
-        buildSelectionBar();
+        renderTopBar();
+        renderBottomNav();
+        buildFramesPanel();
         buildPhotoSheet();
+        renderPanels();
         renderStage();
-        togglePhotoSheet(state.sheetOpen);
         updateWorldTransform();
       }
 
@@ -1847,7 +1897,7 @@
         state.frames = createLayout(layoutKey);
         rebuildQueues();
         ensureCurrentPhotos();
-        fitZoomToViewport();
+        fitZoomToViewport(true);
         renderAll();
         startDisplayTimers();
         saveState();
@@ -1855,8 +1905,14 @@
 
       function toggleStyle() {
         const frame = getSelectedFrame();
-        if (!frame) return;
-        if (frame.kind === "oval") return;
+        if (!frame) {
+          showToast("フレームを選択してください");
+          return;
+        }
+        if (frame.kind === "oval") {
+          showToast("楕円中は装飾切替できません");
+          return;
+        }
 
         const map = {
           vertical: "vertical_simple",
@@ -1873,6 +1929,7 @@
         const before = frame.kind;
         frame.kind = nextKind;
         frame.fallbackKind = nextKind;
+        fitFrameInside(frame);
 
         if (collides(frame, frame.uid)) {
           frame.kind = before;
@@ -1887,8 +1944,12 @@
 
       function toggleOval() {
         const frame = getSelectedFrame();
-        if (!frame) return;
+        if (!frame) {
+          showToast("フレームを選択してください");
+          return;
+        }
 
+        const before = frame.kind;
         if (frame.kind === "oval") {
           frame.kind = frame.fallbackKind || "vertical";
         } else {
@@ -1896,8 +1957,10 @@
           frame.kind = "oval";
         }
 
-        if (frame.x + frame.w > WALL_W || frame.y + frameHeight(frame) > WALL_H || collides(frame, frame.uid)) {
-          frame.kind = frame.fallbackKind || "vertical";
+        fitFrameInside(frame);
+
+        if (collides(frame, frame.uid)) {
+          frame.kind = before;
           showToast("その形では置けません");
           return;
         }
@@ -1908,7 +1971,10 @@
 
       function togglePin() {
         const frame = getSelectedFrame();
-        if (!frame) return;
+        if (!frame) {
+          showToast("フレームを選択してください");
+          return;
+        }
 
         if (frame.pinnedPhotoId) {
           frame.pinnedPhotoId = null;
@@ -1929,9 +1995,78 @@
         startDisplayTimers();
       }
 
+      function addFrame(kind) {
+        const baseWidth = kind === "horizontal" ? 260 : kind === "vertical" ? 180 : kind === "oval" ? 180 : 220;
+        const vp = els.viewport.getBoundingClientRect();
+        const centerWorldX = (vp.width / 2 - state.panX) / state.zoom;
+        const centerWorldY = (vp.height / 2 - state.panY) / state.zoom;
+
+        const frame = normalizeFrame({
+          uid: uid("frame"),
+          fixedId: null,
+          kind,
+          fallbackKind: kind,
+          x: Math.round(centerWorldX - baseWidth / 2),
+          y: Math.round(centerWorldY - (baseWidth / FRAME_SPECS[kind].ratio) / 2),
+          w: baseWidth,
+          photoX: 50,
+          photoY: 50,
+          pinnedPhotoId: null,
+          currentPhotoId: null,
+          queue: [],
+          queueIndex: 0
+        });
+
+        fitFrameInside(frame);
+
+        let placed = false;
+        const tries = [
+          [0,0],[30,0],[-30,0],[0,30],[0,-30],[60,0],[-60,0],[0,60],[0,-60],[90,40],[-90,40]
+        ];
+
+        for (const [dx, dy] of tries) {
+          const next = { ...frame, x: frame.x + dx, y: frame.y + dy };
+          fitFrameInside(next);
+          if (!collides(next, null)) {
+            state.frames.push(normalizeFrame(next));
+            placed = true;
+            break;
+          }
+        }
+
+        if (!placed) {
+          showToast("追加できる空きがありません");
+          return;
+        }
+
+        rebuildQueues();
+        ensureCurrentPhotos();
+        state.selectedFrameUid = state.frames[state.frames.length - 1].uid;
+        renderAll();
+        saveState();
+        showToast("フレームを追加しました");
+      }
+
+      function deleteSelectedFrame() {
+        const frame = getSelectedFrame();
+        if (!frame) {
+          showToast("フレームを選択してください");
+          return;
+        }
+        state.frames = state.frames.filter((item) => item.uid !== frame.uid);
+        state.selectedFrameUid = null;
+        renderAll();
+        saveState();
+        showToast("フレームを削除しました");
+      }
+
       async function addPhotos(fileList) {
         const files = Array.from(fileList || []);
         if (!files.length || state.isUploading) return;
+        if (state.photos.length >= MAX_PHOTOS) {
+          showToast("保存上限です");
+          return;
+        }
 
         setProgress(true, 0, files.length);
 
@@ -1941,6 +2076,11 @@
         try {
           for (let i = 0; i < files.length; i += 1) {
             setProgress(true, i + 1, files.length);
+
+            if (state.photos.length + added >= MAX_PHOTOS) {
+              skipped += (files.length - i);
+              break;
+            }
 
             const fingerprint = fingerprintFromFile(files[i]);
             if (state.photoFingerprints.has(fingerprint)) {
@@ -1963,11 +2103,11 @@
           saveState();
 
           if (added > 0 && skipped > 0) {
-            showToast(`${added}枚追加、${skipped}枚は重複のため追加しませんでした`, 2600);
+            showToast(`${added}枚追加、${skipped}枚は追加しませんでした`, 2400);
           } else if (added > 0) {
             showToast(`${added}枚追加しました`);
           } else {
-            showToast("重複のため追加しませんでした", 2200);
+            showToast("追加しませんでした");
           }
         } finally {
           setProgress(false);
@@ -2002,49 +2142,134 @@
         showToast("写真を削除しました");
       }
 
-      function resetCurrentLayout() {
-        const currentPhotosByFixedId = new Map(
-          state.frames.map((f) => [
-            f.fixedId,
-            {
-              currentPhotoId: f.currentPhotoId || null,
-              pinnedPhotoId: f.pinnedPhotoId || null
-            }
-          ])
-        );
+      function bindStagePanAndZoom() {
+        let dragMode = null;
+        let startX = 0;
+        let startY = 0;
+        let startPanX = 0;
+        let startPanY = 0;
 
-        state.frames = createLayout(state.layoutKey).map((frame) => {
-          const prev = currentPhotosByFixedId.get(frame.fixedId);
-          if (prev) {
-            frame.currentPhotoId = prev.currentPhotoId;
-            frame.pinnedPhotoId = prev.pinnedPhotoId;
+        const pointers = new Map();
+        let pinchStartDistance = 0;
+        let pinchStartZoom = 1;
+
+        function getDistance(a, b) {
+          const dx = a.clientX - b.clientX;
+          const dy = a.clientY - b.clientY;
+          return Math.hypot(dx, dy);
+        }
+
+        function resetPanState() {
+          dragMode = null;
+          pinchStartDistance = 0;
+        }
+
+        els.viewport.addEventListener("pointerdown", (e) => {
+          if (state.mode !== "edit") return;
+          pointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+          if (pointers.size === 2) {
+            const [p1, p2] = Array.from(pointers.values());
+            pinchStartDistance = getDistance(p1, p2);
+            pinchStartZoom = state.zoom;
+            dragMode = "pinch";
+            return;
           }
-          return frame;
+
+          if (e.target.closest(".frame")) return;
+
+          dragMode = "pan";
+          startX = e.clientX;
+          startY = e.clientY;
+          startPanX = state.panX;
+          startPanY = state.panY;
         });
 
-        rebuildQueues();
-        ensureCurrentPhotos();
-        fitZoomToViewport();
-        renderAll();
-        startDisplayTimers();
-        saveState();
-        showToast("現在のセットを初期配置に戻しました");
+        els.viewport.addEventListener("pointermove", (e) => {
+          if (state.mode !== "edit") return;
+          if (pointers.has(e.pointerId)) {
+            pointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+          }
+
+          if (dragMode === "pinch" && pointers.size === 2) {
+            const [p1, p2] = Array.from(pointers.values());
+            const dist = getDistance(p1, p2);
+            if (pinchStartDistance > 0) {
+              const centerX = (p1.clientX + p2.clientX) / 2 - els.viewport.getBoundingClientRect().left;
+              const centerY = (p1.clientY + p2.clientY) / 2 - els.viewport.getBoundingClientRect().top;
+              applyEditZoom(pinchStartZoom * (dist / pinchStartDistance), centerX, centerY);
+            }
+            return;
+          }
+
+          if (dragMode === "pan" && pointers.size === 1) {
+            state.panX = startPanX + (e.clientX - startX);
+            state.panY = startPanY + (e.clientY - startY);
+            updateWorldTransform();
+          }
+        });
+
+        function onPointerUp(e) {
+          pointers.delete(e.pointerId);
+          if (pointers.size === 0) {
+            if (dragMode === "pan" || dragMode === "pinch") saveState();
+            resetPanState();
+          } else if (pointers.size === 1) {
+            const remaining = Array.from(pointers.values())[0];
+            dragMode = "pan";
+            startX = remaining.clientX;
+            startY = remaining.clientY;
+            startPanX = state.panX;
+            startPanY = state.panY;
+          }
+        }
+
+        els.viewport.addEventListener("pointerup", onPointerUp);
+        els.viewport.addEventListener("pointercancel", onPointerUp);
+
+        els.viewport.addEventListener("wheel", (e) => {
+          if (state.mode !== "edit") return;
+          e.preventDefault();
+          const rect = els.viewport.getBoundingClientRect();
+          applyEditZoom(
+            state.zoom + (e.deltaY < 0 ? 0.12 : -0.12),
+            e.clientX - rect.left,
+            e.clientY - rect.top
+          );
+        }, { passive: false });
       }
 
       function bindUI() {
-        document.addEventListener("contextmenu", (e) => {
-          if (e.target.closest(".frame")) {
-            e.preventDefault();
-          }
+        els.fitBtn.addEventListener("click", () => {
+          if (state.mode !== "edit") return;
+          fitZoomToViewport(true);
+          saveState();
         });
 
-        document.addEventListener("selectstart", (e) => {
-          if (e.target.closest(".frame")) {
-            e.preventDefault();
-          }
+        els.navPhoto.addEventListener("click", () => openTab("photo"));
+        els.navFrames.addEventListener("click", () => openTab("frames"));
+        els.navEdit.addEventListener("click", () => openTab("edit"));
+        els.navDisplay.addEventListener("click", () => setDisplayMode());
+
+        els.closePhotoSheetBtn.addEventListener("click", () => {
+          state.activeTab = null;
+          renderAll();
+          saveState();
         });
 
-        els.addPhotosBtn.addEventListener("click", () => {
+        els.closeFramesPanelBtn.addEventListener("click", () => {
+          state.activeTab = null;
+          renderAll();
+          saveState();
+        });
+
+        els.closeEditPanelBtn.addEventListener("click", () => {
+          state.activeTab = null;
+          renderAll();
+          saveState();
+        });
+
+        els.addInSheetBtn.addEventListener("click", () => {
           els.photoInput.click();
         });
 
@@ -2053,90 +2278,23 @@
           e.target.value = "";
         });
 
-        els.framesBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          els.moreMenu.classList.remove("open");
-          els.framesMenu.classList.toggle("open");
-        });
-
-        els.layoutEditBtn.addEventListener("click", () => {
-          if (state.mode !== "edit") return;
-          state.layoutEditMode = !state.layoutEditMode;
-          renderToolbar();
-          saveState();
-          showToast(state.layoutEditMode ? "配置編集ON" : "配置編集OFF", 1200);
-        });
-
-        els.photosBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          togglePhotoSheet();
-        });
-
-        els.openPhotosBtn.addEventListener("click", () => {
-          togglePhotoSheet(true);
-        });
-
-        els.closeSheetBtn.addEventListener("click", () => {
-          togglePhotoSheet(false);
-        });
-
-        els.moreBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          els.framesMenu.classList.remove("open");
-          els.moreMenu.classList.toggle("open");
-        });
-
-        els.displayBtn.addEventListener("click", () => {
-          setMode(state.mode === "edit" ? "display" : "edit");
-        });
-
-        els.fitBtn.addEventListener("click", () => {
-          if (state.mode !== "edit") return;
-          fitZoomToViewport();
-          saveState();
-        });
-
-        els.zoomInBtn.addEventListener("click", () => {
-          if (state.mode !== "edit") return;
-          applyEditZoom(state.zoom + 0.2);
-        });
-
-        els.zoomOutBtn.addEventListener("click", () => {
-          if (state.mode !== "edit") return;
-          applyEditZoom(state.zoom - 0.2);
-        });
-
-        els.saveBtn.addEventListener("click", () => {
-          closeMenus();
-          saveState();
-          showToast("保存しました");
-        });
-
-        els.loadBtn.addEventListener("click", () => {
-          closeMenus();
-          if (!loadState()) {
-            showToast("保存データがありません");
-            return;
-          }
-          rebuildQueues();
-          ensureCurrentPhotos();
-          rebuildPhotoFingerprints();
-          if (state.mode === "edit") {
-            fitZoomToViewport();
-          }
+        els.toggleEditBtn.addEventListener("click", () => {
+          state.editEnabled = !state.editEnabled;
           renderAll();
-          startDisplayTimers();
-          showToast("読み込みました");
-        });
-
-        els.resetBtn.addEventListener("click", () => {
-          closeMenus();
-          resetCurrentLayout();
+          saveState();
+          showToast(state.editEnabled ? "配置編集ON" : "配置編集OFF", 1000);
         });
 
         els.toggleStyleBtn.addEventListener("click", toggleStyle);
         els.toggleOvalBtn.addEventListener("click", toggleOval);
         els.pinPhotoBtn.addEventListener("click", togglePin);
+        els.deleteFrameBtn.addEventListener("click", deleteSelectedFrame);
+
+        document.querySelectorAll("[data-add-kind]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            addFrame(btn.dataset.addKind);
+          });
+        });
 
         els.viewerClose.addEventListener("click", closeViewer);
         els.viewer.addEventListener("click", (e) => {
@@ -2144,15 +2302,27 @@
         });
 
         document.addEventListener("click", (e) => {
-          const keep = e.target.closest(".toolbar") || e.target.closest(".menu");
-          if (!keep) closeMenus();
+          const keep =
+            e.target.closest(".panel") ||
+            e.target.closest(".sheet") ||
+            e.target.closest(".bottom-nav") ||
+            e.target.closest(".topbar");
+          if (!keep && state.mode === "edit") {
+            state.activeTab = null;
+            renderAll();
+            saveState();
+          }
         });
 
         els.stage.addEventListener("click", (e) => {
           if (state.mode === "display") {
-            setMode("edit");
+            state.mode = "edit";
+            renderAll();
+            startDisplayTimers();
+            saveState();
             return;
           }
+
           if (!e.target.closest(".frame")) {
             state.selectedFrameUid = null;
             renderAll();
@@ -2163,9 +2333,11 @@
           if (state.mode === "display") {
             updateWorldTransform();
           } else {
-            fitZoomToViewport();
+            fitZoomToViewport(false);
           }
         });
+
+        bindStagePanAndZoom();
       }
 
       async function init() {
@@ -2176,12 +2348,13 @@
         if (!loadState()) {
           state.layoutKey = "story";
           state.frames = createLayout("story");
+          state.activeTab = "photo";
         }
 
         rebuildQueues();
         ensureCurrentPhotos();
         bindUI();
-        fitZoomToViewport();
+        fitZoomToViewport(true);
         renderAll();
 
         if (state.mode === "display") {
