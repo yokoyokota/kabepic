@@ -441,13 +441,9 @@
 
   <script>
     (() => {
-      const PREFIX = "kabepic_code_v12_";
+      const PREFIX = "kabepic_code_v13_";
       const LONG_PRESS_MS = 650;
 
-      /*
-        trim済みPNG前提
-        実描画範囲ベースの aspect ratio と inset
-      */
       const FRAME_META = {
         portrait: {
           src: "frame_vertical.png",
@@ -591,7 +587,7 @@
               resolve();
             };
             img.onerror = () => resolve();
-            img.src = meta.src + "?v=12";
+            img.src = meta.src + "?v=13";
           }))
         );
       }
@@ -609,15 +605,23 @@
       }
 
       function seedDefaultFrames() {
+        /*
+          2400 x 1500
+          1マス = 10px
+          横 240マス / 縦 150マス
+
+          比率は Claude 実測値ベースを維持
+          位置と幅だけをグリッド基準で固定
+        */
         const preset = [
-          ["portrait",  0.04, 0.32, 0.12],
-          ["square",    0.20, 0.18, 0.16],
-          ["portrait",  0.38, 0.03, 0.19],
-          ["landscape", 0.62, 0.14, 0.15],
-          ["landscape", 0.80, 0.06, 0.20],
-          ["landscape", 0.18, 0.58, 0.18],
-          ["square",    0.42, 0.50, 0.19],
-          ["portrait",  0.66, 0.48, 0.12]
+          ["portrait",   6/240,   43/150,  30/240], // 1
+          ["square",    41/240,   22/150,  36/240], // 2
+          ["portrait",  95/240,    6/150,  38/240], // 3
+          ["landscape", 145/240,  28/150,  28/240], // 4
+          ["landscape", 191/240,  37/150,  42/240], // 5
+          ["landscape",  39/240,  76/150,  42/240], // 6
+          ["square",     90/240,  78/150,  40/240], // 7
+          ["portrait",  148/240,  76/150,  30/240]  // 8
         ];
 
         frames = preset.map(p => ({
@@ -900,7 +904,7 @@
         localStorage.setItem(
           codeKey(c),
           JSON.stringify({
-            meta: { savedAt: Date.now(), v: 12 },
+            meta: { savedAt: Date.now(), v: 13 },
             photos,
             frames
           })
