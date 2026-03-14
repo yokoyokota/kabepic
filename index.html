@@ -1,124 +1,221 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KABEPIC Layout</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <title>KABEPIC Story8 Frame Check</title>
+  <style>
+    :root {
+      --base-w: 2400;
+      --base-h: 1500;
+      --bg: #efefef;
+      --board: #ffffff;
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+    }
 
-<style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-body{
-margin:0;
-background:#f2f2f2;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-overflow:hidden;
-}
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    }
 
-/* 壁 */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-#wall{
-position:relative;
-width:100vw;
-height:100vh;
-background:white;
-overflow:hidden;
-}
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
 
-/* フレーム */
+    #boardWrap {
+      position: relative;
+      transform-origin: center center;
+      will-change: transform;
+    }
 
-.frame{
-position:absolute;
-background-size:contain;
-background-repeat:no-repeat;
-background-position:center;
-}
+    #board {
+      position: relative;
+      width: calc(var(--base-w) * 1px);
+      height: calc(var(--base-h) * 1px);
+      background: var(--board);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
-/* 写真 */
+    .frame {
+      position: absolute;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-position: center center;
+    }
 
-.photo{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-</style>
+    .label {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 14px);
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(20, 20, 20, 0.78);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+  </style>
 </head>
-
 <body>
+  <div id="app">
+    <div id="boardWrap">
+      <div id="board"></div>
+    </div>
+  </div>
 
-<div id="wall"></div>
+  <script>
+    (() => {
+      "use strict";
 
-<script>
+      const BASE_W = 2400;
+      const BASE_H = 1500;
 
-/* =========================
-基準キャンバス
-========================= */
+      const boardWrap = document.getElementById("boardWrap");
+      const board = document.getElementById("board");
 
-const BASE_W = 2400
-const BASE_H = 1500
+      /*
+        2400 x 1500
+        グリッド 10px 基準
+        配置図から読み取って置いた Story8 仮確定値
+      */
+      const frames = [
+        {
+          id: 1,
+          kind: "vertical",
+          x: 50,
+          y: 520,
+          w: 330,
+          h: 520,
+          asset: "frame_vertical.png"
+        },
+        {
+          id: 2,
+          kind: "square",
+          x: 460,
+          y: 300,
+          w: 400,
+          h: 400,
+          asset: "frame_square.png"
+        },
+        {
+          id: 3,
+          kind: "vertical",
+          x: 930,
+          y: 80,
+          w: 520,
+          h: 760,
+          asset: "frame_vertical.png"
+        },
+        {
+          id: 4,
+          kind: "square",
+          x: 1500,
+          y: 450,
+          w: 360,
+          h: 360,
+          asset: "frame_square.png"
+        },
+        {
+          id: 5,
+          kind: "horizontal",
+          x: 1900,
+          y: 500,
+          w: 500,
+          h: 400,
+          asset: "frame_horizontal.png"
+        },
+        {
+          id: 6,
+          kind: "square",
+          x: 420,
+          y: 760,
+          w: 460,
+          h: 460,
+          asset: "frame_square.png"
+        },
+        {
+          id: 7,
+          kind: "square",
+          x: 930,
+          y: 800,
+          w: 490,
+          h: 490,
+          asset: "frame_square.png"
+        },
+        {
+          id: 8,
+          kind: "vertical",
+          x: 1490,
+          y: 860,
+          w: 320,
+          h: 470,
+          asset: "frame_vertical.png"
+        }
+      ];
 
-const scale = window.innerWidth / BASE_W
+      function render() {
+        board.innerHTML = "";
 
-/* =========================
-Story8 フレーム配置
-========================= */
+        frames.forEach((f) => {
+          const el = document.createElement("div");
+          el.className = "frame";
+          el.style.left = `${f.x}px`;
+          el.style.top = `${f.y}px`;
+          el.style.width = `${f.w}px`;
+          el.style.height = `${f.h}px`;
+          el.style.backgroundImage = `url("${f.asset}")`;
 
-const frames = [
+          const label = document.createElement("div");
+          label.className = "label";
+          label.textContent = `${f.id}`;
+          el.appendChild(label);
 
-{type:"vertical",x:240,y:520,w:200,h:300},
+          board.appendChild(el);
+        });
+      }
 
-{type:"square",x:520,y:420,w:320,h:320},
+      function fitBoard() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-{type:"vertical",x:940,y:260,w:320,h:460},
+        const scale = Math.min(vw / BASE_W, vh / BASE_H) * 0.96;
+        boardWrap.style.transform = `scale(${scale})`;
+      }
 
-{type:"square",x:1340,y:420,w:320,h:320},
+      render();
+      fitBoard();
 
-{type:"horizontal",x:1720,y:420,w:420,h:300},
-
-{type:"horizontal",x:480,y:800,w:420,h:300},
-
-{type:"square",x:940,y:820,w:320,h:320},
-
-{type:"vertical",x:1400,y:760,w:220,h:340}
-
-]
-
-/* =========================
-描画
-========================= */
-
-const wall = document.getElementById("wall")
-
-frames.forEach(f=>{
-
-const frame = document.createElement("div")
-
-frame.className="frame"
-
-frame.style.left = f.x * scale + "px"
-frame.style.top = f.y * scale + "px"
-frame.style.width = f.w * scale + "px"
-frame.style.height = f.h * scale + "px"
-
-frame.style.backgroundImage =
-`url(frame_${f.type}.png)`
-
-const img = document.createElement("img")
-
-img.className="photo"
-img.src="https://picsum.photos/600?random="+Math.random()
-
-frame.appendChild(img)
-
-wall.appendChild(frame)
-
-})
-
-</script>
-
+      window.addEventListener("resize", fitBoard);
+    })();
+  </script>
 </body>
 </html>
