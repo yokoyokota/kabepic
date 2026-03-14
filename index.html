@@ -5,390 +5,477 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>KABEPIC Editor</title>
   <style>
-    :root {
-      --ink: #111;
-      --muted: #777;
-      --card: rgba(255,255,255,0.92);
-      --border: rgba(17,17,17,0.14);
-      --bg: #f6f6f6;
-      --accent: #007aff;
+    :root{
+      --bg:#efe9dd;
+      --panel:#f7f4ee;
+      --panel-strong:#ffffff;
+      --line:rgba(20,20,20,.08);
+      --line-strong:rgba(20,20,20,.14);
+      --text:#181818;
+      --muted:#7b766e;
+      --blue:#3b67e8;
+      --blue-soft:rgba(59,103,232,.12);
+      --danger:#c95757;
+      --canvas-bg:#ddd8cf;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: var(--ink);
-      background: var(--bg);
-      display: flex;
-      justify-content: center;
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      min-height:100%;
     }
 
-    .app {
-      width: 100%;
-      max-width: 1200px;
-      min-height: 100vh;
-      background: #fff;
-      margin: 0 auto;
+    body{
+      display:flex;
+      justify-content:center;
     }
 
-    header {
-      padding: 12px 14px 10px;
-      border-bottom: 1px solid #eee;
-      background: #fff;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    .app{
+      width:100%;
+      max-width:1180px;
+      min-height:100vh;
+      padding-bottom:calc(96px + var(--safe-bottom));
     }
 
-    .brand {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:14px 14px 10px;
+      background:linear-gradient(to bottom, rgba(239,233,221,.98), rgba(239,233,221,.90));
+      backdrop-filter:blur(12px);
     }
 
-    .brand h1 {
-      font-size: 16px;
-      margin: 0;
-      letter-spacing: .02em;
+    .topCard{
+      background:rgba(255,255,255,.72);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:14px;
     }
 
-    .brand span {
-      font-size: 12px;
-      color: var(--muted);
+    .brandRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
     }
 
-    .tabs {
-      margin-top: 10px;
-      display: flex;
-      gap: 8px;
+    .brand{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:.02em;
     }
 
-    .tabbtn {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      border-radius: 10px;
-      font-size: 13px;
-      color: var(--ink);
-      cursor: pointer;
+    .subbrand{
+      color:var(--muted);
+      font-size:16px;
+      font-weight:700;
     }
 
-    .tabbtn.active {
-      border-color: rgba(17,17,17,0.5);
-      background: rgba(17,17,17,0.04);
-      font-weight: 600;
+    .seg{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
 
-    .content {
-      padding: 14px;
+    .seg button{
+      min-height:56px;
+      border-radius:18px;
+      border:1px solid var(--line-strong);
+      background:#fff;
+      color:var(--text);
+      font-size:17px;
+      font-weight:900;
+      box-shadow:0 3px 8px rgba(0,0,0,.03) inset;
+      cursor:pointer;
     }
 
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
+    .seg button.active{
+      background:var(--blue-soft);
+      border-color:rgba(59,103,232,.26);
+      color:var(--blue);
     }
 
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
+    .content{
+      padding:14px;
     }
 
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+
+    .controlWrap{
+      display:grid;
+      gap:12px;
+    }
+
+    .controlRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pill,
     button,
     select,
-    input[type="text"] {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      font-size: 13px;
-      cursor: pointer;
+    input[type="text"]{
+      border-radius:18px;
+      border:1px solid var(--line-strong);
+      background:#fff;
+      color:var(--text);
+      min-height:54px;
+      padding:0 16px;
+      font-size:16px;
     }
 
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-top: 8px;
+    button{
+      font-weight:900;
+      cursor:pointer;
     }
 
-    #canvasWrap {
-      margin-top: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(0,0,0,0.06);
-      overflow: hidden;
-      background: transparent;
+    button.primary{
+      background:var(--blue-soft);
+      color:var(--blue);
+      border-color:rgba(59,103,232,.20);
     }
 
-    #canvas {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #ddd;
-      overflow: hidden;
-      touch-action: none;
+    button.ghost{
+      background:#fff;
     }
 
-    .frame {
-      position: absolute;
-      overflow: visible;
-      touch-action: none;
+    button.danger{
+      color:var(--danger);
     }
 
-    .frame.selected {
-      outline: 3px solid var(--accent);
-      outline-offset: 2px;
+    select{
+      min-width:110px;
+      font-weight:800;
     }
 
-    .mask {
-      position: absolute;
-      overflow: hidden;
-      background: transparent;
+    .codeLabel{
+      color:var(--muted);
+      font-size:14px;
+      font-weight:800;
+      padding-left:2px;
     }
 
-    .mask img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-drag: none;
+    .codeInput{
+      width:140px;
+      text-align:center;
+      letter-spacing:.22em;
+      font-weight:900;
     }
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-drag: none;
-      z-index: 3;
+    .hint{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+      margin-top:4px;
     }
 
-    .handle {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      right: -12px;
-      bottom: -12px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: 3px solid #fff;
-      display: none;
-      z-index: 5;
-      cursor: nwse-resize;
+    #canvasWrap{
+      margin-top:14px;
+      background:#ede8df;
+      border-radius:28px;
+      border:1px solid var(--line);
+      padding:14px;
     }
 
-    .frame.selected .handle {
-      display: block;
+    #canvas{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/9;
+      background:var(--canvas-bg);
+      border-radius:24px;
+      overflow:hidden;
+      touch-action:none;
     }
 
-    .selectedBar {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(0,0,0,0.06);
+    .frame{
+      position:absolute;
+      overflow:visible;
+      touch-action:none;
     }
 
-    .selectedTitle {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+    .frame.selected{
+      outline:4px solid rgba(59,103,232,.92);
+      outline-offset:4px;
+      border-radius:8px;
     }
 
-    .selectedTitle .left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .mask{
+      position:absolute;
+      overflow:hidden;
+      background:transparent;
+      z-index:2;
     }
 
-    .selectedTitle .left strong {
-      font-size: 13px;
+    .mask img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
     }
 
-    .selectedTitle .left small {
-      font-size: 11px;
-      color: var(--muted);
+    .overlay{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      z-index:3;
     }
 
-    .strip {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 2px;
+    .handle{
+      position:absolute;
+      width:28px;
+      height:28px;
+      right:-14px;
+      bottom:-14px;
+      border-radius:999px;
+      background:var(--blue);
+      border:4px solid #fff;
+      display:none;
+      z-index:5;
+      cursor:nwse-resize;
+      box-shadow:0 6px 14px rgba(0,0,0,.14);
     }
 
-    .thumb {
-      width: 86px;
-      flex: 0 0 auto;
-      border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.08);
-      overflow: hidden;
-      background: #fff;
+    .frame.selected .handle{
+      display:block;
     }
 
-    .thumb img {
-      width: 100%;
-      height: 62px;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
+    .selectedBar{
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid var(--line);
     }
 
-    .thumb .act {
-      display: flex;
-      gap: 6px;
-      padding: 6px;
+    .selectedTitle{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:10px;
     }
 
-    .thumb button {
-      flex: 1;
-      padding: 6px 8px;
-      font-size: 11px;
-      border-radius: 10px;
-      border: 1px solid rgba(17,17,17,0.18);
-      background: rgba(17,17,17,0.04);
-      cursor: pointer;
+    .selectedTitle strong{
+      display:block;
+      font-size:17px;
+      margin-bottom:4px;
     }
 
-    .thumb button.primary {
-      border-color: rgba(0,122,255,0.35);
-      background: rgba(0,122,255,0.10);
+    .selectedTitle small{
+      color:var(--muted);
+      font-size:13px;
     }
 
-    .trayTop {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
+    .strip{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding-bottom:4px;
     }
 
-    .file {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      font-size: 13px;
-      cursor: pointer;
+    .thumb{
+      width:94px;
+      flex:0 0 auto;
+      border-radius:16px;
+      border:1px solid var(--line);
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 6px 14px rgba(0,0,0,.05);
     }
 
-    input[type="file"] {
-      display: none;
+    .thumb img{
+      width:100%;
+      height:72px;
+      object-fit:cover;
+      display:block;
     }
 
-    .trayGrid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
+    .thumb .act{
+      display:flex;
+      gap:6px;
+      padding:6px;
     }
 
-    .tile {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 14px;
-      overflow: hidden;
-      background: #fff;
-      cursor: pointer;
-      user-select: none;
-      touch-action: none;
+    .thumb button{
+      flex:1;
+      min-height:34px;
+      padding:0 8px;
+      font-size:11px;
+      border-radius:12px;
     }
 
-    .tile img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
+    .thumb button.primary{
+      background:var(--blue-soft);
+      color:var(--blue);
+      border-color:rgba(59,103,232,.18);
     }
 
-    .badge {
-      position: absolute;
-      left: 8px;
-      bottom: 8px;
-      background: rgba(255,255,255,0.88);
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 999px;
-      font-size: 11px;
-      padding: 4px 8px;
+    #panelTray{
+      display:none;
     }
 
-    .subnote {
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
+    .trayTop{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      background: rgba(17,17,17,0.92);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      max-width: min(520px, calc(100% - 24px));
-      z-index: 50;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-      display: none;
+    .file{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:54px;
+      padding:0 16px;
+      border-radius:18px;
+      border:1px solid var(--line-strong);
+      background:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    input[type="file"]{
+      display:none;
+    }
+
+    .trayGrid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .tile{
+      position:relative;
+      aspect-ratio:1/1;
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 6px 14px rgba(0,0,0,.04);
+      cursor:pointer;
+      user-select:none;
+      touch-action:none;
+    }
+
+    .tile img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      pointer-events:none;
+    }
+
+    .badge{
+      position:absolute;
+      left:8px;
+      bottom:8px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      padding:4px 8px;
+    }
+
+    .subnote{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:calc(18px + var(--safe-bottom));
+      transform:translateX(-50%);
+      background:rgba(17,17,17,.92);
+      color:#fff;
+      padding:11px 14px;
+      border-radius:14px;
+      font-size:14px;
+      max-width:min(520px, calc(100% - 24px));
+      z-index:50;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+      display:none;
+    }
+
+    @media (max-width: 760px){
+      .brand{font-size:24px}
+      .subbrand{font-size:14px}
+      .controlRow{gap:8px}
+      button, select, input[type="text"]{font-size:15px}
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <div class="brand">
-        <h1>KABEPIC</h1>
-        <span>Editor</span>
-      </div>
+      <div class="topCard">
+        <div class="brandRow">
+          <div class="brand">KABEPIC</div>
+          <div class="subbrand">Editor</div>
+        </div>
 
-      <div class="tabs">
-        <button id="tabCanvas" class="tabbtn active">キャンバス</button>
-        <button id="tabTray" class="tabbtn">写真</button>
+        <div class="seg">
+          <button id="tabCanvas" class="active">キャンバス</button>
+          <button id="tabTray">写真</button>
+        </div>
       </div>
     </header>
 
     <div class="content">
-      <div class="panel" id="panelCanvas">
-        <div class="row">
-          <select id="frameType">
-            <option value="portrait">縦</option>
-            <option value="square">正方形</option>
-            <option value="landscape">横</option>
-            <option value="oval">楕円</option>
-          </select>
+      <div class="card" id="panelCanvas">
+        <div class="controlWrap">
+          <div class="controlRow">
+            <select id="frameType">
+              <option value="portrait">縦</option>
+              <option value="square">正方形</option>
+              <option value="landscape">横</option>
+              <option value="oval">楕円</option>
+            </select>
 
-          <button id="addFrame">＋ フレーム追加</button>
-          <button id="deleteFrame">選択フレーム削除</button>
+            <button id="addFrame" class="primary">＋ フレーム追加</button>
+            <button id="deleteFrame" class="ghost danger">選択フレーム削除</button>
+          </div>
 
-          <label class="row" style="gap:8px;">
-            <span style="font-size:12px;color:var(--muted);">コード：</span>
-            <input id="codeInput" maxlength="6" placeholder="123456" inputmode="numeric"
-              style="width:120px;text-align:center;letter-spacing:.25em">
-          </label>
-
-          <button id="genCodeBtn">コード生成</button>
-          <button id="saveBtn">保存</button>
-          <button id="loadBtn">読込</button>
-          <button id="openViewBtn">壁表示を開く</button>
-          <button id="resetBtn">リセット</button>
+          <div class="controlRow">
+            <div class="codeLabel">コード：</div>
+            <input id="codeInput" class="codeInput" maxlength="6" placeholder="123456" inputmode="numeric">
+            <button id="genCodeBtn" class="primary">コード生成</button>
+            <button id="saveBtn" class="ghost">保存</button>
+            <button id="loadBtn" class="ghost">読込</button>
+            <button id="openViewBtn" class="ghost">壁表示を開く</button>
+            <button id="resetBtn" class="ghost">リセット</button>
+          </div>
         </div>
 
         <div class="hint">
@@ -398,11 +485,13 @@
           写真タブから PNG を追加してフレームに割り当て
         </div>
 
-        <div id="canvasWrap"><div id="canvas"></div></div>
+        <div id="canvasWrap">
+          <div id="canvas"></div>
+        </div>
 
         <div class="selectedBar">
           <div class="selectedTitle">
-            <div class="left">
+            <div>
               <strong>選択フレーム情報</strong>
               <small id="selectedInfo">なし</small>
             </div>
@@ -415,15 +504,15 @@
         </div>
       </div>
 
-      <div id="panelTray" class="panel" style="display:none;">
+      <div id="panelTray" class="card" style="display:none;">
         <div class="trayTop">
           <label class="file">
             写真を追加する
             <input id="fileInput" type="file" accept="image/*" multiple>
           </label>
-          <button id="saveBtn2">保存</button>
-          <button id="loadBtn2">読込</button>
-          <button id="resetBtn2">リセット</button>
+          <button id="saveBtn2" class="ghost">保存</button>
+          <button id="loadBtn2" class="ghost">読込</button>
+          <button id="resetBtn2" class="ghost">リセット</button>
         </div>
 
         <div class="subnote">
@@ -605,14 +694,6 @@
       }
 
       function seedDefaultFrames() {
-        /*
-          2400 x 1500
-          1マス = 10px
-          横 240マス / 縦 150マス
-
-          比率は Claude 実測値ベースを維持
-          位置と幅だけをグリッド基準で固定
-        */
         const preset = [
           ["portrait",   6/240,   43/150,  30/240], // 1
           ["square",    41/240,   22/150,  36/240], // 2
