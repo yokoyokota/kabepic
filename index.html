@@ -145,6 +145,11 @@
       box-shadow: var(--shadow-md);
       font-weight: 900;
       white-space: nowrap;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+    }
+
+    .chip-btn:active {
+      transform: scale(0.98);
     }
 
     .chip-btn.primary {
@@ -439,6 +444,11 @@
       font-weight: 900;
       background: transparent;
       border: 1px solid transparent;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.98);
     }
 
     .nav-btn.active {
@@ -605,12 +615,22 @@
       font-weight: 900;
       border: 1px solid var(--panel-line);
       background: rgba(255,255,255,0.9);
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+    }
+
+    .menu-item:active {
+      transform: scale(0.99);
     }
 
     .menu-item.active {
       background: var(--accent-soft);
       color: var(--accent);
-      border-color: rgba(47,91,218,0.12);
+      border-color: rgba(47,91,218,0.18);
+    }
+
+    .menu-item.disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     .section-label {
@@ -773,7 +793,7 @@
     <div id="topbar" class="topbar">
       <div class="brand">KABEPIC</div>
       <div class="topbar-right">
-        <div id="modeText" class="status-mini">編集</div>
+        <div id="modeText" class="status-mini">配置編集OFF</div>
         <button id="fitBtn" class="chip-btn soft">全体</button>
       </div>
     </div>
@@ -841,16 +861,16 @@
         <div class="section-label">選択中フレーム</div>
         <div class="menu-list">
           <button id="toggleStyleBtn" class="menu-item">
-            <span>装飾切替</span>
-            <span>選択中</span>
+            <span id="toggleStyleText">装飾なし</span>
+            <span id="toggleStyleState">選択中</span>
           </button>
           <button id="toggleOvalBtn" class="menu-item">
-            <span>楕円切替</span>
-            <span>選択中</span>
+            <span id="toggleOvalText">楕円</span>
+            <span id="toggleOvalState">選択中</span>
           </button>
           <button id="pinPhotoBtn" class="menu-item">
-            <span>写真固定</span>
-            <span>選択中</span>
+            <span id="pinPhotoText">写真固定</span>
+            <span id="pinPhotoState">選択中</span>
           </button>
           <button id="deleteFrameBtn" class="menu-item">
             <span style="color:#c84a4a;">フレーム削除</span>
@@ -883,8 +903,8 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "kabepic_full_v32";
-      const DB_NAME = "kabepic_photo_db_v32";
+      const STORAGE_KEY = "kabepic_full_v33";
+      const DB_NAME = "kabepic_photo_db_v33";
       const STORE_NAME = "photos";
 
       const WALL_W = 1600;
@@ -933,8 +953,14 @@
         toggleEditBtn: $("toggleEditBtn"),
         toggleEditLabel: $("toggleEditLabel"),
         toggleStyleBtn: $("toggleStyleBtn"),
+        toggleStyleText: $("toggleStyleText"),
+        toggleStyleState: $("toggleStyleState"),
         toggleOvalBtn: $("toggleOvalBtn"),
+        toggleOvalText: $("toggleOvalText"),
+        toggleOvalState: $("toggleOvalState"),
         pinPhotoBtn: $("pinPhotoBtn"),
+        pinPhotoText: $("pinPhotoText"),
+        pinPhotoState: $("pinPhotoState"),
         deleteFrameBtn: $("deleteFrameBtn"),
 
         viewer: $("viewer"),
@@ -1544,13 +1570,20 @@
         }));
       }
 
+      function isSimpleKind(kind) {
+        return kind.includes("_simple");
+      }
+
+      function isOvalKind(kind) {
+        return kind === "oval" || kind === "oval_simple";
+      }
+
       function renderTopBar() {
-        els.modeText.textContent =
-          state.mode === "display"
-            ? "表示"
-            : state.editEnabled
-              ? "編集ON"
-              : "編集OFF";
+        if (state.mode === "display") {
+          els.modeText.textContent = "表示";
+        } else {
+          els.modeText.textContent = state.editEnabled ? "配置編集ON" : "配置編集OFF";
+        }
 
         document.body.classList.toggle("display-mode", state.mode === "display");
         document.body.classList.toggle("edit-enabled", state.mode === "edit" && state.editEnabled);
@@ -1563,11 +1596,60 @@
         els.navDisplay.classList.toggle("active", state.mode === "display");
       }
 
+      function updateEditActionButtons() {
+        const frame = getSelectedFrame();
+        const noSelection = !frame;
+
+        els.toggleEditLabel.textContent = state.editEnabled ? "ON" : "OFF";
+        els.toggleEditBtn.classList.toggle("active", state.editEnabled);
+
+        if (noSelection) {
+          els.toggleStyleText.textContent = "装飾なし";
+          els.toggleStyleState.textContent = "未選択";
+          els.toggleOvalText.textContent = "楕円";
+          els.toggleOvalState.textContent = "未選択";
+          els.pinPhotoText.textContent = "写真固定";
+          els.pinPhotoState.textContent = "未選択";
+
+          els.toggleStyleBtn.classList.remove("active");
+          els.toggleOvalBtn.classList.remove("active");
+          els.pinPhotoBtn.classList.remove("active");
+
+          els.toggleStyleBtn.classList.add("disabled");
+          els.toggleOvalBtn.classList.add("disabled");
+          els.pinPhotoBtn.classList.add("disabled");
+          els.deleteFrameBtn.classList.add("disabled");
+          return;
+        }
+
+        const simple = isSimpleKind(frame.kind);
+        const oval = isOvalKind(frame.kind);
+        const pinned = !!frame.pinnedPhotoId;
+
+        els.toggleStyleText.textContent = simple ? "装飾あり" : "装飾なし";
+        els.toggleStyleState.textContent = simple ? "現在: 装飾なし" : "現在: 装飾あり";
+
+        els.toggleOvalText.textContent = oval ? "元の形に戻す" : "楕円";
+        els.toggleOvalState.textContent = oval ? "現在: 楕円" : "現在: 元の形";
+
+        els.pinPhotoText.textContent = pinned ? "写真固定解除" : "写真固定";
+        els.pinPhotoState.textContent = pinned ? "現在: 固定中" : "現在: 未固定";
+
+        els.toggleStyleBtn.classList.toggle("active", simple);
+        els.toggleOvalBtn.classList.toggle("active", oval);
+        els.pinPhotoBtn.classList.toggle("active", pinned);
+
+        els.toggleStyleBtn.classList.remove("disabled");
+        els.toggleOvalBtn.classList.remove("disabled");
+        els.pinPhotoBtn.classList.remove("disabled");
+        els.deleteFrameBtn.classList.remove("disabled");
+      }
+
       function renderPanels() {
         els.photoSheet.classList.toggle("open", state.mode === "edit" && state.activeTab === "photo");
         els.framesPanel.classList.toggle("open", state.mode === "edit" && state.activeTab === "frames");
         els.editPanel.classList.toggle("open", state.mode === "edit" && state.activeTab === "edit");
-        els.toggleEditLabel.textContent = state.editEnabled ? "ON" : "OFF";
+        updateEditActionButtons();
       }
 
       function buildFramesPanel() {
@@ -1613,7 +1695,7 @@
               renderAll();
               startDisplayTimers();
               saveState();
-              showToast("写真を固定しました", 900);
+              showToast("写真固定", 700);
             } else {
               openViewer(photo.dataUrl);
             }
@@ -2027,8 +2109,8 @@
           return;
         }
 
-        saveState();
         renderAll();
+        saveState();
       }
 
       function toggleOval() {
@@ -2055,8 +2137,8 @@
           return;
         }
 
-        saveState();
         renderAll();
+        saveState();
       }
 
       function togglePin() {
@@ -2069,7 +2151,10 @@
         if (frame.pinnedPhotoId) {
           frame.pinnedPhotoId = null;
           state.selectedPhotoId = null;
-          showToast("固定解除", 700);
+          renderAll();
+          saveState();
+          startDisplayTimers();
+          showToast("写真固定解除", 700);
         } else {
           if (!frame.currentPhotoId) {
             showToast("固定する写真がありません", 900);
@@ -2077,12 +2162,11 @@
           }
           frame.pinnedPhotoId = frame.currentPhotoId;
           state.selectedPhotoId = frame.currentPhotoId;
+          renderAll();
+          saveState();
+          startDisplayTimers();
           showToast("写真固定", 700);
         }
-
-        saveState();
-        renderAll();
-        startDisplayTimers();
       }
 
       function tryPlaceFrame(newFrameBase) {
@@ -2176,9 +2260,10 @@
         if (!files.length || state.isUploading) return;
         if (state.photos.length >= MAX_PHOTOS) {
           showToast("保存上限です", 900);
-          setProgress(false);
           return;
         }
+
+        setProgress(true, 0, files.length);
 
         let added = 0;
         let skipped = 0;
@@ -2385,9 +2470,6 @@
 
         els.photoInput.addEventListener("change", async (e) => {
           const files = Array.from(e.target.files || []);
-          if (files.length) {
-            setProgress(true, 0, files.length);
-          }
           await addPhotos(files);
           e.target.value = "";
         });
