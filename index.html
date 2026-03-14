@@ -6,14 +6,17 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
-  <title>KABEPIC Story8 Frame Check</title>
+  <title>KABEPIC Story8 Frame Spec</title>
   <style>
     :root {
       --base-w: 2400;
       --base-h: 1500;
-      --bg: #efefef;
-      --board: #ffffff;
-      --shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+      --page-bg: #ececec;
+      --board-bg: #f8f8f8;
+      --shadow: 0 18px 40px rgba(0,0,0,0.12);
+      --label-bg: rgba(40,40,40,0.82);
+      --label-fg: #fff;
+      --inner-stroke: rgba(80,80,80,0.45);
     }
 
     * {
@@ -26,8 +29,15 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--bg);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--page-bg);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Hiragino Sans",
+        "Noto Sans JP",
+        sans-serif;
     }
 
     body {
@@ -44,7 +54,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--bg);
+      background: var(--page-bg);
     }
 
     #boardWrap {
@@ -57,9 +67,9 @@
       position: relative;
       width: calc(var(--base-w) * 1px);
       height: calc(var(--base-h) * 1px);
-      background: var(--board);
+      background: var(--board-bg);
       box-shadow: var(--shadow);
-      overflow: hidden;
+      overflow: visible;
     }
 
     .frame {
@@ -69,23 +79,60 @@
       background-position: center center;
     }
 
+    .inner-hole {
+      position: absolute;
+      border: 2px solid var(--inner-stroke);
+      background: rgba(255,255,255,0.22);
+      pointer-events: none;
+    }
+
     .label {
       position: absolute;
       left: 50%;
-      top: calc(100% + 14px);
+      top: calc(100% + 18px);
       transform: translateX(-50%);
-      padding: 8px 12px;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 12px;
       border-radius: 999px;
-      background: rgba(20, 20, 20, 0.78);
-      color: #fff;
-      font-size: 22px;
+      background: var(--label-bg);
+      color: var(--label-fg);
+      font-size: 20px;
       font-weight: 800;
-      line-height: 1;
+      line-height: 34px;
+      text-align: center;
       white-space: nowrap;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+    }
+
+    .hud {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 20;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .hud strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
+  <div class="hud">
+    <strong>Story8 / 2400×1500</strong>
+    縦長: 1, 3, 8<br>
+    正方形: 2, 7<br>
+    横長: 4, 5, 6
+  </div>
+
   <div id="app">
     <div id="boardWrap">
       <div id="board"></div>
@@ -104,116 +151,137 @@
 
       /*
         2400 x 1500
-        グリッド 10px 基準
-        配置図から読み取って置いた Story8 仮確定値
+        グリッド10px基準
+        現時点の Story8 設計値
+        - 位置
+        - 外寸
+        - 内枠(inset)
+        をまとめて持つ
       */
-      const frames = [
+      const STORY8 = [
         {
           id: 1,
           kind: "vertical",
-          x: 50,
+          asset: "frame_vertical.png",
+          x: 160,
           y: 520,
-          w: 330,
-          h: 520,
-          asset: "frame_vertical.png"
+          w: 300,
+          h: 500,
+          inset: { top: 54, right: 52, bottom: 58, left: 54 }
         },
         {
           id: 2,
           kind: "square",
-          x: 460,
-          y: 300,
+          asset: "frame_square.png",
+          x: 500,
+          y: 380,
           w: 400,
           h: 400,
-          asset: "frame_square.png"
+          inset: { top: 58, right: 58, bottom: 60, left: 58 }
         },
         {
           id: 3,
           kind: "vertical",
+          asset: "frame_vertical.png",
           x: 930,
-          y: 80,
-          w: 520,
-          h: 760,
-          asset: "frame_vertical.png"
+          y: 130,
+          w: 470,
+          h: 660,
+          inset: { top: 68, right: 64, bottom: 72, left: 66 }
         },
         {
           id: 4,
-          kind: "square",
-          x: 1500,
-          y: 450,
+          kind: "horizontal",
+          asset: "frame_horizontal.png",
+          x: 1490,
+          y: 460,
           w: 360,
-          h: 360,
-          asset: "frame_square.png"
+          h: 280,
+          inset: { top: 48, right: 54, bottom: 50, left: 52 }
         },
         {
           id: 5,
           kind: "horizontal",
+          asset: "frame_horizontal.png",
           x: 1900,
-          y: 500,
-          w: 500,
-          h: 400,
-          asset: "frame_horizontal.png"
+          y: 480,
+          w: 470,
+          h: 310,
+          inset: { top: 50, right: 58, bottom: 52, left: 56 }
         },
         {
           id: 6,
-          kind: "square",
-          x: 420,
-          y: 760,
-          w: 460,
-          h: 460,
-          asset: "frame_square.png"
+          kind: "horizontal",
+          asset: "frame_horizontal.png",
+          x: 470,
+          y: 790,
+          w: 440,
+          h: 330,
+          inset: { top: 52, right: 56, bottom: 54, left: 54 }
         },
         {
           id: 7,
           kind: "square",
-          x: 930,
-          y: 800,
-          w: 490,
-          h: 490,
-          asset: "frame_square.png"
+          asset: "frame_square.png",
+          x: 960,
+          y: 820,
+          w: 400,
+          h: 400,
+          inset: { top: 58, right: 58, bottom: 60, left: 58 }
         },
         {
           id: 8,
           kind: "vertical",
-          x: 1490,
-          y: 860,
-          w: 320,
-          h: 470,
-          asset: "frame_vertical.png"
+          asset: "frame_vertical.png",
+          x: 1480,
+          y: 820,
+          w: 300,
+          h: 500,
+          inset: { top: 54, right: 52, bottom: 58, left: 54 }
         }
       ];
 
+      function createFrame(frame) {
+        const el = document.createElement("div");
+        el.className = "frame";
+        el.style.left = `${frame.x}px`;
+        el.style.top = `${frame.y}px`;
+        el.style.width = `${frame.w}px`;
+        el.style.height = `${frame.h}px`;
+        el.style.backgroundImage = `url("${frame.asset}")`;
+
+        const hole = document.createElement("div");
+        hole.className = "inner-hole";
+        hole.style.left = `${frame.inset.left}px`;
+        hole.style.top = `${frame.inset.top}px`;
+        hole.style.width = `${frame.w - frame.inset.left - frame.inset.right}px`;
+        hole.style.height = `${frame.h - frame.inset.top - frame.inset.bottom}px`;
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = String(frame.id);
+
+        el.appendChild(hole);
+        el.appendChild(label);
+        return el;
+      }
+
       function render() {
         board.innerHTML = "";
-
-        frames.forEach((f) => {
-          const el = document.createElement("div");
-          el.className = "frame";
-          el.style.left = `${f.x}px`;
-          el.style.top = `${f.y}px`;
-          el.style.width = `${f.w}px`;
-          el.style.height = `${f.h}px`;
-          el.style.backgroundImage = `url("${f.asset}")`;
-
-          const label = document.createElement("div");
-          label.className = "label";
-          label.textContent = `${f.id}`;
-          el.appendChild(label);
-
-          board.appendChild(el);
+        STORY8.forEach((frame) => {
+          board.appendChild(createFrame(frame));
         });
       }
 
       function fitBoard() {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-
-        const scale = Math.min(vw / BASE_W, vh / BASE_H) * 0.96;
+        const scale = Math.min(vw / BASE_W, vh / BASE_H) * 0.94;
         boardWrap.style.transform = `scale(${scale})`;
       }
 
       render();
       fitBoard();
-
       window.addEventListener("resize", fitBoard);
     })();
   </script>
