@@ -3,1162 +3,180 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>KABEPIC Editor</title>
+  <title>KABEPIC Story8 Frame Check</title>
   <style>
     :root{
-      --bg: #ece6da;
-      --bg-2: #f3eee5;
-      --panel: rgba(255,255,255,0.72);
-      --panel-solid: #f7f3ec;
-      --surface: #ffffff;
-      --line: rgba(24,24,24,.08);
-      --line-strong: rgba(24,24,24,.14);
-      --text: #191919;
-      --muted: #7c766d;
-      --blue: #3f67e8;
-      --blue-soft: rgba(63,103,232,.12);
-      --blue-line: rgba(63,103,232,.22);
-      --danger: #c85a5a;
-      --canvas-bg: #d7d2c8;
-      --shadow-lg: 0 16px 40px rgba(0,0,0,.08);
-      --shadow-md: 0 8px 20px rgba(0,0,0,.05);
-      --r-xl: 28px;
-      --r-lg: 22px;
-      --r-md: 16px;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg:#ece6da;
+      --board:#d8d3ca;
+      --line:rgba(0,0,0,.08);
+      --shadow:0 16px 40px rgba(0,0,0,.08);
+      --text:#1a1a1a;
+      --muted:#7b756c;
     }
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
     html,body{
       margin:0;
-      min-height:100%;
-      background:linear-gradient(180deg,var(--bg),var(--bg-2));
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:linear-gradient(180deg,#ece6da,#f4efe7);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,sans-serif;
       color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     }
 
     body{
       display:flex;
+      align-items:center;
       justify-content:center;
     }
 
-    .app{
+    .wrap{
       width:100%;
-      max-width:1180px;
-      min-height:100vh;
-      padding-bottom:calc(96px + var(--safe-bottom));
-    }
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:20;
-      padding:14px 14px 10px;
-      background:linear-gradient(to bottom, rgba(236,230,218,.95), rgba(236,230,218,.82));
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-    }
-
-    .topCard{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:32px;
-      box-shadow:var(--shadow-lg);
-      padding:16px;
-    }
-
-    .brandRow{
+      height:100%;
       display:flex;
-      align-items:baseline;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .brand{
-      font-size:34px;
-      font-weight:900;
-      letter-spacing:.01em;
-    }
-
-    .subbrand{
-      font-size:16px;
-      font-weight:700;
-      color:var(--muted);
-    }
-
-    .seg{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .seg button{
-      min-height:58px;
-      border-radius:20px;
-      border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.92);
-      color:var(--text);
-      font-size:18px;
-      font-weight:900;
-      box-shadow:0 2px 6px rgba(0,0,0,.02) inset;
-      cursor:pointer;
-    }
-
-    .seg button.active{
-      background:var(--blue-soft);
-      border-color:var(--blue-line);
-      color:var(--blue);
-    }
-
-    .content{
-      padding:14px;
-    }
-
-    .card{
-      background:rgba(247,243,236,.94);
-      border:1px solid var(--line);
-      border-radius:32px;
-      box-shadow:var(--shadow-lg);
-      padding:16px;
-    }
-
-    .controlWrap{
-      display:grid;
-      gap:12px;
-    }
-
-    .controlRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
       align-items:center;
+      justify-content:center;
+      padding:20px;
     }
 
-    button,
-    select,
-    input[type="text"]{
-      min-height:54px;
-      padding:0 16px;
-      border-radius:18px;
-      border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.96);
-      color:var(--text);
-      font-size:16px;
-      box-shadow:var(--shadow-md);
+    .board-wrap{
+      transform-origin:center center;
+      will-change:transform;
     }
 
-    button{
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    button.primary{
-      background:var(--blue-soft);
-      color:var(--blue);
-      border-color:var(--blue-line);
-      box-shadow:none;
-    }
-
-    button.ghost{
-      background:rgba(255,255,255,.96);
-      color:var(--text);
-    }
-
-    button.danger{
-      color:var(--danger);
-    }
-
-    select{
-      min-width:116px;
-      font-weight:900;
-    }
-
-    .codeLabel{
-      color:var(--muted);
-      font-size:14px;
-      font-weight:800;
-      padding-left:2px;
-    }
-
-    .codeInput{
-      width:150px;
-      text-align:center;
-      letter-spacing:.22em;
-      font-weight:900;
-    }
-
-    .hint{
-      color:var(--muted);
-      line-height:1.7;
-      font-size:14px;
-      margin-top:4px;
-    }
-
-    #canvasWrap{
-      margin-top:14px;
-      border-radius:30px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.30);
-      padding:14px;
-    }
-
-    #canvas{
+    .board{
       position:relative;
-      width:100%;
-      aspect-ratio:16 / 9;
-      background:var(--canvas-bg);
-      border-radius:24px;
-      overflow:hidden;
-      touch-action:none;
+      width:2400px;
+      height:1500px;
+      background:var(--board);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:visible;
     }
 
     .frame{
       position:absolute;
-      overflow:visible;
-      touch-action:none;
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:100% 100%;
     }
 
-    .frame.selected{
-      outline:4px solid rgba(63,103,232,.95);
-      outline-offset:4px;
-      border-radius:8px;
-    }
-
-    .mask{
+    .label{
       position:absolute;
-      overflow:hidden;
-      background:transparent;
-      z-index:2;
-    }
-
-    .mask img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-      display:block;
-      pointer-events:none;
-      user-select:none;
-      -webkit-user-drag:none;
-    }
-
-    .overlay{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      display:block;
-      pointer-events:none;
-      user-select:none;
-      -webkit-user-drag:none;
-      z-index:3;
-    }
-
-    .handle{
-      position:absolute;
-      width:28px;
-      height:28px;
-      right:-14px;
-      bottom:-14px;
-      border-radius:999px;
-      background:var(--blue);
-      border:4px solid #fff;
-      display:none;
-      z-index:5;
-      cursor:nwse-resize;
-      box-shadow:0 6px 14px rgba(0,0,0,.14);
-    }
-
-    .frame.selected .handle{
-      display:block;
-    }
-
-    .selectedBar{
-      margin-top:18px;
-      padding-top:16px;
-      border-top:1px solid var(--line);
-    }
-
-    .selectedTitle{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .selectedTitle strong{
-      display:block;
-      font-size:18px;
-      margin-bottom:4px;
-    }
-
-    .selectedTitle small{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .strip{
-      display:flex;
-      gap:10px;
-      overflow-x:auto;
-      padding-bottom:4px;
-    }
-
-    .thumb{
-      width:94px;
-      flex:0 0 auto;
-      border-radius:18px;
-      border:1px solid var(--line);
-      overflow:hidden;
-      background:#fff;
-      box-shadow:var(--shadow-md);
-    }
-
-    .thumb img{
-      width:100%;
-      height:72px;
-      object-fit:cover;
-      display:block;
-    }
-
-    .thumb .act{
-      display:flex;
-      gap:6px;
-      padding:6px;
-    }
-
-    .thumb button{
-      flex:1;
-      min-height:34px;
-      padding:0 8px;
-      font-size:11px;
-      border-radius:12px;
-      box-shadow:none;
-    }
-
-    .thumb button.primary{
-      background:var(--blue-soft);
-      color:var(--blue);
-      border-color:var(--blue-line);
-    }
-
-    #panelTray{
-      display:none;
-    }
-
-    .trayTop{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .file{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:54px;
-      padding:0 16px;
-      border-radius:18px;
-      border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.96);
-      box-shadow:var(--shadow-md);
-      font-size:16px;
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    input[type="file"]{
-      display:none;
-    }
-
-    .trayGrid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .tile{
-      position:relative;
-      aspect-ratio:1 / 1;
-      border:1px solid var(--line);
-      border-radius:20px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:var(--shadow-md);
-      cursor:pointer;
-      user-select:none;
-      touch-action:none;
-    }
-
-    .tile img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-      pointer-events:none;
-    }
-
-    .badge{
-      position:absolute;
-      left:8px;
-      bottom:8px;
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:999px;
-      font-size:11px;
-      font-weight:800;
-      padding:4px 8px;
-    }
-
-    .subnote{
-      margin-top:8px;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.6;
-    }
-
-    .toast{
-      position:fixed;
       left:50%;
-      bottom:calc(18px + var(--safe-bottom));
+      top:calc(100% + 14px);
       transform:translateX(-50%);
-      background:rgba(17,17,17,.92);
+      min-width:34px;
+      height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(20,20,20,.82);
       color:#fff;
-      padding:11px 14px;
-      border-radius:14px;
-      font-size:14px;
-      max-width:min(520px, calc(100% - 24px));
-      z-index:50;
-      box-shadow:0 10px 30px rgba(0,0,0,.18);
-      display:none;
+      font-size:20px;
+      font-weight:800;
+      line-height:34px;
+      text-align:center;
+      white-space:nowrap;
+      box-shadow:0 6px 14px rgba(0,0,0,.16);
     }
 
-    @media (max-width: 760px){
-      .brand{font-size:26px}
-      .subbrand{font-size:14px}
-      .controlRow{gap:8px}
-      button, select, input[type="text"]{font-size:15px}
-      .seg button{font-size:17px}
+    .hud{
+      position:fixed;
+      top:14px;
+      left:14px;
+      z-index:10;
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .hud strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:14px;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="topCard">
-        <div class="brandRow">
-          <div class="brand">KABEPIC</div>
-          <div class="subbrand">Editor</div>
-        </div>
+  <div class="hud">
+    <strong>Story(8) / フレーム確認用</strong>
+    1,3,8 = 縦 / 2,7 = 正方形 / 4,5,6 = 横<br>
+    今回は前回より「短すぎる」を補正した版
+  </div>
 
-        <div class="seg">
-          <button id="tabCanvas" class="active">キャンバス</button>
-          <button id="tabTray">写真</button>
-        </div>
-      </div>
-    </header>
-
-    <div class="content">
-      <div class="card" id="panelCanvas">
-        <div class="controlWrap">
-          <div class="controlRow">
-            <select id="frameType">
-              <option value="portrait">縦</option>
-              <option value="square">正方形</option>
-              <option value="landscape">横</option>
-              <option value="oval">楕円</option>
-            </select>
-
-            <button id="addFrame" class="primary">＋ フレーム追加</button>
-            <button id="deleteFrame" class="ghost danger">選択フレーム削除</button>
-          </div>
-
-          <div class="controlRow">
-            <div class="codeLabel">コード：</div>
-            <input id="codeInput" class="codeInput" maxlength="6" placeholder="123456" inputmode="numeric">
-            <button id="genCodeBtn" class="primary">コード生成</button>
-            <button id="saveBtn" class="ghost">保存</button>
-            <button id="loadBtn" class="ghost">読込</button>
-            <button id="openViewBtn" class="ghost">壁表示を開く</button>
-            <button id="resetBtn" class="ghost">リセット</button>
-          </div>
-        </div>
-
-        <div class="hint">
-          初期は Story（8枚）を自動配置します。<br>
-          フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
-          楕円は mask_oval.png を使用します。<br>
-          写真タブから PNG を追加してフレームに割り当て
-        </div>
-
-        <div id="canvasWrap">
-          <div id="canvas"></div>
-        </div>
-
-        <div class="selectedBar">
-          <div class="selectedTitle">
-            <div>
-              <strong>選択フレーム情報</strong>
-              <small id="selectedInfo">なし</small>
-            </div>
-          </div>
-
-          <div id="selectedStrip" class="strip"></div>
-          <div id="selectedEmpty" class="subnote" style="display:none;">
-            写真タブから写真を追加し、タップしてフレームに割り当て
-          </div>
-        </div>
-      </div>
-
-      <div id="panelTray" class="card" style="display:none;">
-        <div class="trayTop">
-          <label class="file">
-            写真を追加する
-            <input id="fileInput" type="file" accept="image/*" multiple>
-          </label>
-          <button id="saveBtn2" class="ghost">保存</button>
-          <button id="loadBtn2" class="ghost">読込</button>
-          <button id="resetBtn2" class="ghost">リセット</button>
-        </div>
-
-        <div class="subnote">
-          タップで選択中フレームに割り当て<br>
-          長押しで写真をライブラリから削除
-        </div>
-
-        <div id="trayGrid" class="trayGrid"></div>
-        <div id="trayEmpty" class="subnote" style="display:none;">写真がまだありません</div>
-      </div>
+  <div class="wrap">
+    <div id="boardWrap" class="board-wrap">
+      <div id="board" class="board"></div>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
-
   <script>
     (() => {
-      const PREFIX = "kabepic_code_v13_";
-      const LONG_PRESS_MS = 650;
+      "use strict";
 
-      const FRAME_META = {
-        portrait: {
-          src: "frame_vertical.png",
-          inset: "15.7% 18.7% 15.5% 19.9%",
-          mask: "rect",
-          ar: 894 / 1063
-        },
-        square: {
-          src: "frame_square.png",
-          inset: "19.0% 19.9% 20.2% 19.2%",
-          mask: "rect",
-          ar: 1053 / 1052
-        },
-        landscape: {
-          src: "frame_horizontal.png",
-          inset: "18.6% 15.5% 20.0% 15.7%",
-          mask: "rect",
-          ar: 1063 / 894
-        },
-        oval: {
-          src: "frame_oval.png",
-          inset: "7.8% 11.7% 8.4% 12.4%",
-          mask: "oval",
-          maskPng: "mask_oval.png",
-          ar: 694 / 982
-        }
+      const boardWrap = document.getElementById("boardWrap");
+      const board = document.getElementById("board");
+
+      // 実測比率ベース
+      const AR = {
+        portrait: 894 / 1063,
+        square: 1053 / 1052,
+        landscape: 1063 / 894,
+        oval: 694 / 982
       };
 
-      const SIZE_PRESETS = [0.16, 0.22, 0.28];
+      // 短すぎた前回版を補正
+      // x, y, w は 2400x1500 基準
+      const frames = [
+        { id: 1, kind: "portrait",  x:  70, y: 510, w: 350, src: "frame_vertical.png"   },
+        { id: 2, kind: "square",    x: 500, y: 300, w: 410, src: "frame_square.png"     },
+        { id: 3, kind: "portrait",  x: 930, y:  40, w: 500, src: "frame_vertical.png"   },
+        { id: 4, kind: "landscape", x:1490, y: 420, w: 360, src: "frame_horizontal.png" },
+        { id: 5, kind: "landscape", x:1890, y: 430, w: 500, src: "frame_horizontal.png" },
+        { id: 6, kind: "landscape", x: 430, y: 860, w: 480, src: "frame_horizontal.png" },
+        { id: 7, kind: "square",    x: 970, y: 820, w: 430, src: "frame_square.png"     },
+        { id: 8, kind: "portrait",  x:1510, y: 790, w: 350, src: "frame_vertical.png"   }
+      ];
 
-      let photos = [];
-      let frames = [];
-      let selectedId = null;
-      let currentTab = "canvas";
+      function render() {
+        board.innerHTML = "";
 
-      const $ = (id) => document.getElementById(id);
-      const canvas = $("canvas");
-      const trayGrid = $("trayGrid");
-      const toastEl = $("toast");
-
-      const uid = () => Math.random().toString(36).slice(2, 10);
-      const codeKey = (code) => PREFIX + code;
-
-      function showToast(msg, ms = 1400) {
-        toastEl.textContent = msg;
-        toastEl.style.display = "block";
-        clearTimeout(showToast._t);
-        showToast._t = setTimeout(() => {
-          toastEl.style.display = "none";
-        }, ms);
-      }
-
-      function makePlaceholderDataUrl() {
-        const c = document.createElement("canvas");
-        c.width = 1200;
-        c.height = 1200;
-        const g = c.getContext("2d");
-        g.fillStyle = "#f1efe8";
-        g.fillRect(0, 0, c.width, c.height);
-        g.strokeStyle = "rgba(0,0,0,0.12)";
-        g.lineWidth = 12;
-        g.strokeRect(60, 60, c.width - 120, c.height - 120);
-        g.fillStyle = "rgba(0,0,0,0.35)";
-        g.font = "72px sans-serif";
-        g.fillText("KABEPIC", 350, 560);
-        g.font = "34px sans-serif";
-        g.fillText("placeholder", 430, 640);
-        return c.toDataURL("image/png");
-      }
-
-      function setTab(which) {
-        currentTab = which;
-        $("tabCanvas").classList.toggle("active", which === "canvas");
-        $("tabTray").classList.toggle("active", which === "tray");
-        $("panelCanvas").style.display = which === "canvas" ? "" : "none";
-        $("panelTray").style.display = which === "tray" ? "" : "none";
-      }
-
-      $("tabCanvas").onclick = () => setTab("canvas");
-      $("tabTray").onclick = () => setTab("tray");
-
-      function normalizeCodeInput() {
-        const v = ($("codeInput").value || "").replace(/\D/g, "").slice(0, 6);
-        $("codeInput").value = v;
-        return v;
-      }
-
-      $("codeInput").oninput = normalizeCodeInput;
-
-      $("genCodeBtn").onclick = () => {
-        $("codeInput").value = String(Math.floor(100000 + Math.random() * 900000));
-        showToast("コードを生成しました");
-      };
-
-      function findFrame(id) {
-        return frames.find(f => f.id === id) || null;
-      }
-
-      function findPhoto(id) {
-        return photos.find(p => p.id === id) || null;
-      }
-
-      function detectOrient(ratio) {
-        if (ratio > 1.05) return "landscape";
-        if (ratio < 0.95) return "portrait";
-        return "square";
-      }
-
-      async function readFile(file) {
-        const dataUrl = await new Promise((resolve, reject) => {
-          const r = new FileReader();
-          r.onload = () => resolve(r.result);
-          r.onerror = reject;
-          r.readAsDataURL(file);
-        });
-
-        const meta = await new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            const ratio = (img.naturalWidth || 1) / (img.naturalHeight || 1);
-            resolve({ ratio, orient: detectOrient(ratio) });
-          };
-          img.onerror = () => resolve({ ratio: 1, orient: "square" });
-          img.src = dataUrl;
-        });
-
-        return {
-          id: uid(),
-          name: file.name,
-          dataUrl,
-          ...meta
-        };
-      }
-
-      async function hydrateAspectRatios() {
-        await Promise.all(
-          Object.values(FRAME_META).map(meta => new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-              meta.ar = (img.naturalWidth || 1) / (img.naturalHeight || 1);
-              resolve();
-            };
-            img.onerror = () => resolve();
-            img.src = meta.src + "?v=13";
-          }))
-        );
-      }
-
-      function applyOvalMask(el) {
-        el.style.borderRadius = "50%";
-        el.style.webkitMaskImage = `url("${FRAME_META.oval.maskPng}")`;
-        el.style.webkitMaskSize = "100% 100%";
-        el.style.webkitMaskRepeat = "no-repeat";
-        el.style.webkitMaskPosition = "center";
-        el.style.maskImage = `url("${FRAME_META.oval.maskPng}")`;
-        el.style.maskSize = "100% 100%";
-        el.style.maskRepeat = "no-repeat";
-        el.style.maskPosition = "center";
-      }
-
-      function seedDefaultFrames() {
-        const preset = [
-          ["portrait",   6/240,   43/150,  30/240], // 1
-          ["square",    41/240,   22/150,  36/240], // 2
-          ["portrait",  95/240,    6/150,  38/240], // 3
-          ["landscape", 145/240,  28/150,  28/240], // 4
-          ["landscape", 191/240,  37/150,  42/240], // 5
-          ["landscape",  39/240,  76/150,  42/240], // 6
-          ["square",     90/240,  78/150,  40/240], // 7
-          ["portrait",  148/240,  76/150,  30/240]  // 8
-        ];
-
-        frames = preset.map(p => ({
-          id: uid(),
-          kind: p[0],
-          x: p[1],
-          y: p[2],
-          w: p[3],
-          photoIds: photos[0] ? [photos[0].id] : [],
-          fixedPhotoId: null
-        }));
-      }
-
-      function framePx(f) {
-        const r = canvas.getBoundingClientRect();
-        const m = FRAME_META[f.kind];
-        const w = Math.max(1, Math.round(f.w * r.width));
-        const h = Math.max(1, Math.round(w / m.ar));
-        return { w, h };
-      }
-
-      function updateSelectionUI() {
-        canvas.querySelectorAll(".frame").forEach(el => {
-          el.classList.toggle("selected", el.dataset.id === selectedId);
-        });
-      }
-
-      function attachDrag(el, f) {
-        let on = false, sx = 0, sy = 0, ox = 0, oy = 0;
-
-        el.addEventListener("pointerdown", (e) => {
-          if (e.target.classList.contains("handle")) return;
-          e.stopPropagation();
-          selectedId = f.id;
-          updateSelectionUI();
-          renderSelected();
-
-          on = true;
-          sx = e.clientX;
-          sy = e.clientY;
-          ox = f.x;
-          oy = f.y;
-          el.setPointerCapture(e.pointerId);
-        });
-
-        el.addEventListener("pointermove", (e) => {
-          if (!on) return;
-          const r = canvas.getBoundingClientRect();
-          f.x = ox + (e.clientX - sx) / r.width;
-          f.y = oy + (e.clientY - sy) / r.height;
-          el.style.left = (f.x * 100) + "%";
-          el.style.top = (f.y * 100) + "%";
-        });
-
-        el.addEventListener("pointerup", () => { on = false; });
-        el.addEventListener("pointercancel", () => { on = false; });
-      }
-
-      function attachResize(handle, el, f) {
-        let on = false, sx = 0, sw = 0;
-
-        handle.addEventListener("pointerdown", (e) => {
-          e.stopPropagation();
-          selectedId = f.id;
-          updateSelectionUI();
-          renderSelected();
-
-          on = true;
-          sx = e.clientX;
-          sw = f.w;
-          handle.setPointerCapture(e.pointerId);
-        });
-
-        handle.addEventListener("pointermove", (e) => {
-          if (!on) return;
-          const r = canvas.getBoundingClientRect();
-          let nw = sw + (e.clientX - sx) / r.width;
-          const minW = Math.max(0.10, 80 / r.width);
-          if (nw < minW) nw = minW;
-          f.w = nw;
-
-          const m = FRAME_META[f.kind];
-          el.style.width = Math.round(f.w * r.width) + "px";
-          el.style.height = Math.round((f.w * r.width) / m.ar) + "px";
-        });
-
-        handle.addEventListener("pointerup", () => { on = false; });
-        handle.addEventListener("pointercancel", () => { on = false; });
-      }
-
-      function renderFrames() {
-        canvas.innerHTML = "";
-
-        frames.forEach(f => {
-          const m = FRAME_META[f.kind];
-          const sz = framePx(f);
+        frames.forEach((f) => {
+          const h = Math.round(f.w / AR[f.kind]);
 
           const el = document.createElement("div");
           el.className = "frame";
-          el.dataset.id = f.id;
-          el.style.left = (f.x * 100) + "%";
-          el.style.top = (f.y * 100) + "%";
-          el.style.width = sz.w + "px";
-          el.style.height = sz.h + "px";
+          el.style.left = `${f.x}px`;
+          el.style.top = `${f.y}px`;
+          el.style.width = `${f.w}px`;
+          el.style.height = `${h}px`;
+          el.style.backgroundImage = `url("${f.src}")`;
 
-          const mask = document.createElement("div");
-          mask.className = "mask";
-          mask.style.inset = m.inset;
-          if (f.kind === "oval") applyOvalMask(mask);
+          const label = document.createElement("div");
+          label.className = "label";
+          label.textContent = String(f.id);
 
-          const img = document.createElement("img");
-          const pid =
-            (f.fixedPhotoId && f.photoIds.includes(f.fixedPhotoId))
-              ? f.fixedPhotoId
-              : (f.photoIds[0] || photos[0]?.id);
-          const p = pid ? findPhoto(pid) : photos[0];
-          img.src = p ? p.dataUrl : makePlaceholderDataUrl();
-          mask.appendChild(img);
-          el.appendChild(mask);
-
-          const ov = document.createElement("img");
-          ov.className = "overlay";
-          ov.src = m.src;
-          el.appendChild(ov);
-
-          const h = document.createElement("div");
-          h.className = "handle";
-          el.appendChild(h);
-
-          attachDrag(el, f);
-          attachResize(h, el, f);
-
-          canvas.appendChild(el);
-        });
-
-        updateSelectionUI();
-      }
-
-      function renderSelected() {
-        const f = selectedId ? findFrame(selectedId) : null;
-        $("selectedInfo").textContent = f ? `ID: ${f.id} / 種類: ${f.kind} / 写真: ${f.photoIds.length}枚` : "なし";
-        $("selectedStrip").innerHTML = "";
-
-        if (!f || !f.photoIds.length) {
-          $("selectedEmpty").style.display = f ? "" : "none";
-          return;
-        }
-
-        $("selectedEmpty").style.display = "none";
-
-        f.photoIds.forEach(pid => {
-          const p = findPhoto(pid);
-          if (!p) return;
-
-          const box = document.createElement("div");
-          box.className = "thumb";
-          box.innerHTML = `
-            <img src="${p.dataUrl}">
-            <div class="act">
-              <button class="primary">${f.fixedPhotoId === pid ? "固定中" : "固定"}</button>
-              <button>除外</button>
-            </div>
-          `;
-
-          box.querySelectorAll("button")[0].onclick = () => {
-            f.fixedPhotoId = pid;
-            renderFrames();
-            renderSelected();
-            showToast("固定しました");
-          };
-
-          box.querySelectorAll("button")[1].onclick = () => {
-            f.photoIds = f.photoIds.filter(x => x !== pid);
-            if (f.fixedPhotoId === pid) f.fixedPhotoId = null;
-            renderFrames();
-            renderSelected();
-            showToast("除外しました");
-          };
-
-          $("selectedStrip").appendChild(box);
+          el.appendChild(label);
+          board.appendChild(el);
         });
       }
 
-      function renderTray() {
-        trayGrid.innerHTML = "";
-
-        if (!photos.length) {
-          $("trayEmpty").style.display = "";
-          return;
-        }
-
-        $("trayEmpty").style.display = "none";
-
-        photos.forEach(p => {
-          const tile = document.createElement("div");
-          tile.className = "tile";
-          tile.innerHTML = `
-            <img src="${p.dataUrl}">
-            <div class="badge">${selectedId ? "割当" : "写真追加済み"}</div>
-          `;
-
-          let timer = null;
-          let longPressed = false;
-
-          tile.addEventListener("pointerdown", () => {
-            longPressed = false;
-            timer = setTimeout(() => {
-              longPressed = true;
-              if (!confirm("この写真をライブラリから削除しますか？\n（フレームからも除外されます）")) return;
-
-              photos = photos.filter(x => x.id !== p.id);
-              frames.forEach(fr => {
-                fr.photoIds = fr.photoIds.filter(x => x !== p.id);
-                if (fr.fixedPhotoId === p.id) fr.fixedPhotoId = null;
-              });
-
-              if (!photos.length) {
-                photos = [{
-                  id: uid(),
-                  name: "placeholder",
-                  dataUrl: makePlaceholderDataUrl(),
-                  ratio: 1,
-                  orient: "square"
-                }];
-              }
-
-              renderAll(false);
-              showToast("写真を削除しました");
-            }, LONG_PRESS_MS);
-          });
-
-          tile.addEventListener("pointerup", () => {
-            if (timer) clearTimeout(timer);
-            timer = null;
-            if (longPressed) return;
-
-            if (!selectedId) {
-              showToast("先にフレームを選択してください");
-              return;
-            }
-
-            const f = findFrame(selectedId);
-            if (!f) return;
-
-            if (f.photoIds.includes(p.id)) {
-              showToast("すでに割り当て済みです");
-              return;
-            }
-
-            f.photoIds.push(p.id);
-            renderFrames();
-            renderSelected();
-            showToast("写真を割り当てました");
-          });
-
-          tile.addEventListener("pointercancel", () => {
-            if (timer) clearTimeout(timer);
-            timer = null;
-          });
-
-          trayGrid.appendChild(tile);
-        });
+      function fit() {
+        const vw = window.innerWidth - 24;
+        const vh = window.innerHeight - 24;
+        const scale = Math.min(vw / 2400, vh / 1500) * 0.96;
+        boardWrap.style.transform = `scale(${scale})`;
       }
 
-      function renderAll(keepTab = true) {
-        renderFrames();
-        renderSelected();
-        renderTray();
-        if (!keepTab) setTab("canvas");
-        else setTab(currentTab);
-      }
-
-      function save() {
-        const c = normalizeCodeInput();
-        if (!/^\d{6}$/.test(c)) {
-          showToast("6桁コードを入力してください");
-          return;
-        }
-
-        localStorage.setItem(
-          codeKey(c),
-          JSON.stringify({
-            meta: { savedAt: Date.now(), v: 13 },
-            photos,
-            frames
-          })
-        );
-
-        showToast("保存 " + c + " 完了しました");
-      }
-
-      function load() {
-        const c = normalizeCodeInput();
-        if (!/^\d{6}$/.test(c)) {
-          showToast("6桁コードを入力してください");
-          return;
-        }
-
-        const raw = localStorage.getItem(codeKey(c));
-        if (!raw) {
-          showToast("このコードのデータはありません");
-          return;
-        }
-
-        try {
-          const d = JSON.parse(raw);
-          photos = (Array.isArray(d.photos) && d.photos.length)
-            ? d.photos
-            : [{
-                id: uid(),
-                name: "placeholder",
-                dataUrl: makePlaceholderDataUrl(),
-                ratio: 1,
-                orient: "square"
-              }];
-          frames = Array.isArray(d.frames) ? d.frames : [];
-          selectedId = null;
-          renderAll();
-          showToast("読み込み完了");
-        } catch {
-          showToast("読み込み失敗");
-        }
-      }
-
-      function reset() {
-        photos = [{
-          id: uid(),
-          name: "placeholder",
-          dataUrl: makePlaceholderDataUrl(),
-          ratio: 1,
-          orient: "square"
-        }];
-        frames = [];
-        selectedId = null;
-        seedDefaultFrames();
-        renderAll();
-        showToast("リセットしました（Story 8枚）");
-      }
-
-      $("saveBtn").onclick = save;
-      $("saveBtn2").onclick = save;
-      $("loadBtn").onclick = load;
-      $("loadBtn2").onclick = load;
-      $("resetBtn").onclick = reset;
-      $("resetBtn2").onclick = reset;
-
-      $("openViewBtn").onclick = () => {
-        const c = normalizeCodeInput();
-        if (!/^\d{6}$/.test(c)) {
-          showToast("6桁コードを入力してください");
-          return;
-        }
-        save();
-        window.open("KPview.html?code=" + encodeURIComponent(c), "_blank");
-      };
-
-      $("addFrame").onclick = () => {
-        const kind = $("frameType").value;
-        const w = SIZE_PRESETS[Math.floor(Math.random() * SIZE_PRESETS.length)];
-
-        frames.push({
-          id: uid(),
-          kind,
-          x: 0.10 + Math.random() * 0.60,
-          y: 0.10 + Math.random() * 0.60,
-          w,
-          photoIds: photos[0] ? [photos[0].id] : [],
-          fixedPhotoId: null
-        });
-
-        selectedId = frames[frames.length - 1].id;
-        renderAll();
-        showToast("フレームを追加しました");
-      };
-
-      $("deleteFrame").onclick = () => {
-        if (!selectedId) {
-          showToast("フレームを選択してください");
-          return;
-        }
-        frames = frames.filter(f => f.id !== selectedId);
-        selectedId = null;
-        renderAll();
-        showToast("削除しました");
-      };
-
-      $("fileInput").onchange = async (e) => {
-        const files = [...(e.target.files || [])];
-        if (!files.length) return;
-
-        try {
-          const arr = [];
-          for (const f of files) {
-            arr.push(await readFile(f));
-          }
-
-          const placeholderIndex = photos.findIndex(p => p.name === "placeholder");
-          if (placeholderIndex >= 0) {
-            photos.splice(placeholderIndex, 1);
-          }
-
-          photos = [...arr, ...photos];
-          renderTray();
-          showToast(arr.length + "枚追加しました");
-        } catch {
-          showToast("読み込み失敗");
-        }
-
-        e.target.value = "";
-      };
-
-      (async function init() {
-        if (!/^\d{6}$/.test(normalizeCodeInput())) {
-          $("codeInput").value = String(Math.floor(100000 + Math.random() * 900000));
-        }
-
-        photos = [{
-          id: uid(),
-          name: "placeholder",
-          dataUrl: makePlaceholderDataUrl(),
-          ratio: 1,
-          orient: "square"
-        }];
-
-        await hydrateAspectRatios();
-        seedDefaultFrames();
-        renderAll();
-
-        let rt = null;
-        window.addEventListener("resize", () => {
-          clearTimeout(rt);
-          rt = setTimeout(renderFrames, 80);
-        });
-
-        canvas.addEventListener("pointerdown", (e) => {
-          if (e.target === canvas) {
-            selectedId = null;
-            renderSelected();
-            updateSelectionUI();
-          }
-        });
-      })();
+      render();
+      fit();
+      window.addEventListener("resize", fit);
     })();
   </script>
 </body>
