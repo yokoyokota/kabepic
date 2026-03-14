@@ -6,17 +6,19 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
-  <title>KABEPIC Story8 Frame Spec</title>
+  <title>KABEPIC Story8 Grid Check</title>
   <style>
     :root {
-      --base-w: 2400;
-      --base-h: 1500;
-      --page-bg: #ececec;
-      --board-bg: #f8f8f8;
-      --shadow: 0 18px 40px rgba(0,0,0,0.12);
-      --label-bg: rgba(40,40,40,0.82);
+      --canvas-w: 2400;
+      --canvas-h: 1500;
+      --grid: 10px;
+      --page-bg: #1f1f1f;
+      --board-bg: #ffffff;
+      --grid-line: rgba(0, 0, 0, 0.18);
+      --grid-line-bold: rgba(0, 0, 0, 0.28);
+      --shadow: 0 20px 42px rgba(0, 0, 0, 0.18);
+      --label-bg: rgba(35, 35, 35, 0.85);
       --label-fg: #fff;
-      --inner-stroke: rgba(80,80,80,0.45);
     }
 
     * {
@@ -65,9 +67,15 @@
 
     #board {
       position: relative;
-      width: calc(var(--base-w) * 1px);
-      height: calc(var(--base-h) * 1px);
-      background: var(--board-bg);
+      width: calc(var(--canvas-w) * 1px);
+      height: calc(var(--canvas-h) * 1px);
+      background:
+        linear-gradient(to right, transparent 0, transparent 49px, var(--grid-line-bold) 50px),
+        linear-gradient(to bottom, transparent 0, transparent 49px, var(--grid-line-bold) 50px),
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+      background-color: var(--board-bg);
       box-shadow: var(--shadow);
       overflow: visible;
     }
@@ -79,17 +87,17 @@
       background-position: center center;
     }
 
-    .inner-hole {
+    .frame::after {
+      content: "";
       position: absolute;
-      border: 2px solid var(--inner-stroke);
-      background: rgba(255,255,255,0.22);
+      inset: 0;
       pointer-events: none;
     }
 
     .label {
       position: absolute;
       left: 50%;
-      top: calc(100% + 18px);
+      top: calc(100% + 16px);
       transform: translateX(-50%);
       min-width: 34px;
       height: 34px;
@@ -102,35 +110,45 @@
       line-height: 34px;
       text-align: center;
       white-space: nowrap;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.16);
     }
 
     .hud {
       position: fixed;
-      top: 16px;
-      left: 16px;
+      top: 14px;
+      left: 14px;
       z-index: 20;
       padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
-      font-size: 14px;
-      line-height: 1.5;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.94);
+      color: #111;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+      font-size: 13px;
+      line-height: 1.55;
     }
 
     .hud strong {
       display: block;
       margin-bottom: 4px;
-      font-size: 15px;
+      font-size: 14px;
+    }
+
+    .legend {
+      margin-top: 6px;
+      color: #444;
     }
   </style>
 </head>
 <body>
   <div class="hud">
-    <strong>Story8 / 2400×1500</strong>
-    縦長: 1, 3, 8<br>
-    正方形: 2, 7<br>
-    横長: 4, 5, 6
+    <strong>Story8 / 2400×1500 / 10pxグリッド固定</strong>
+    1, 3, 8 = 縦長<br>
+    2, 7 = 正方形<br>
+    4, 5, 6 = 横長
+    <div class="legend">
+      今回は比率ではなく、<br>
+      位置もサイズも「マス数」で指定しています
+    </div>
   </div>
 
   <div id="app">
@@ -143,140 +161,130 @@
     (() => {
       "use strict";
 
-      const BASE_W = 2400;
-      const BASE_H = 1500;
+      const CANVAS_W = 2400;
+      const CANVAS_H = 1500;
+      const CELL = 10;
 
       const boardWrap = document.getElementById("boardWrap");
       const board = document.getElementById("board");
 
       /*
-        2400 x 1500
-        グリッド10px基準
-        現時点の Story8 設計値
-        - 位置
-        - 外寸
-        - 内枠(inset)
-        をまとめて持つ
+        gx, gy, gw, gh は全部「10pxマス数」
+        つまり:
+          x = gx * 10
+          y = gy * 10
+          w = gw * 10
+          h = gh * 10
+
+        今回は画像からマス数ベースで組み直した版
       */
-      const STORY8 = [
+      const layout = [
         {
           id: 1,
           kind: "vertical",
           asset: "frame_vertical.png",
-          x: 160,
-          y: 520,
-          w: 300,
-          h: 500,
-          inset: { top: 54, right: 52, bottom: 58, left: 54 }
+          gx: 0,
+          gy: 50,
+          gw: 35,
+          gh: 41
         },
         {
           id: 2,
           kind: "square",
           asset: "frame_square.png",
-          x: 500,
-          y: 380,
-          w: 400,
-          h: 400,
-          inset: { top: 58, right: 58, bottom: 60, left: 58 }
+          gx: 42,
+          gy: 30,
+          gw: 41,
+          gh: 41
         },
         {
           id: 3,
           kind: "vertical",
           asset: "frame_vertical.png",
-          x: 930,
-          y: 130,
-          w: 470,
-          h: 660,
-          inset: { top: 68, right: 64, bottom: 72, left: 66 }
+          gx: 89,
+          gy: 6,
+          gw: 54,
+          gh: 64
         },
         {
           id: 4,
           kind: "horizontal",
           asset: "frame_horizontal.png",
-          x: 1490,
-          y: 460,
-          w: 360,
-          h: 280,
-          inset: { top: 48, right: 54, bottom: 50, left: 52 }
+          gx: 147,
+          gy: 39,
+          gw: 38,
+          gh: 32
         },
         {
           id: 5,
           kind: "horizontal",
           asset: "frame_horizontal.png",
-          x: 1900,
-          y: 480,
-          w: 470,
-          h: 310,
-          inset: { top: 50, right: 58, bottom: 52, left: 56 }
+          gx: 189,
+          gy: 49,
+          gw: 50,
+          gh: 42
         },
         {
           id: 6,
           kind: "horizontal",
           asset: "frame_horizontal.png",
-          x: 470,
-          y: 790,
-          w: 440,
-          h: 330,
-          inset: { top: 52, right: 56, bottom: 54, left: 54 }
+          gx: 39,
+          gy: 76,
+          gw: 47,
+          gh: 40
         },
         {
           id: 7,
           kind: "square",
           asset: "frame_square.png",
-          x: 960,
-          y: 820,
-          w: 400,
-          h: 400,
-          inset: { top: 58, right: 58, bottom: 60, left: 58 }
+          gx: 90,
+          gy: 76,
+          gw: 51,
+          gh: 51
         },
         {
           id: 8,
           kind: "vertical",
           asset: "frame_vertical.png",
-          x: 1480,
-          y: 820,
-          w: 300,
-          h: 500,
-          inset: { top: 54, right: 52, bottom: 58, left: 54 }
+          gx: 146,
+          gy: 76,
+          gw: 38,
+          gh: 45
         }
       ];
 
-      function createFrame(frame) {
+      function px(n) {
+        return `${n}px`;
+      }
+
+      function createFrame(item) {
         const el = document.createElement("div");
         el.className = "frame";
-        el.style.left = `${frame.x}px`;
-        el.style.top = `${frame.y}px`;
-        el.style.width = `${frame.w}px`;
-        el.style.height = `${frame.h}px`;
-        el.style.backgroundImage = `url("${frame.asset}")`;
-
-        const hole = document.createElement("div");
-        hole.className = "inner-hole";
-        hole.style.left = `${frame.inset.left}px`;
-        hole.style.top = `${frame.inset.top}px`;
-        hole.style.width = `${frame.w - frame.inset.left - frame.inset.right}px`;
-        hole.style.height = `${frame.h - frame.inset.top - frame.inset.bottom}px`;
+        el.style.left = px(item.gx * CELL);
+        el.style.top = px(item.gy * CELL);
+        el.style.width = px(item.gw * CELL);
+        el.style.height = px(item.gh * CELL);
+        el.style.backgroundImage = `url("${item.asset}")`;
 
         const label = document.createElement("div");
         label.className = "label";
-        label.textContent = String(frame.id);
-
-        el.appendChild(hole);
+        label.textContent = String(item.id);
         el.appendChild(label);
+
         return el;
       }
 
       function render() {
         board.innerHTML = "";
-        STORY8.forEach((frame) => {
-          board.appendChild(createFrame(frame));
+        layout.forEach((item) => {
+          board.appendChild(createFrame(item));
         });
       }
 
       function fitBoard() {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        const scale = Math.min(vw / BASE_W, vh / BASE_H) * 0.94;
+        const scale = Math.min(vw / CANVAS_W, vh / CANVAS_H) * 0.94;
         boardWrap.style.transform = `scale(${scale})`;
       }
 
