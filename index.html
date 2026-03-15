@@ -1,4 +1,4 @@
-　<!doctype html>
+<!doctype html>
 
 <html lang="ja">
 <head>
@@ -583,15 +583,15 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,  gy,  w]  gap=5均一版（Yy確認済みベース）
-      ["portrait",     4,  51, 34],   // #1  w:31→34
-      ["square",      43,  33, 37],   // #2  w:39→37
-      ["portrait",    85,  10, 50],   // #3  w:47→50
-      ["landscape",  140,  40, 33],   // #4
-      ["landscape",  178,  48, 45],   // #5
-      ["landscape",   43,  76, 42],   // #6
-      ["square",      90,  76, 42],   // #7
-      ["portrait",   137,  76, 32],   // #8  w:29→32
+      // [type,       gx,  gy,  w]  縦+3 正方形-2 下段y=75一直線
+      ["portrait",     4,  51, 37],   // #1(左端) w:34→37
+      ["square",      43,  33, 35],   // 上段1 w:37→35
+      ["portrait",    85,  10, 53],   // 上段2 w:50→53
+      ["landscape",  140,  40, 33],   // 上段3
+      ["landscape",  178,  48, 45],   // #5(右端) 固定
+      ["landscape",   43,  75, 42],   // 下段4 y=75
+      ["square",      90,  75, 42],   // 下段5 y=75
+      ["portrait",   137,  75, 35],   // 下段6 w:32→35 y=75
     ];
 
     frames = grid.map(g => ({
