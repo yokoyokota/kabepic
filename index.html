@@ -583,15 +583,15 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,  gy,  w]  gap=5マスで均一化
-      ["portrait",     4,  51, 34],   // #1
+      // [type,       gx,  gy,  w]  gap=3マス
+      ["portrait",     4,  51, 36],   // #1
       ["square",      43,  33, 37],   // #2
-      ["portrait",    85,  10, 50],   // #3
-      ["landscape",  140,  40, 33],   // #4
-      ["landscape",  178,  48, 45],   // #5
+      ["portrait",    83,  10, 52],   // #3
+      ["landscape",  138,  40, 33],   // #4
+      ["landscape",  174,  48, 45],   // #5
       ["landscape",   43,  76, 42],   // #6
-      ["square",      90,  76, 42],   // #7
-      ["portrait",   137,  76, 32],   // #8
+      ["square",      88,  76, 42],   // #7
+      ["portrait",   133,  76, 34],   // #8
     ];
 
     frames = grid.map(g => ({
