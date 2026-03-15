@@ -89,12 +89,19 @@ margin-top:10px;
 border-radius:18px;
 border:1px solid rgba(0,0,0,0.06);
 overflow:hidden;
-background:transparent;
+background:#ddd;
+position:relative;
+}
+#canvasScaler{
+width:2400px;
+height:1500px;
+transform-origin:top left;
+position:relative;
 }
 #canvas{
 position:relative;
-width:100%;
-aspect-ratio:8/5;
+width:2400px;
+height:1500px;
 background:#ddd;
 overflow:hidden;
 touch-action:none;
@@ -344,7 +351,7 @@ display:none;
     写真タブから PNG を追加してフレームに割り当て
   </div>
 
-  <div id="canvasWrap"><div id="canvas"></div></div>
+  <div id="canvasWrap"><div id="canvasScaler"><div id="canvas"></div></div></div>
 
   <div class="selectedBar">
     <div class="selectedTitle">
@@ -998,10 +1005,21 @@ display:none;
     seedDefaultFrames();
     renderAll();
 
+    const scaler = $("canvasScaler");
+    const wrap = $("canvasWrap");
+
+    function fitCanvas() {
+      const wrapW = wrap.clientWidth;
+      const scale = wrapW / 2400;
+      scaler.style.transform = `scale(${scale})`;
+      wrap.style.height = (1500 * scale) + "px";
+    }
+
+    fitCanvas();
     let rt = null;
     window.addEventListener("resize", () => {
       clearTimeout(rt);
-      rt = setTimeout(renderFrames, 80);
+      rt = setTimeout(() => { fitCanvas(); }, 80);
     });
   })();
 })();
