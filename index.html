@@ -424,7 +424,7 @@ display:none;
     }
   };
 
-  const SIZE_PRESETS = [0.16, 0.22, 0.28];
+  // (SIZE_PRESETS removed - addFrame now uses grid cell counts directly)
 
   let photos = [];
   let frames = [];
@@ -554,43 +554,47 @@ display:none;
     el.style.maskPosition = "center";
   }
 
-  function seedDefaultFrames() {
-    /*
-      Story (8枚) デフォルトレイアウト
-      グリッド図（240×150マス）から読み取ったマス数を正規化
-      x,y = 左上座標 / w = フレーム幅（hはアスペクト比で自動計算）
-    */
-    const G = { W: 240, H: 150 };
-    const grid = [
-      // [type,      gridX, gridY, gridW]
-      ["portrait",     4,    51,    31],   // #1
-      ["square",      43,    31,    39],   // #2
-      ["portrait",    91,    10,    47],   // #3  ← y:5→10 下に5マス
-      ["landscape",  146,    40,    33],   // #4
-      ["landscape",  186,    48,    45],   // #5  ← x:190→186 左に4マス
-      ["landscape",   40,    75,    42],   // #6
-      ["square",      93,    74,    42],   // #7
-      ["portrait",   147,    76,    29],   // #8
-    ];
-    const preset = grid.map(g => [g[0], g[1]/G.W, g[2]/G.H, g[3]/G.W]);
+  /*
+    グリッド定義: 240×150 マス
+    全フレームの位置・サイズをグリッドマス数で保持し、
+    表示時にキャンバスサイズに対する%で配置する。
+    これによりキャンバスがどんなサイズでもグリッド図と完全一致する。
+  */
+  const GRID = { W: 240, H: 150 };
 
-    frames = preset.map(p => ({
+  function gridToPercent(f) {
+    const m = FRAME_META[f.kind];
+    const hCells = f.w / m.ar;  // マス数でのフレーム高さ
+    return {
+      left: (f.gx / GRID.W * 100) + "%",
+      top:  (f.gy / GRID.H * 100) + "%",
+      width:  (f.w / GRID.W * 100) + "%",
+      height: (hCells / GRID.H * 100) + "%",
+    };
+  }
+
+  function seedDefaultFrames() {
+    const grid = [
+      // [type,       gx,  gy,  w]
+      ["portrait",     4,  51, 31],   // #1
+      ["square",      43,  31, 39],   // #2
+      ["portrait",    91,  10, 47],   // #3
+      ["landscape",  146,  40, 33],   // #4
+      ["landscape",  186,  48, 45],   // #5
+      ["landscape",   40,  75, 42],   // #6
+      ["square",      93,  74, 42],   // #7
+      ["portrait",   147,  76, 29],   // #8
+    ];
+
+    frames = grid.map(g => ({
       id: uid(),
-      kind: p[0],
-      x: p[1],
-      y: p[2],
-      w: p[3],
+      kind: g[0],
+      gx: g[1],
+      gy: g[2],
+      w: g[3],
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     }));
-  }
-
-  function framePx(f) {
-    const r = canvas.getBoundingClientRect();
-    const m = FRAME_META[f.kind];
-    const w = Math.max(1, Math.round(f.w * r.width));
-    const h = Math.max(1, Math.round(w / m.ar));
-    return { w, h };
   }
 
   function updateSelectionUI() {
@@ -600,7 +604,7 @@ display:none;
   }
 
   function attachDrag(el, f) {
-    let on = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    let on = false, sx = 0, sy = 0, ogx = 0, ogy = 0;
 
     el.addEventListener("pointerdown", (e) => {
       if (e.target.classList.contains("handle")) return;
@@ -612,18 +616,19 @@ display:none;
       on = true;
       sx = e.clientX;
       sy = e.clientY;
-      ox = f.x;
-      oy = f.y;
+      ogx = f.gx;
+      ogy = f.gy;
       el.setPointerCapture(e.pointerId);
     });
 
     el.addEventListener("pointermove", (e) => {
       if (!on) return;
       const r = canvas.getBoundingClientRect();
-      f.x = ox + (e.clientX - sx) / r.width;
-      f.y = oy + (e.clientY - sy) / r.height;
-      el.style.left = (f.x * 100) + "%";
-      el.style.top = (f.y * 100) + "%";
+      // ピクセル移動量をグリッドマス数に変換
+      f.gx = ogx + (e.clientX - sx) / r.width * GRID.W;
+      f.gy = ogy + (e.clientY - sy) / r.height * GRID.H;
+      el.style.left = (f.gx / GRID.W * 100) + "%";
+      el.style.top = (f.gy / GRID.H * 100) + "%";
     });
 
     el.addEventListener("pointerup", () => { on = false; });
@@ -648,14 +653,12 @@ display:none;
     handle.addEventListener("pointermove", (e) => {
       if (!on) return;
       const r = canvas.getBoundingClientRect();
-      let nw = sw + (e.clientX - sx) / r.width;
-      const minW = Math.max(0.10, 80 / r.width);
-      if (nw < minW) nw = minW;
+      let nw = sw + (e.clientX - sx) / r.width * GRID.W;
+      if (nw < 10) nw = 10;  // 最小10マス
       f.w = nw;
-
-      const m = FRAME_META[f.kind];
-      el.style.width = Math.round(f.w * r.width) + "px";
-      el.style.height = Math.round((f.w * r.width) / m.ar) + "px";
+      const pct = gridToPercent(f);
+      el.style.width = pct.width;
+      el.style.height = pct.height;
     });
 
     handle.addEventListener("pointerup", () => { on = false; });
@@ -667,15 +670,15 @@ display:none;
 
     frames.forEach(f => {
       const m = FRAME_META[f.kind];
-      const sz = framePx(f);
+      const pct = gridToPercent(f);
 
       const el = document.createElement("div");
       el.className = "frame";
       el.dataset.id = f.id;
-      el.style.left = (f.x * 100) + "%";
-      el.style.top = (f.y * 100) + "%";
-      el.style.width = sz.w + "px";
-      el.style.height = sz.h + "px";
+      el.style.left = pct.left;
+      el.style.top = pct.top;
+      el.style.width = pct.width;
+      el.style.height = pct.height;
       el.style.setProperty("--inset", m.inset);
 
       const mask = document.createElement("div");
@@ -930,13 +933,14 @@ display:none;
 
   $("addFrame").onclick = () => {
     const kind = $("frameType").value;
-    const w = SIZE_PRESETS[Math.floor(Math.random() * SIZE_PRESETS.length)];
+    const wPresets = [30, 35, 42]; // グリッドマス数
+    const w = wPresets[Math.floor(Math.random() * wPresets.length)];
 
     frames.push({
       id: uid(),
       kind,
-      x: 0.10 + Math.random() * 0.60,
-      y: 0.10 + Math.random() * 0.60,
+      gx: 24 + Math.random() * 140,
+      gy: 15 + Math.random() * 90,
       w,
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
