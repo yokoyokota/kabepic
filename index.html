@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="ja">
+<html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KABEPIC frame check</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
+
 html,body{
 margin:0;
 background:#ece6da;
@@ -13,15 +12,14 @@ height:100%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-family:sans-serif;
 }
 
 .wall{
-position:relative;
-width:2400px;
-height:1500px;
+width:min(92vw,1200px);
+aspect-ratio:16/10;
 background:#d8d3ca;
-border-radius:30px;
+position:relative;
+border-radius:20px;
 }
 
 .frame{
@@ -30,64 +28,104 @@ background-size:100% 100%;
 background-repeat:no-repeat;
 background-position:center;
 }
+
+/* ---- grid ---- */
+/* 24列 × 15行 */
+
+:root{
+--c:4.166%;
+--r:6.666%;
+}
+
+/* 1 */
+.f1{
+left:calc(var(--c)*1);
+top:calc(var(--r)*7);
+width:calc(var(--c)*3);
+aspect-ratio:894/1063;
+background-image:url(frame_vertical.png);
+}
+
+/* 2 */
+.f2{
+left:calc(var(--c)*5);
+top:calc(var(--r)*4);
+width:calc(var(--c)*4);
+aspect-ratio:1053/1052;
+background-image:url(frame_square.png);
+}
+
+/* 3 */
+.f3{
+left:calc(var(--c)*10);
+top:calc(var(--r)*1);
+width:calc(var(--c)*4.8);
+aspect-ratio:894/1063;
+background-image:url(frame_vertical.png);
+}
+
+/* 4 */
+.f4{
+left:calc(var(--c)*15);
+top:calc(var(--r)*5);
+width:calc(var(--c)*3.8);
+aspect-ratio:1063/894;
+background-image:url(frame_horizontal.png);
+}
+
+/* 5 */
+.f5{
+left:calc(var(--c)*19);
+top:calc(var(--r)*5);
+width:calc(var(--c)*4.5);
+aspect-ratio:1063/894;
+background-image:url(frame_horizontal.png);
+}
+
+/* 6 */
+.f6{
+left:calc(var(--c)*4);
+top:calc(var(--r)*10);
+width:calc(var(--c)*4.5);
+aspect-ratio:1063/894;
+background-image:url(frame_horizontal.png);
+}
+
+/* 7 */
+.f7{
+left:calc(var(--c)*9.5);
+top:calc(var(--r)*10);
+width:calc(var(--c)*4);
+aspect-ratio:1053/1052;
+background-image:url(frame_square.png);
+}
+
+/* 8 */
+.f8{
+left:calc(var(--c)*15);
+top:calc(var(--r)*10);
+width:calc(var(--c)*3);
+aspect-ratio:894/1063;
+background-image:url(frame_vertical.png);
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="wall" class="wall"></div>
+<div class="wall">
 
-<script>
+<div class="frame f1"></div>
+<div class="frame f2"></div>
+<div class="frame f3"></div>
+<div class="frame f4"></div>
+<div class="frame f5"></div>
+<div class="frame f6"></div>
+<div class="frame f7"></div>
+<div class="frame f8"></div>
 
-const RATIO={
-portrait:894/1063,
-square:1053/1052,
-landscape:1063/894,
-oval:694/982
-}
-
-const frames=[
-
-{kind:"portrait",src:"frame_vertical.png",x:80,y:520,w:360},
-
-{kind:"square",src:"frame_square.png",x:520,y:320,w:420},
-
-{kind:"portrait",src:"frame_vertical.png",x:980,y:40,w:500},
-
-{kind:"landscape",src:"frame_horizontal.png",x:1500,y:430,w:360},
-
-{kind:"landscape",src:"frame_horizontal.png",x:1910,y:440,w:500},
-
-{kind:"landscape",src:"frame_horizontal.png",x:460,y:900,w:480},
-
-{kind:"square",src:"frame_square.png",x:1020,y:860,w:430},
-
-{kind:"portrait",src:"frame_vertical.png",x:1560,y:830,w:360}
-
-]
-
-const wall=document.getElementById("wall")
-
-frames.forEach(f=>{
-
-const h=f.w/RATIO[f.kind]
-
-const el=document.createElement("div")
-
-el.className="frame"
-
-el.style.left=f.x+"px"
-el.style.top=f.y+"px"
-el.style.width=f.w+"px"
-el.style.height=h+"px"
-
-el.style.backgroundImage=`url(${f.src})`
-
-wall.appendChild(el)
-
-})
-
-</script>
+</div>
 
 </body>
 </html>
