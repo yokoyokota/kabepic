@@ -566,16 +566,14 @@ display:none;
   }
 
   /*
-    グリッド定義: 240×150 マス
-    全フレームの位置・サイズをグリッドマス数で保持し、
-    表示時にキャンバスサイズに対する%で配置する。
-    これによりキャンバスがどんなサイズでもグリッド図と完全一致する。
+    グリッド定義: 240×150 マス (16:10)
+    壁表示と同じ比率を維持。
   */
   const GRID = { W: 240, H: 150 };
 
   function gridToPercent(f) {
     const m = FRAME_META[f.kind];
-    const hCells = f.w / m.ar;  // マス数でのフレーム高さ
+    const hCells = f.w / m.ar;
     return {
       left: (f.gx / GRID.W * 100) + "%",
       top:  (f.gy / GRID.H * 100) + "%",
@@ -586,10 +584,10 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,  gy,  w]  ← Procreate実測 + #3補正
+      // [type,       gx,  gy,  w]
       ["portrait",     2,  51, 33],   // #1
       ["square",      42,  30, 40],   // #2
-      ["portrait",    91,  10, 47],   // #3  ← y=10 (Procreateに合わせて2マス上)
+      ["portrait",    91,  10, 47],   // #3
       ["landscape",  148,  39, 37],   // #4
       ["landscape",  189,  49, 49],   // #5
       ["landscape",   39,  76, 46],   // #6
