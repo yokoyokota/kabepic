@@ -583,15 +583,15 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,  gy,  w]  縦+3 正方形-2 下段y=75一直線
-      ["portrait",     4,  51, 37],   // #1(左端) w:34→37
-      ["square",      43,  33, 35],   // 上段1 w:37→35
-      ["portrait",    85,  10, 53],   // 上段2 w:50→53
-      ["landscape",  140,  40, 33],   // 上段3
+      // [type,       gx,  gy,  w]  黄色gap=6 青gap=5 下段y=79一直線
+      ["portrait",     4,  51, 37],   // #1(左端) 固定
+      ["square",      43,  33, 35],   // 上段1
+      ["portrait",    84,  10, 53],   // 上段2  gap6
+      ["landscape",  143,  40, 33],   // 上段3  gap6
       ["landscape",  178,  48, 45],   // #5(右端) 固定
-      ["landscape",   43,  75, 42],   // 下段4 y=75
-      ["square",      90,  75, 42],   // 下段5 y=75
-      ["portrait",   137,  75, 35],   // 下段6 w:32→35 y=75
+      ["landscape",   43,  79, 42],   // 下段4  y=79
+      ["square",      90,  79, 42],   // 下段5  gap5
+      ["portrait",   137,  79, 35],   // 下段6  gap5
     ];
 
     frames = grid.map(g => ({
