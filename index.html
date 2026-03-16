@@ -573,25 +573,37 @@ display:none;
   function gridToPercent(f) {
     const m = FRAME_META[f.kind];
     const hCells = f.w / m.ar;
+    if (f.bottomAlign != null) {
+      // 下端をCSS bottomで直接指定（丸め誤差なし）
+      const bottomFromBottom = GRID.H - f.bottomAlign; // キャンバス下端からの距離
+      return {
+        left: (f.gx / GRID.W * 100) + "%",
+        bottom: (bottomFromBottom / GRID.H * 100) + "%",
+        width:  (f.w / GRID.W * 100) + "%",
+        height: (hCells / GRID.H * 100) + "%",
+        useBottom: true,
+      };
+    }
     return {
       left: (f.gx / GRID.W * 100) + "%",
       top:  (f.gy / GRID.H * 100) + "%",
       width:  (f.w / GRID.W * 100) + "%",
       height: (hCells / GRID.H * 100) + "%",
+      useBottom: false,
     };
   }
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,     gy,     w]  上段下端=68.0 下段上端=75
-      ["portrait",     3,  22.82, 38],   // #1 y2=68.00
-      ["square",      43,  28.04, 40],   // #2 y2=68.00
-      ["portrait",    87,   4.98, 53],   // #3 y2=68.00
-      ["landscape",  149,  36.88, 37],   // #4 y2=68.00
-      ["landscape",  187,  27.63, 48],   // #5 y2=68.00
-      ["landscape",   43,  75,    47],   // #6 上端75
-      ["square",      95,  75,    47],   // #7 上端75
-      ["portrait",   147,  75,    40],   // #8 上端75
+      // [type,       gx,  gy,  w,  bottomAlign]
+      ["portrait",     3,  0, 38,  68],   // #1 下端68
+      ["square",      43,  0, 40,  68],   // #2 下端68
+      ["portrait",    87,  0, 53,  68],   // #3 下端68
+      ["landscape",  149,  0, 37,  68],   // #4 下端68
+      ["landscape",  187,  0, 48,  68],   // #5 下端68
+      ["landscape",   43, 75, 47, null],  // #6 上端75
+      ["square",      95, 75, 47, null],  // #7 上端75
+      ["portrait",   147, 75, 40, null],  // #8 上端75
     ];
 
     frames = grid.map(g => ({
@@ -600,6 +612,7 @@ display:none;
       gx: g[1],
       gy: g[2],
       w: g[3],
+      bottomAlign: g[4],
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     }));
@@ -684,7 +697,11 @@ display:none;
       el.className = "frame";
       el.dataset.id = f.id;
       el.style.left = pct.left;
-      el.style.top = pct.top;
+      if (pct.useBottom) {
+        el.style.bottom = pct.bottom;
+      } else {
+        el.style.top = pct.top;
+      }
       el.style.width = pct.width;
       el.style.height = pct.height;
       el.style.setProperty("--inset", m.inset);
