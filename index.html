@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
@@ -42,264 +43,265 @@ header{
 
 .tabs{margin-top:10px;display:flex;gap:8px;}
 .tabbtn{
-  flex:1;
-  padding:10px 12px;
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:10px;
-  font-size:13px;
-  color:var(--ink);
-  cursor:pointer;
+flex:1;
+padding:10px 12px;
+border:1px solid var(–border);
+background:#fff;
+border-radius:10px;
+font-size:13px;
+color:var(–ink);
+cursor:pointer;
 }
 .tabbtn.active{
-  border-color:rgba(17,17,17,0.5);
-  background:rgba(17,17,17,0.04);
-  font-weight:600;
+border-color:rgba(17,17,17,0.5);
+background:rgba(17,17,17,0.04);
+font-weight:600;
 }
 
 .content{padding:14px;}
 .panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:12px;
+background:var(–card);
+border:1px solid var(–border);
+border-radius:14px;
+padding:12px;
 }
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 
-button,select,input[type="text"]{
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-size:13px;
-  cursor:pointer;
+button,select,input[type=“text”]{
+padding:10px 12px;
+border-radius:12px;
+border:1px solid var(–border);
+background:#fff;
+font-size:13px;
+cursor:pointer;
 }
 
 .hint{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.55;
-  margin-top:8px;
+font-size:12px;
+color:var(–muted);
+line-height:1.55;
+margin-top:8px;
 }
 
 #canvasWrap{
-  margin-top:10px;
-  border-radius:18px;
-  border:1px solid rgba(0,0,0,0.06);
-  overflow:hidden;
-  background:#ddd;
-  position:relative;
-  width:100%;
-  aspect-ratio:8/5;
+margin-top:10px;
+border-radius:18px;
+border:1px solid rgba(0,0,0,0.06);
+overflow:hidden;
+background:#ddd;
+position:relative;
+width:100%;
+aspect-ratio:8/5;
 }
 #canvasScaler{
-  position:absolute;
-  top:0;
-  left:0;
-  width:2400px;
-  height:1500px;
-  transform-origin:top left;
+position:absolute;
+top:0;
+left:0;
+width:2400px;
+height:1500px;
+transform-origin:top left;
 }
 #canvas{
-  position:relative;
-  width:2400px;
-  height:1500px;
-  background:#ddd;
-  overflow:hidden;
-  touch-action:none;
+position:relative;
+width:2400px;
+height:1500px;
+background:#ddd;
+overflow:hidden;
+touch-action:none;
 }
 
 .frame{
-  position:absolute;
-  overflow:visible;
-  touch-action:none;
+position:absolute;
+overflow:visible;
+touch-action:none;
 }
 .frame.selected{
-  outline:3px solid var(--accent);
-  outline-offset:2px;
+outline:3px solid var(–accent);
+outline-offset:2px;
 }
 
 .mask{
-  position:absolute;
-  overflow:hidden;
-  background:transparent;
+position:absolute;
+overflow:hidden;
+background:transparent;
 }
 .mask img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-  display:block;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
+width:100%;
+height:100%;
+object-fit:cover;
+object-position:center;
+display:block;
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
 }
 
 .overlay{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
-  z-index:3;
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
+z-index:3;
 }
 
 .handle{
-  position:absolute;
-  width:22px;
-  height:22px;
-  right:-12px;
-  bottom:-12px;
-  border-radius:50%;
-  background:var(--accent);
-  border:3px solid #fff;
-  display:none;
-  z-index:5;
-  cursor:nwse-resize;
+position:absolute;
+width:22px;
+height:22px;
+right:-12px;
+bottom:-12px;
+border-radius:50%;
+background:var(–accent);
+border:3px solid #fff;
+display:none;
+z-index:5;
+cursor:nwse-resize;
 }
 .frame.selected .handle{display:block;}
 
 .selectedBar{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid rgba(0,0,0,0.06);
+margin-top:12px;
+padding-top:12px;
+border-top:1px solid rgba(0,0,0,0.06);
 }
 .selectedTitle{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:8px;
+margin-bottom:8px;
 }
 .selectedTitle .left{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
+display:flex;
+flex-direction:column;
+gap:2px;
 }
 .selectedTitle .left strong{font-size:13px;}
-.selectedTitle .left small{font-size:11px;color:var(--muted);}
+.selectedTitle .left small{font-size:11px;color:var(–muted);}
 
 .strip{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding-bottom:2px;
+display:flex;
+gap:10px;
+overflow-x:auto;
+padding-bottom:2px;
 }
 
 .thumb{
-  width:86px;
-  flex:0 0 auto;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,0.08);
-  overflow:hidden;
-  background:#fff;
+width:86px;
+flex:0 0 auto;
+border-radius:12px;
+border:1px solid rgba(0,0,0,0.08);
+overflow:hidden;
+background:#fff;
 }
 .thumb img{
-  width:100%;
-  height:62px;
-  object-fit:cover;
-  display:block;
-  pointer-events:none;
+width:100%;
+height:62px;
+object-fit:cover;
+display:block;
+pointer-events:none;
 }
 .thumb .act{
-  display:flex;
-  gap:6px;
-  padding:6px;
+display:flex;
+gap:6px;
+padding:6px;
 }
 .thumb button{
-  flex:1;
-  padding:6px 8px;
-  font-size:11px;
-  border-radius:10px;
-  border:1px solid rgba(17,17,17,0.18);
-  background:rgba(17,17,17,0.04);
-  cursor:pointer;
+flex:1;
+padding:6px 8px;
+font-size:11px;
+border-radius:10px;
+border:1px solid rgba(17,17,17,0.18);
+background:rgba(17,17,17,0.04);
+cursor:pointer;
 }
 .thumb button.primary{
-  border-color:rgba(0,122,255,0.35);
-  background:rgba(0,122,255,0.10);
+border-color:rgba(0,122,255,0.35);
+background:rgba(0,122,255,0.10);
 }
 
 .trayTop{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
+display:flex;
+gap:10px;
+align-items:center;
+flex-wrap:wrap;
 }
 .file{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-size:13px;
-  cursor:pointer;
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 12px;
+border-radius:12px;
+border:1px solid var(–border);
+background:#fff;
+font-size:13px;
+cursor:pointer;
 }
-input[type="file"]{display:none;}
+input[type=“file”]{display:none;}
 
 .trayGrid{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:10px;
-  margin-top:12px;
+display:grid;
+grid-template-columns:repeat(3, 1fr);
+gap:10px;
+margin-top:12px;
 }
 
 .tile{
-  position:relative;
-  aspect-ratio:1/1;
-  border:1px solid rgba(0,0,0,0.08);
-  border-radius:14px;
-  overflow:hidden;
-  background:#fff;
-  cursor:pointer;
-  user-select:none;
-  touch-action:none;
+position:relative;
+aspect-ratio:1/1;
+border:1px solid rgba(0,0,0,0.08);
+border-radius:14px;
+overflow:hidden;
+background:#fff;
+cursor:pointer;
+user-select:none;
+touch-action:none;
 }
 .tile img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  pointer-events:none;
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+pointer-events:none;
 }
 .badge{
-  position:absolute;
-  left:8px;
-  bottom:8px;
-  background:rgba(255,255,255,0.88);
-  border:1px solid rgba(0,0,0,0.12);
-  border-radius:999px;
-  font-size:11px;
-  padding:4px 8px;
+position:absolute;
+left:8px;
+bottom:8px;
+background:rgba(255,255,255,0.88);
+border:1px solid rgba(0,0,0,0.12);
+border-radius:999px;
+font-size:11px;
+padding:4px 8px;
 }
 
 .subnote{
-  margin-top:8px;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.5;
+margin-top:8px;
+font-size:12px;
+color:var(–muted);
+line-height:1.5;
 }
 
 .toast{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  background:rgba(17,17,17,0.92);
-  color:#fff;
-  padding:10px 12px;
-  border-radius:12px;
-  font-size:13px;
-  max-width:min(520px, calc(100% - 24px));
-  z-index:50;
-  box-shadow:0 10px 30px rgba(0,0,0,0.18);
-  display:none;
+position:fixed;
+left:50%;
+bottom:18px;
+transform:translateX(-50%);
+background:rgba(17,17,17,0.92);
+color:#fff;
+padding:10px 12px;
+border-radius:12px;
+font-size:13px;
+max-width:min(520px, calc(100% - 24px));
+z-index:50;
+box-shadow:0 10px 30px rgba(0,0,0,0.18);
+display:none;
 }
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -309,10 +311,13 @@ input[type="file"]{display:none;}
       <span>Editor</span>
     </div>
 
-    <div class="tabs">
-      <button id="tabCanvas" class="tabbtn active">キャンバス</button>
-      <button id="tabTray" class="tabbtn">写真</button>
-    </div>
+```
+<div class="tabs">
+  <button id="tabCanvas" class="tabbtn active">キャンバス</button>
+  <button id="tabTray" class="tabbtn">写真</button>
+</div>
+```
+
   </header>
 
   <div class="content">
@@ -325,69 +330,68 @@ input[type="file"]{display:none;}
           <option value="oval">楕円</option>
         </select>
 
-        <button id="addFrame">＋ フレーム追加</button>
-        <button id="deleteFrame">選択フレーム削除</button>
+```
+    <button id="addFrame">＋ フレーム追加</button>
+    <button id="deleteFrame">選択フレーム削除</button>
 
-        <label class="row" style="gap:8px;">
-          <span style="font-size:12px;color:var(--muted);">コード：</span>
-          <input id="codeInput" maxlength="6" placeholder="123456" inputmode="numeric"
-            style="width:120px;text-align:center;letter-spacing:.25em">
-        </label>
+    <label class="row" style="gap:8px;">
+      <span style="font-size:12px;color:var(--muted);">コード：</span>
+      <input id="codeInput" maxlength="6" placeholder="123456" inputmode="numeric"
+        style="width:120px;text-align:center;letter-spacing:.25em">
+    </label>
 
-        <button id="genCodeBtn">コード生成</button>
-        <button id="saveBtn">保存</button>
-        <button id="loadBtn">読込</button>
-        <button id="openViewBtn">壁表示を開く</button>
-        <button id="resetBtn">リセット</button>
-      </div>
+    <button id="genCodeBtn">コード生成</button>
+    <button id="saveBtn">保存</button>
+    <button id="loadBtn">読込</button>
+    <button id="openViewBtn">壁表示を開く</button>
+    <button id="resetBtn">リセット</button>
+  </div>
 
-      <div class="hint">
-        初期は Story（8枚）を自動配置します。<br>
-        フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
-        楕円は mask_oval.png を使用します。<br>
-        写真タブから PNG を追加してフレームに割り当て
-      </div>
+  <div class="hint">
+    初期は Story（8枚）を自動配置します。<br>
+    フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
+    楕円は mask_oval.png を使用します。<br>
+    写真タブから PNG を追加してフレームに割り当て
+  </div>
 
-      <div id="canvasWrap">
-        <div id="canvasScaler">
-          <div id="canvas"></div>
-        </div>
-      </div>
+  <div id="canvasWrap"><div id="canvasScaler"><div id="canvas"></div></div></div>
 
-      <div class="selectedBar">
-        <div class="selectedTitle">
-          <div class="left">
-            <strong>選択フレーム情報</strong>
-            <small id="selectedInfo">なし</small>
-          </div>
-        </div>
-
-        <div id="selectedStrip" class="strip"></div>
-        <div id="selectedEmpty" class="subnote" style="display:none;">
-          写真タブから写真を追加し、タップしてフレームに割り当て
-        </div>
+  <div class="selectedBar">
+    <div class="selectedTitle">
+      <div class="left">
+        <strong>選択フレーム情報</strong>
+        <small id="selectedInfo">なし</small>
       </div>
     </div>
 
-    <div id="panelTray" style="display:none;">
-      <div class="trayTop">
-        <label class="file">
-          写真を追加する
-          <input id="fileInput" type="file" accept="image/*" multiple>
-        </label>
-        <button id="saveBtn2">保存</button>
-        <button id="loadBtn2">読込</button>
-        <button id="resetBtn2">リセット</button>
-      </div>
-
-      <div class="subnote">
-        タップで選択中フレームに割り当て<br>
-        長押しで写真をライブラリから削除
-      </div>
-
-      <div id="trayGrid" class="trayGrid"></div>
-      <div id="trayEmpty" class="subnote" style="display:none;">写真がまだありません</div>
+    <div id="selectedStrip" class="strip"></div>
+    <div id="selectedEmpty" class="subnote" style="display:none;">
+      写真タブから写真を追加し、タップしてフレームに割り当て
     </div>
+  </div>
+</div>
+
+<div id="panelTray" style="display:none;">
+  <div class="trayTop">
+    <label class="file">
+      写真を追加する
+      <input id="fileInput" type="file" accept="image/*" multiple>
+    </label>
+    <button id="saveBtn2">保存</button>
+    <button id="loadBtn2">読込</button>
+    <button id="resetBtn2">リセット</button>
+  </div>
+
+  <div class="subnote">
+    タップで選択中フレームに割り当て<br>
+    長押しで写真をライブラリから削除
+  </div>
+
+  <div id="trayGrid" class="trayGrid"></div>
+  <div id="trayEmpty" class="subnote" style="display:none;">写真がまだありません</div>
+</div>
+```
+
   </div>
 </div>
 
@@ -395,39 +399,42 @@ input[type="file"]{display:none;}
 
 <script>
 (() => {
-  const PREFIX = "kabepic_code_v13_";
+  const PREFIX = "kabepic_code_v12_";
   const LONG_PRESS_MS = 650;
 
+  /*
+    PNG実測データから算出した正確なアスペクト比とinset
+    PNGは余白をトリミング＋白部分を透明化済み
+  */
   const FRAME_META = {
     portrait: {
       src: "frame_vertical.png",
       inset: "15.7% 18.7% 15.5% 19.9%",
       mask: "rect",
-      ar: 894 / 1063
+      ar: 894 / 1063   // 0.8410
     },
     square: {
       src: "frame_square.png",
       inset: "19.0% 19.9% 20.2% 19.2%",
       mask: "rect",
-      ar: 1053 / 1052
+      ar: 1053 / 1052   // 1.0010
     },
     landscape: {
       src: "frame_horizontal.png",
       inset: "18.6% 15.5% 20.0% 15.7%",
       mask: "rect",
-      ar: 1063 / 894
+      ar: 1063 / 894   // 1.1890
     },
     oval: {
       src: "frame_oval.png",
       inset: "7.8% 11.7% 8.4% 12.4%",
       mask: "oval",
       maskPng: "mask_oval.png",
-      ar: 694 / 982
+      ar: 694 / 982   // 0.7067
     }
   };
 
-  const GRID = { W: 240, H: 150 };
-  const MIN_GW = 10;
+  // (SIZE_PRESETS removed - addFrame now uses grid cell counts directly)
 
   let photos = [];
   let frames = [];
@@ -540,7 +547,7 @@ input[type="file"]{display:none;}
           resolve();
         };
         img.onerror = () => resolve();
-        img.src = meta.src + "?v=13";
+        img.src = meta.src + "?v=12";
       }))
     );
   }
@@ -557,35 +564,46 @@ input[type="file"]{display:none;}
     el.style.maskPosition = "center";
   }
 
-  function gridRectToPercent(f) {
+  /*
+    グリッド定義: 240×150 マス (16:10)
+    壁表示と同じ比率を維持。
+  */
+  const GRID = { W: 240, H: 150 };
+
+  function gridToPercent(f) {
+    const m = FRAME_META[f.kind];
+    const hCells = f.w / m.ar;
+    if (f.bottomAlign != null) {
+      // 下端をCSS bottomで直接指定（丸め誤差なし）
+      const bottomFromBottom = GRID.H - f.bottomAlign; // キャンバス下端からの距離
+      return {
+        left: (f.gx / GRID.W * 100) + "%",
+        bottom: (bottomFromBottom / GRID.H * 100) + "%",
+        width:  (f.w / GRID.W * 100) + "%",
+        height: (hCells / GRID.H * 100) + "%",
+        useBottom: true,
+      };
+    }
     return {
       left: (f.gx / GRID.W * 100) + "%",
-      top: (f.gy / GRID.H * 100) + "%",
-      width: (f.gw / GRID.W * 100) + "%",
-      height: (f.gh / GRID.H * 100) + "%"
+      top:  (f.gy / GRID.H * 100) + "%",
+      width:  (f.w / GRID.W * 100) + "%",
+      height: (hCells / GRID.H * 100) + "%",
+      useBottom: false,
     };
-  }
-
-  function clampFrameToGrid(f) {
-    f.gw = Math.max(MIN_GW, f.gw);
-    f.gh = Math.max(MIN_GW, f.gh);
-    if (f.gx < 0) f.gx = 0;
-    if (f.gy < 0) f.gy = 0;
-    if (f.gx + f.gw > GRID.W) f.gx = GRID.W - f.gw;
-    if (f.gy + f.gh > GRID.H) f.gy = GRID.H - f.gh;
   }
 
   function seedDefaultFrames() {
     const grid = [
-      // kind, gx, gy, gw, gh
-      ["portrait",   3.0, 20.5, 35.0, 33.5],  // #1
-      ["square",    43.0, 13.0, 41.0, 35.0],  // #2
-      ["portrait",  89.0,  4.5, 51.0, 42.0],  // #3
-      ["square",   147.0, 15.5, 38.0, 28.0],  // #4
-      ["landscape",189.0, 18.5, 51.0, 31.0],  // #5
-      ["landscape", 38.0, 50.5, 47.0, 31.0],  // #6
-      ["square",    89.0, 51.0, 50.0, 38.0],  // #7
-      ["portrait", 144.0, 52.0, 39.0, 36.0]   // #8
+      // [type,       gx,     gy,  w,  bottomAlign]
+      ["portrait",   -0.4,  0, 35,  80.5],  // #1 5.5下,0.4左,w-1
+      ["square",      42,   0, 41,  70.6],  // #2 下端0.4上
+      ["portrait",    89,   0, 51,  70.6],  // #3 w+1,下端0.4上
+      ["landscape",  147,   0, 38,  70.6],  // #4 下端0.4上
+      ["landscape",  189,   0, 51,  79.25], // #5 下端4.25下
+      ["landscape",   38,  77, 47, null],   // #6 w-1,右端0.25左
+      ["square",      89,  77, 50, null],   // #7 ほぼそのまま
+      ["portrait",   144,  77, 39, null],   // #8 w-1,右端そのまま
     ];
 
     frames = grid.map(g => ({
@@ -593,8 +611,8 @@ input[type="file"]{display:none;}
       kind: g[0],
       gx: g[1],
       gy: g[2],
-      gw: g[3],
-      gh: g[4],
+      w: g[3],
+      bottomAlign: g[4],
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     }));
@@ -627,12 +645,11 @@ input[type="file"]{display:none;}
     el.addEventListener("pointermove", (e) => {
       if (!on) return;
       const r = canvas.getBoundingClientRect();
+      // ピクセル移動量をグリッドマス数に変換
       f.gx = ogx + (e.clientX - sx) / r.width * GRID.W;
       f.gy = ogy + (e.clientY - sy) / r.height * GRID.H;
-      clampFrameToGrid(f);
-      const pct = gridRectToPercent(f);
-      el.style.left = pct.left;
-      el.style.top = pct.top;
+      el.style.left = (f.gx / GRID.W * 100) + "%";
+      el.style.top = (f.gy / GRID.H * 100) + "%";
     });
 
     el.addEventListener("pointerup", () => { on = false; });
@@ -640,7 +657,7 @@ input[type="file"]{display:none;}
   }
 
   function attachResize(handle, el, f) {
-    let on = false, sx = 0, sy = 0, sgw = 0, sgh = 0;
+    let on = false, sx = 0, sw = 0;
 
     handle.addEventListener("pointerdown", (e) => {
       e.stopPropagation();
@@ -650,19 +667,17 @@ input[type="file"]{display:none;}
 
       on = true;
       sx = e.clientX;
-      sy = e.clientY;
-      sgw = f.gw;
-      sgh = f.gh;
+      sw = f.w;
       handle.setPointerCapture(e.pointerId);
     });
 
     handle.addEventListener("pointermove", (e) => {
       if (!on) return;
       const r = canvas.getBoundingClientRect();
-      f.gw = sgw + (e.clientX - sx) / r.width * GRID.W;
-      f.gh = sgh + (e.clientY - sy) / r.height * GRID.H;
-      clampFrameToGrid(f);
-      const pct = gridRectToPercent(f);
+      let nw = sw + (e.clientX - sx) / r.width * GRID.W;
+      if (nw < 10) nw = 10;  // 最小10マス
+      f.w = nw;
+      const pct = gridToPercent(f);
       el.style.width = pct.width;
       el.style.height = pct.height;
     });
@@ -676,15 +691,20 @@ input[type="file"]{display:none;}
 
     frames.forEach(f => {
       const m = FRAME_META[f.kind];
-      const pct = gridRectToPercent(f);
+      const pct = gridToPercent(f);
 
       const el = document.createElement("div");
       el.className = "frame";
       el.dataset.id = f.id;
       el.style.left = pct.left;
-      el.style.top = pct.top;
+      if (pct.useBottom) {
+        el.style.bottom = pct.bottom;
+      } else {
+        el.style.top = pct.top;
+      }
       el.style.width = pct.width;
       el.style.height = pct.height;
+      el.style.setProperty("--inset", m.inset);
 
       const mask = document.createElement("div");
       mask.className = "mask";
@@ -694,8 +714,8 @@ input[type="file"]{display:none;}
       const img = document.createElement("img");
       const pid =
         (f.fixedPhotoId && f.photoIds.includes(f.fixedPhotoId))
-          ? f.fixedPhotoId
-          : (f.photoIds[0] || photos[0]?.id);
+        ? f.fixedPhotoId
+        : (f.photoIds[0] || photos[0]?.id);
       const p = pid ? findPhoto(pid) : photos[0];
       img.src = p ? p.dataUrl : makePlaceholderDataUrl();
       mask.appendChild(img);
@@ -740,7 +760,7 @@ input[type="file"]{display:none;}
       box.innerHTML = `
         <img src="${p.dataUrl}">
         <div class="act">
-          <button class="primary">${f.fixedPhotoId === pid ? "固定中" : "固定"}</button>
+          <button class="primary">${f.fixedPhotoId === pid ? '固定中' : '固定'}</button>
           <button>除外</button>
         </div>
       `;
@@ -779,7 +799,7 @@ input[type="file"]{display:none;}
       tile.className = "tile";
       tile.innerHTML = `
         <img src="${p.dataUrl}">
-        <div class="badge">${selectedId ? "割当" : "写真追加済み"}</div>
+        <div class="badge">${selectedId ? '割当' : '写真追加済み'}</div>
       `;
 
       let timer = null;
@@ -862,7 +882,7 @@ input[type="file"]{display:none;}
     localStorage.setItem(
       codeKey(c),
       JSON.stringify({
-        meta: { savedAt: Date.now(), v: 13 },
+        meta: { savedAt: Date.now(), v: 12 },
         photos,
         frames
       })
@@ -938,21 +958,15 @@ input[type="file"]{display:none;}
 
   $("addFrame").onclick = () => {
     const kind = $("frameType").value;
-    const sizePresets = {
-      portrait:  { gw: 36, gh: 34 },
-      square:    { gw: 40, gh: 35 },
-      landscape: { gw: 46, gh: 30 },
-      oval:      { gw: 34, gh: 40 }
-    };
-    const preset = sizePresets[kind] || { gw: 36, gh: 34 };
+    const wPresets = [30, 35, 42]; // グリッドマス数
+    const w = wPresets[Math.floor(Math.random() * wPresets.length)];
 
     frames.push({
       id: uid(),
       kind,
-      gx: 24 + Math.random() * 120,
-      gy: 15 + Math.random() * 70,
-      gw: preset.gw,
-      gh: preset.gh,
+      gx: 24 + Math.random() * 140,
+      gy: 15 + Math.random() * 90,
+      w,
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     });
@@ -1014,8 +1028,7 @@ input[type="file"]{display:none;}
 
     function fitCanvas() {
       const wrapW = wrap.clientWidth;
-      const wrapH = wrap.clientHeight;
-      const scale = Math.min(wrapW / 2400, wrapH / 1500);
+      const scale = wrapW / 2400;
       scaler.style.transform = `scale(${scale})`;
     }
 
@@ -1028,5 +1041,6 @@ input[type="file"]{display:none;}
   })();
 })();
 </script>
+
 </body>
 </html>
