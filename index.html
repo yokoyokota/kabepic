@@ -595,15 +595,15 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,  gy,  w,  bottomAlign]  理想図実測
-      ["portrait",     0,  0, 36,  71],   // #1 下端71
-      ["square",      42,  0, 41,  71],   // #2 下端71
-      ["portrait",    89,  0, 54,  71],   // #3 下端71
-      ["landscape",  147,  0, 38,  71],   // #4 下端71
-      ["landscape",  189,  0, 51,  71],   // #5 下端71
-      ["landscape",   38, 77, 48, null],  // #6 上端77
-      ["square",      89, 77, 50, null],  // #7 上端77
-      ["portrait",   143, 77, 40, null],  // #8 上端77
+      // [type,       gx,     gy,  w,  bottomAlign]
+      ["portrait",   -0.4,  0, 35,  80.5],  // #1 5.5下,0.4左,w-1
+      ["square",      42,   0, 41,  70.6],  // #2 下端0.4上
+      ["portrait",    89,   0, 51,  70.6],  // #3 w+1,下端0.4上
+      ["landscape",  147,   0, 38,  70.6],  // #4 下端0.4上
+      ["landscape",  189,   0, 51,  79.25], // #5 下端4.25下
+      ["landscape",   38,  77, 47, null],   // #6 w-1,右端0.25左
+      ["square",      89,  77, 50, null],   // #7 ほぼそのまま
+      ["portrait",   144,  77, 39, null],   // #8 w-1,右端そのまま
     ];
 
     frames = grid.map(g => ({
