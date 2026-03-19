@@ -616,9 +616,9 @@ display:none;
   function seedDefaultFrames() {
     const grid = [
       // [type,        gx,   gy,   w,    bottomAlign]
-      ["portrait",     50,    0,   89,   null],   // 左上 — 縦（1マス小さく）
+      ["portrait",     37,    0,   86,   null],   // 左上 — 縦（1マス小・左4マス）
       ["square",      126,   27,   53,   null],   // 右上 — 正方形
-      ["landscape",    88,   75,   68,   null],   // 下中央 — 横（4マス下）
+      ["landscape",    88,   89,   68,   null],   // 下中央 — 横（4マス下）
     ];
 
     frames = grid.map(g => ({
