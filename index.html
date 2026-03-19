@@ -606,15 +606,15 @@ display:none;
 
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,     gy,    w,  bottomAlign]  理想図image8実測
-      ["portrait",     4.1, 56.4, 38, null],   // #1
-      ["square",      43.4, 24.5, 41, null],   // #2
-      ["portrait",    90.9,  3.6, 56, null],   // #3
-      ["landscape",  144.3, 33.9, 38, null],   // #4
-      ["landscape",  186.5, 51.2, 51, null],   // #5
-      ["landscape",   39.8, 76.8, 47, null],   // #6
-      ["square",      91.8, 76.5, 47, null],   // #7
-      ["portrait",   146.3, 76.8, 41.5, null], // #8
+      // [type,       gx,     gy,    w,  bottomAlign]  差分補正済み
+      ["portrait",    -0.2, 51.8, 38, null],   // #1
+      ["square",      38.9, 21.2, 41, null],   // #2
+      ["portrait",    78.4,  1.2, 56, null],   // #3
+      ["landscape",  132.7, 27.1, 38, null],   // #4
+      ["landscape",  171.5, 42.4, 51, null],   // #5
+      ["landscape",   35.5, 67.1, 47, null],   // #6
+      ["square",      83.7, 70.4, 47, null],   // #7
+      ["portrait",   130.7, 71.0, 41.5, null], // #8
     ];
 
     frames = grid.map(g => ({
