@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>KABEPIC Editor</title>
+<title>KABEPIC Editor – Calm Preview</title>
 <style>
 :root{
   --ink:#111;
@@ -319,7 +319,7 @@ display:none;
   <header>
     <div class="brand">
       <h1>KABEPIC</h1>
-      <span>Editor</span>
+      <span>Editor – Calm (3)</span>
     </div>
 
 ```
@@ -360,7 +360,7 @@ display:none;
   </div>
 
   <div class="hint">
-    初期は Story（8枚）を自動配置します。<br>
+    Calm（3枚）プリセットをプレビュー中。<br>
     フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
     楕円は mask_oval.png を使用します。<br>
     写真タブから PNG を追加してフレームに割り当て
@@ -414,45 +414,39 @@ display:none;
   const PREFIX = "kabepic_code_v12_";
   const LONG_PRESS_MS = 650;
 
-  /*
-    PNG実測データから算出した正確なアスペクト比とinset
-    PNGは余白をトリミング＋白部分を透明化済み
-  */
   const FRAME_META = {
     portrait: {
       src: "frame_vertical.png",
       inset: "15.7% 18.7% 15.5% 19.9%",
       mask: "rect",
-      ar: 894 / 1063   // 0.8410
+      ar: 894 / 1063
     },
     square: {
       src: "frame_square.png",
       inset: "19.0% 19.9% 20.2% 19.2%",
       mask: "rect",
-      ar: 1053 / 1052   // 1.0010
+      ar: 1053 / 1052
     },
     landscape: {
       src: "frame_horizontal.png",
       inset: "18.6% 15.5% 20.0% 15.7%",
       mask: "rect",
-      ar: 1063 / 894   // 1.1890
+      ar: 1063 / 894
     },
     landscape_simple: {
       src: "frame_horizontal_simple.png",
       inset: "17.8% 14.9% 19.4% 15.0%",
       mask: "rect",
-      ar: 1043 / 873   // 1.1947
+      ar: 1043 / 873
     },
     oval: {
       src: "frame_oval.png",
       inset: "7.8% 11.7% 8.4% 12.4%",
       mask: "oval",
       maskPng: "mask_oval.png",
-      ar: 694 / 982   // 0.7067
+      ar: 694 / 982
     }
   };
-
-  // (SIZE_PRESETS removed - addFrame now uses grid cell counts directly)
 
   let photos = [];
   let frames = [];
@@ -582,18 +576,13 @@ display:none;
     el.style.maskPosition = "center";
   }
 
-  /*
-    グリッド定義: 240×150 マス (16:10)
-    壁表示と同じ比率を維持。
-  */
   const GRID = { W: 240, H: 150 };
 
   function gridToPercent(f) {
     const m = FRAME_META[f.kind];
     const hCells = f.w / m.ar;
     if (f.bottomAlign != null) {
-      // 下端をCSS bottomで直接指定（丸め誤差なし）
-      const bottomFromBottom = GRID.H - f.bottomAlign; // キャンバス下端からの距離
+      const bottomFromBottom = GRID.H - f.bottomAlign;
       return {
         left: (f.gx / GRID.W * 100) + "%",
         bottom: (bottomFromBottom / GRID.H * 100) + "%",
@@ -611,17 +600,23 @@ display:none;
     };
   }
 
+  /* ========================================
+     Calm (3) プリセット
+     ========================================
+     三角構成: 縦（左上）× 正方形（右上）× 横（下中央）
+     余白重視 — フレームは大きめ、間隔広め
+     
+     グリッド画像読み取り:
+       portrait:  gx≈63, gy≈14, w≈50
+       square:    gx≈126, gy≈27, w≈50
+       landscape: gx≈88, gy≈95, w≈76
+  */
   function seedDefaultFrames() {
     const grid = [
-      // [type,       gx,     gy,    w,  bottomAlign]
-      ["portrait",    -0.2, 57.8, 38, null],   // #1
-      ["square",      42.9, 32.2, 41, null],   // #2
-      ["portrait",    87.4, 16.5, 56.25, null], // #3
-      ["landscape_simple",  144.7, 38.1, 38, null],   // #4 シンプル版
-      ["landscape",  187.5, 48.4, 51, null],   // #5
-      ["landscape",   39.5, 73.1, 47, null],   // #6
-      ["square",      91.7, 76.4, 47, null],   // #7
-      ["portrait",   142.7, 77.0, 41.5, null], // #8
+      // [type,        gx,   gy,   w,    bottomAlign]
+      ["portrait",     63,   14,   50,   null],   // 左上 — 縦
+      ["square",      126,   27,   50,   null],   // 右上 — 正方形
+      ["landscape",    88,   95,   76,   null],   // 下中央 — 横
     ];
 
     frames = grid.map(g => ({
@@ -663,7 +658,6 @@ display:none;
     el.addEventListener("pointermove", (e) => {
       if (!on) return;
       const r = canvas.getBoundingClientRect();
-      // ピクセル移動量をグリッドマス数に変換
       f.gx = ogx + (e.clientX - sx) / r.width * GRID.W;
       f.gy = ogy + (e.clientY - sy) / r.height * GRID.H;
       el.style.left = (f.gx / GRID.W * 100) + "%";
@@ -693,7 +687,7 @@ display:none;
       if (!on) return;
       const r = canvas.getBoundingClientRect();
       let nw = sw + (e.clientX - sx) / r.width * GRID.W;
-      if (nw < 10) nw = 10;  // 最小10マス
+      if (nw < 10) nw = 10;
       f.w = nw;
       const pct = gridToPercent(f);
       el.style.width = pct.width;
@@ -954,7 +948,7 @@ display:none;
     selectedId = null;
     seedDefaultFrames();
     renderAll();
-    showToast("リセットしました（Story 8枚）");
+    showToast("リセットしました（Calm 3枚）");
   }
 
   $("saveBtn").onclick = save;
@@ -976,7 +970,7 @@ display:none;
 
   $("addFrame").onclick = () => {
     const kind = $("frameType").value;
-    const wPresets = [30, 35, 42]; // グリッドマス数
+    const wPresets = [30, 35, 42];
     const w = wPresets[Math.floor(Math.random() * wPresets.length)];
 
     frames.push({
