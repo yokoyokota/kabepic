@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>KABEPIC Editor – Calm Preview</title>
+<title>KABEPIC Editor</title>
 <style>
 :root{
   --ink:#111;
@@ -160,18 +160,16 @@ z-index:3;
 
 .handle{
 position:absolute;
-width:60px;
-height:60px;
-right:-30px;
-bottom:-30px;
+width:22px;
+height:22px;
+right:-12px;
+bottom:-12px;
 border-radius:50%;
 background:var(–accent);
-border:4px solid #fff;
-box-shadow:0 2px 8px rgba(0,0,0,0.25);
+border:3px solid #fff;
 display:none;
 z-index:5;
 cursor:nwse-resize;
-touch-action:none;
 }
 .frame.selected .handle{display:block;}
 
@@ -313,6 +311,27 @@ z-index:50;
 box-shadow:0 10px 30px rgba(0,0,0,0.18);
 display:none;
 }
+
+/* Layout selector */
+.layoutRow{
+display:flex;
+gap:6px;
+margin-bottom:10px;
+}
+.layoutBtn{
+padding:8px 14px;
+border-radius:10px;
+border:1px solid var(–border);
+background:#fff;
+font-size:12px;
+cursor:pointer;
+color:var(–ink);
+}
+.layoutBtn.active{
+border-color:rgba(17,17,17,0.5);
+background:rgba(17,17,17,0.06);
+font-weight:600;
+}
 </style>
 
 </head>
@@ -321,7 +340,7 @@ display:none;
   <header>
     <div class="brand">
       <h1>KABEPIC</h1>
-      <span>Editor – Calm (3)</span>
+      <span>Editor</span>
     </div>
 
 ```
@@ -335,16 +354,24 @@ display:none;
 
   <div class="content">
     <div class="panel" id="panelCanvas">
-      <div class="row">
-        <select id="frameType">
-          <option value="portrait">縦</option>
-          <option value="square">正方形</option>
-          <option value="landscape">横</option>
-          <option value="landscape_simple">横シンプル</option>
-          <option value="oval">楕円</option>
-        </select>
 
 ```
+  <div class="layoutRow">
+    <button class="layoutBtn" data-layout="calm">Calm (3)</button>
+    <button class="layoutBtn" data-layout="flow">Flow (5)</button>
+    <button class="layoutBtn" data-layout="story">Story (8)</button>
+    <button class="layoutBtn active" data-layout="scene">Scene (11)</button>
+  </div>
+
+  <div class="row">
+    <select id="frameType">
+      <option value="portrait">縦</option>
+      <option value="square">正方形</option>
+      <option value="landscape">横</option>
+      <option value="landscape_simple">横シンプル</option>
+      <option value="oval">楕円</option>
+    </select>
+
     <button id="addFrame">＋ フレーム追加</button>
     <button id="deleteFrame">選択フレーム削除</button>
 
@@ -362,7 +389,6 @@ display:none;
   </div>
 
   <div class="hint">
-    Calm（3枚）プリセットをプレビュー中。<br>
     フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
     楕円は mask_oval.png を使用します。<br>
     写真タブから PNG を追加してフレームに割り当て
@@ -453,6 +479,7 @@ display:none;
   let photos = [];
   let frames = [];
   let selectedId = null;
+  let currentLayout = "scene";
 
   const $ = (id) => document.getElementById(id);
   const canvas = $("canvas");
@@ -578,6 +605,7 @@ display:none;
     el.style.maskPosition = "center";
   }
 
+  /* グリッド: 240×150 (80×46の3倍) */
   const GRID = { W: 240, H: 150 };
 
   function gridToPercent(f) {
@@ -603,22 +631,21 @@ display:none;
   }
 
   /* ========================================
-     Calm (3) プリセット
-     ========================================
-     三角構成: 縦（左上）× 正方形（右上）× 横（下中央）
-     余白重視 — フレームは大きめ、間隔広め
-     
-     グリッド画像読み取り:
-       portrait:  gx≈63, gy≈14, w≈50
-       square:    gx≈126, gy≈27, w≈50
-       landscape: gx≈88, gy≈95, w≈76
-  */
-  function seedDefaultFrames() {
+     レイアウトプリセット定義
+     座標は240×150グリッド（80×46の3倍）
+     ======================================== */
+
+  // Story (8枚) — 既存
+  function seedStoryFrames() {
     const grid = [
-      // [type,        gx,   gy,   w,    bottomAlign]
-      ["portrait",     43.9,  0,   84.5, null],   // 左上 — 縦
-      ["square",      126,   27.6, 56.8, null],   // 右上 — 正方形
-      ["landscape",    88,   82.6, 71,   null],   // 下中央 — 横
+      ["portrait",         -0.2, 57.8, 38,   null],
+      ["square",           42.9, 32.2, 41,   null],
+      ["portrait",         87.4, 16.5, 56.25,null],
+      ["landscape_simple", 144.7,38.1, 38,   null],
+      ["landscape",        187.5,48.4, 51,   null],
+      ["landscape",        39.5, 73.1, 47,   null],
+      ["square",           91.7, 76.4, 47,   null],
+      ["portrait",         142.7,77.0, 41.5, null],
     ];
 
     frames = grid.map(g => ({
@@ -632,6 +659,110 @@ display:none;
       fixedPhotoId: null
     }));
   }
+
+  // Scene (11枚) — グリッド画像から読み取り
+  // 80×46グリッドの座標を ×3 して240×150に変換
+  function seedSceneFrames() {
+    const grid = [
+      // [type,           gx,   gy,   w(240grid), bottomAlign]
+      // --- 上段 ---
+      ["portrait",         3,   15,   30,  null],   // #1  左上の縦 (80grid: ~1,5 → w~10)
+      ["square",          33,   24,   33,  null],   // #2  上段左寄り正方形 (80grid: ~11,8 → w~11)
+      ["portrait",        69,    3,   45,  null],   // #3  上段中央の大きい縦 (80grid: ~23,1 → w~15)
+      ["landscape",      111,    9,   36,  null],   // #4  上段中央右の横 (80grid: ~37,3 → w~12)
+      ["landscape",      147,    3,   48,  null],   // #5  右上の大きい横 (80grid: ~49,1 → w~16)
+      // --- 中段 ---
+      ["landscape",       15,   75,   48,  null],   // #6  中央左の横 (80grid: ~5,25 → w~16)
+      ["square",          63,   63,   48,  null],   // #7  中央の大きい正方形 (80grid: ~21,21 → w~16)
+      ["landscape",      111,   75,   48,  null],   // #8  中央右の横 (80grid: ~37,25 → w~16)
+      // --- 右・下段 ---
+      ["landscape",      183,   39,   48,  null],   // #9  右中段の横 (80grid: ~61,13 → w~16)
+      ["square",          39,   87,   36,  null],   // #10 下中央左の正方形 (80grid: ~13,29 → w~12)
+      ["portrait",       195,   75,   36,  null],   // #11 右下の縦 (80grid: ~65,25 → w~12)
+    ];
+
+    frames = grid.map(g => ({
+      id: uid(),
+      kind: g[0],
+      gx: g[1],
+      gy: g[2],
+      w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  // Calm (3枚) — 縦×正方形×横 の三角構成
+  function seedCalmFrames() {
+    const grid = [
+      ["portrait",   30,  20,  50,  null],
+      ["square",     95,  35,  50,  null],
+      ["landscape", 155,  55,  55,  null],
+    ];
+
+    frames = grid.map(g => ({
+      id: uid(),
+      kind: g[0],
+      gx: g[1],
+      gy: g[2],
+      w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  // Flow (5枚) — 軽い物語構成
+  function seedFlowFrames() {
+    const grid = [
+      ["portrait",    10,  25,  42,  null],
+      ["landscape",   60,  15,  50,  null],
+      ["square",     120,  40,  42,  null],
+      ["portrait",   170,  20,  38,  null],
+      ["landscape",   55,  80,  50,  null],
+    ];
+
+    frames = grid.map(g => ({
+      id: uid(),
+      kind: g[0],
+      gx: g[1],
+      gy: g[2],
+      w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  function seedLayout(layout) {
+    currentLayout = layout;
+    selectedId = null;
+    switch (layout) {
+      case "calm":  seedCalmFrames(); break;
+      case "flow":  seedFlowFrames(); break;
+      case "story": seedStoryFrames(); break;
+      case "scene": seedSceneFrames(); break;
+      default:      seedStoryFrames(); break;
+    }
+    updateLayoutButtons();
+    renderAll();
+  }
+
+  function updateLayoutButtons() {
+    document.querySelectorAll(".layoutBtn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.layout === currentLayout);
+    });
+  }
+
+  // Layout button click handlers
+  document.querySelectorAll(".layoutBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      seedLayout(btn.dataset.layout);
+      const names = { calm:"Calm (3)", flow:"Flow (5)", story:"Story (8)", scene:"Scene (11)" };
+      showToast(names[btn.dataset.layout] + " に切り替えました");
+    });
+  });
 
   function updateSelectionUI() {
     canvas.querySelectorAll(".frame").forEach(el => {
@@ -896,7 +1027,7 @@ display:none;
     localStorage.setItem(
       codeKey(c),
       JSON.stringify({
-        meta: { savedAt: Date.now(), v: 12 },
+        meta: { savedAt: Date.now(), v: 12, layout: currentLayout },
         photos,
         frames
       })
@@ -930,6 +1061,10 @@ display:none;
             orient: "square"
           }];
       frames = Array.isArray(d.frames) ? d.frames : [];
+      if (d.meta && d.meta.layout) {
+        currentLayout = d.meta.layout;
+        updateLayoutButtons();
+      }
       selectedId = null;
       renderAll();
       showToast("読み込み完了");
@@ -948,9 +1083,8 @@ display:none;
     }];
     frames = [];
     selectedId = null;
-    seedDefaultFrames();
-    renderAll();
-    showToast("リセットしました（Calm 3枚）");
+    seedLayout(currentLayout);
+    showToast(currentLayout + " にリセットしました");
   }
 
   $("saveBtn").onclick = save;
@@ -1034,8 +1168,7 @@ display:none;
     }];
 
     await hydrateAspectRatios();
-    seedDefaultFrames();
-    renderAll();
+    seedLayout(currentLayout);
 
     const scaler = $("canvasScaler");
     const wrap = $("canvasWrap");
