@@ -675,17 +675,17 @@ font-weight:600;
   */
   function seedSceneFrames() {
     const grid = [
-      ["landscape_simple",  3,  27, 36, null],  // #1
-      ["square",           42,  27, 33, null],  // #2
-      ["portrait_simple", 102,   3, 33, null],  // #3
-      ["portrait",        147,  27, 30, null],  // #4
-      ["landscape",       186,  39, 45, null],  // #5
-      ["square",           15,  75, 30, null],  // #6
-      ["portrait",         51,  63, 36, null],  // #7
-      ["portrait",         99,  51, 42, null],  // #8
-      ["landscape",       147,  75, 48, null],  // #9
-      ["landscape_simple",195,  75, 42, null],  // #10
-      ["square",           99, 111, 42, null],  // #11
+      ["landscape_simple",  3,  42, 36, null],  // #1  5マス下げ
+      ["square",           42,  27, 39, null],  // #2  2回り大きく
+      ["portrait_simple", 102,   3, 36, null],  // #3  1回り大きく
+      ["portrait",        147,  42, 36, null],  // #4  2回り大きく+5マス下げ
+      ["landscape",       186,  39, 39, null],  // #5  2回り小さく
+      ["square",           15,  75, 33, null],  // #6  1回り大きく
+      ["portrait",         51,  78, 36, null],  // #7  5マス下げ
+      ["portrait",         99,  51, 51, null],  // #8  3回り大きく
+      ["landscape",       147,  75, 54, null],  // #9  2回り大きく
+      ["landscape_simple",195,  75, 42, null],  // #10 変更なし
+      ["square",           99, 120, 42, null],  // #11 3マス下げ
     ];
     frames = grid.map(g => ({
       id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
