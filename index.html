@@ -6,391 +6,1095 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>KABEPIC Editor</title>
 <style>
-:root{--ink:#111;--muted:#777;--card:rgba(255,255,255,0.92);--border:rgba(17,17,17,0.14);--bg:#f6f6f6;--accent:#007aff;}
+:root{
+  --ink:#111;
+  --muted:#777;
+  --card:rgba(255,255,255,0.92);
+  --border:rgba(17,17,17,0.14);
+  --bg:#f6f6f6;
+  --accent:#007aff;
+}
 *{box-sizing:border-box;}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);display:flex;justify-content:center;}
-.app{width:100%;min-height:100vh;background:#fff;margin:0 auto;}
-header{padding:12px 14px 10px;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:10;}
-@media(orientation:landscape){header{padding:4px 14px 4px;}.tabs{margin-top:4px;}.tabbtn{padding:6px 12px;}.brand h1{font-size:14px;}.content{padding:6px;}.panel{padding:6px;}.hint{display:none;}.row{gap:6px;}button,select,input[type="text"]{padding:6px 10px;font-size:12px;}}
-.brand{display:flex;align-items:baseline;gap:10px;}.brand h1{font-size:16px;margin:0;letter-spacing:.02em;}.brand span{font-size:12px;color:var(--muted);}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  display:flex;
+  justify-content:center;
+}
+.app{
+  width:100%;
+  min-height:100vh;
+  background:#fff;
+  margin:0 auto;
+}
+header{
+  padding:12px 14px 10px;
+  border-bottom:1px solid #eee;
+  background:#fff;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+@media (orientation: landscape) {
+  header{padding:4px 14px 4px;}
+  .tabs{margin-top:4px;}
+  .tabbtn{padding:6px 12px;}
+  .brand h1{font-size:14px;}
+  .content{padding:6px;}
+  .panel{padding:6px;}
+  .hint{display:none;}
+  .row{gap:6px;}
+  button,select,input[type="text"]{padding:6px 10px;font-size:12px;}
+}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand h1{font-size:16px;margin:0;letter-spacing:.02em;}
+.brand span{font-size:12px;color:var(--muted);}
+
 .tabs{margin-top:10px;display:flex;gap:8px;}
-.tabbtn{flex:1;padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:10px;font-size:13px;color:var(--ink);cursor:pointer;}
-.tabbtn.active{border-color:rgba(17,17,17,0.5);background:rgba(17,17,17,0.04);font-weight:600;}
+.tabbtn{
+flex:1;
+padding:10px 12px;
+border:1px solid var(–border);
+background:#fff;
+border-radius:10px;
+font-size:13px;
+color:var(–ink);
+cursor:pointer;
+}
+.tabbtn.active{
+border-color:rgba(17,17,17,0.5);
+background:rgba(17,17,17,0.04);
+font-weight:600;
+}
+
 .content{padding:14px;}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;}
+.panel{
+background:var(–card);
+border:1px solid var(–border);
+border-radius:14px;
+padding:12px;
+}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-button,select,input[type="text"]{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:13px;cursor:pointer;}
-.hint{font-size:12px;color:var(--muted);line-height:1.55;margin-top:8px;}
-#canvasWrap{margin-top:10px;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;background:#ddd;position:relative;width:100%;aspect-ratio:8/5;}
-#canvasScaler{position:absolute;top:0;left:0;width:2400px;height:1500px;transform-origin:top left;}
-#canvas{position:relative;width:2400px;height:1500px;background:#ddd;overflow:hidden;touch-action:none;}
 
-/* CSS Frame Rendering */
-.frame{position:absolute;overflow:visible;touch-action:none;}
-.frame.selected{outline:3px solid var(–accent);outline-offset:2px;}
-
-.frame-border{
-position:absolute;inset:0;
-pointer-events:none;z-index:3;
-}
-/* Standard frame: double border with shadow for depth */
-.frame-border.style-standard{
-border:4px solid #333;
-box-shadow:inset 0 0 0 2px #555, inset 0 0 0 8px #ddd, inset 0 0 0 10px #444,
-2px 3px 8px rgba(0,0,0,0.25);
-}
-/* Simple frame: clean single border */
-.frame-border.style-simple{
-border:3px solid #444;
-box-shadow:inset 0 0 0 6px #eee, inset 0 0 0 8px #444,
-1px 2px 6px rgba(0,0,0,0.2);
-}
-/* Oval frame */
-.frame-border.style-oval{
-border:4px solid #333;
-border-radius:50%;
-box-shadow:inset 0 0 0 3px #bbb, inset 0 0 0 6px #444,
-2px 3px 8px rgba(0,0,0,0.25);
+button,select,input[type=“text”]{
+padding:10px 12px;
+border-radius:12px;
+border:1px solid var(–border);
+background:#fff;
+font-size:13px;
+cursor:pointer;
 }
 
-.photoArea{
+.hint{
+font-size:12px;
+color:var(–muted);
+line-height:1.55;
+margin-top:8px;
+}
+
+#canvasWrap{
+margin-top:10px;
+border-radius:18px;
+border:1px solid rgba(0,0,0,0.06);
+overflow:hidden;
+background:#ddd;
+position:relative;
+width:100%;
+aspect-ratio:8/5;
+}
+#canvasScaler{
+position:absolute;
+top:0;
+left:0;
+width:2400px;
+height:1500px;
+transform-origin:top left;
+}
+#canvas{
+position:relative;
+width:2400px;
+height:1500px;
+background:#ddd;
+overflow:hidden;
+touch-action:none;
+}
+
+.frame{
+position:absolute;
+overflow:visible;
+touch-action:none;
+}
+.frame.selected{
+outline:3px solid var(–accent);
+outline-offset:2px;
+}
+
+.mask{
 position:absolute;
 overflow:hidden;
 background:transparent;
 }
-.photoArea img{
-width:100%;height:100%;
-object-fit:cover;object-position:center;
-display:block;pointer-events:none;user-select:none;-webkit-user-drag:none;
-}
-.photoArea.oval-mask{
-border-radius:50%;
+.mask img{
+width:100%;
+height:100%;
+object-fit:cover;
+object-position:center;
+display:block;
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
 }
 
-.handle{position:absolute;width:22px;height:22px;right:-12px;bottom:-12px;border-radius:50%;background:var(–accent);border:3px solid #fff;display:none;z-index:5;cursor:nwse-resize;}
+.overlay{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
+z-index:3;
+}
+
+.handle{
+position:absolute;
+width:60px;
+height:60px;
+right:-30px;
+bottom:-30px;
+border-radius:50%;
+background:var(–accent);
+border:4px solid #fff;
+box-shadow:0 2px 8px rgba(0,0,0,0.25);
+display:none;
+z-index:5;
+cursor:nwse-resize;
+touch-action:none;
+}
 .frame.selected .handle{display:block;}
 
-.selectedBar{margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06);}
-.selectedTitle{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;}
-.selectedTitle .left{display:flex;flex-direction:column;gap:2px;}
+.selectedBar{
+margin-top:12px;
+padding-top:12px;
+border-top:1px solid rgba(0,0,0,0.06);
+}
+.selectedTitle{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:8px;
+margin-bottom:8px;
+}
+.selectedTitle .left{
+display:flex;
+flex-direction:column;
+gap:2px;
+}
 .selectedTitle .left strong{font-size:13px;}
 .selectedTitle .left small{font-size:11px;color:var(–muted);}
-.strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px;}
-.thumb{width:86px;flex:0 0 auto;border-radius:12px;border:1px solid rgba(0,0,0,0.08);overflow:hidden;background:#fff;}
-.thumb img{width:100%;height:62px;object-fit:cover;display:block;pointer-events:none;}
-.thumb .act{display:flex;gap:6px;padding:6px;}
-.thumb button{flex:1;padding:6px 8px;font-size:11px;border-radius:10px;border:1px solid rgba(17,17,17,0.18);background:rgba(17,17,17,0.04);cursor:pointer;}
-.thumb button.primary{border-color:rgba(0,122,255,0.35);background:rgba(0,122,255,0.10);}
-.trayTop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.file{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(–border);background:#fff;font-size:13px;cursor:pointer;}
+
+.strip{
+display:flex;
+gap:10px;
+overflow-x:auto;
+padding-bottom:2px;
+}
+
+.thumb{
+width:86px;
+flex:0 0 auto;
+border-radius:12px;
+border:1px solid rgba(0,0,0,0.08);
+overflow:hidden;
+background:#fff;
+}
+.thumb img{
+width:100%;
+height:62px;
+object-fit:cover;
+display:block;
+pointer-events:none;
+}
+.thumb .act{
+display:flex;
+gap:6px;
+padding:6px;
+}
+.thumb button{
+flex:1;
+padding:6px 8px;
+font-size:11px;
+border-radius:10px;
+border:1px solid rgba(17,17,17,0.18);
+background:rgba(17,17,17,0.04);
+cursor:pointer;
+}
+.thumb button.primary{
+border-color:rgba(0,122,255,0.35);
+background:rgba(0,122,255,0.10);
+}
+
+.trayTop{
+display:flex;
+gap:10px;
+align-items:center;
+flex-wrap:wrap;
+}
+.file{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 12px;
+border-radius:12px;
+border:1px solid var(–border);
+background:#fff;
+font-size:13px;
+cursor:pointer;
+}
 input[type=“file”]{display:none;}
-.trayGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
-.tile{position:relative;aspect-ratio:1/1;border:1px solid rgba(0,0,0,0.08);border-radius:14px;overflow:hidden;background:#fff;cursor:pointer;user-select:none;touch-action:none;}
-.tile img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
-.badge{position:absolute;left:8px;bottom:8px;background:rgba(255,255,255,0.88);border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:11px;padding:4px 8px;}
-.subnote{margin-top:8px;font-size:12px;color:var(–muted);line-height:1.5;}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(17,17,17,0.92);color:#fff;padding:10px 12px;border-radius:12px;font-size:13px;max-width:min(520px,calc(100% - 24px));z-index:50;box-shadow:0 10px 30px rgba(0,0,0,0.18);display:none;}
-.layoutRow{display:flex;gap:6px;margin-bottom:10px;}
-.layoutBtn{padding:8px 14px;border-radius:10px;border:1px solid var(–border);background:#fff;font-size:12px;cursor:pointer;color:var(–ink);}
-.layoutBtn.active{border-color:rgba(17,17,17,0.5);background:rgba(17,17,17,0.06);font-weight:600;}
+
+.trayGrid{
+display:grid;
+grid-template-columns:repeat(3, 1fr);
+gap:10px;
+margin-top:12px;
+}
+
+.tile{
+position:relative;
+aspect-ratio:1/1;
+border:1px solid rgba(0,0,0,0.08);
+border-radius:14px;
+overflow:hidden;
+background:#fff;
+cursor:pointer;
+user-select:none;
+touch-action:none;
+}
+.tile img{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+pointer-events:none;
+}
+.badge{
+position:absolute;
+left:8px;
+bottom:8px;
+background:rgba(255,255,255,0.88);
+border:1px solid rgba(0,0,0,0.12);
+border-radius:999px;
+font-size:11px;
+padding:4px 8px;
+}
+
+.subnote{
+margin-top:8px;
+font-size:12px;
+color:var(–muted);
+line-height:1.5;
+}
+
+.toast{
+position:fixed;
+left:50%;
+bottom:18px;
+transform:translateX(-50%);
+background:rgba(17,17,17,0.92);
+color:#fff;
+padding:10px 12px;
+border-radius:12px;
+font-size:13px;
+max-width:min(520px, calc(100% - 24px));
+z-index:50;
+box-shadow:0 10px 30px rgba(0,0,0,0.18);
+display:none;
+}
 </style>
 
 </head>
 <body>
 <div class="app">
   <header>
-    <div class="brand"><h1>KABEPIC</h1><span>Editor</span></div>
-    <div class="tabs">
-      <button id="tabCanvas" class="tabbtn active">キャンバス</button>
-      <button id="tabTray" class="tabbtn">写真</button>
+    <div class="brand">
+      <h1>KABEPIC</h1>
+      <span>Editor</span>
     </div>
+
+```
+<div class="tabs">
+  <button id="tabCanvas" class="tabbtn active">キャンバス</button>
+  <button id="tabTray" class="tabbtn">写真</button>
+</div>
+```
+
   </header>
+
   <div class="content">
     <div class="panel" id="panelCanvas">
-      <div class="layoutRow">
-        <button class="layoutBtn" data-layout="calm">Calm (3)</button>
-        <button class="layoutBtn" data-layout="flow">Flow (5)</button>
-        <button class="layoutBtn" data-layout="story">Story (8)</button>
-        <button class="layoutBtn active" data-layout="scene">Scene (11)</button>
-      </div>
       <div class="row">
-        <select id="frameType">
-          <option value="portrait">縦</option>
-          <option value="portrait_simple">縦シンプル</option>
-          <option value="square">正方形</option>
-          <option value="landscape">横</option>
-          <option value="landscape_simple">横シンプル</option>
-          <option value="oval">楕円</option>
+        <select id="frameSet">
+          <option value="calm">Calm（3）</option>
+          <option value="flow">Flow（5）</option>
+          <option value="story" selected>Story（8）</option>
         </select>
-        <button id="addFrame">＋ フレーム追加</button>
-        <button id="deleteFrame">選択フレーム削除</button>
-        <label class="row" style="gap:8px;">
-          <span style="font-size:12px;color:var(--muted);">コード：</span>
-          <input id="codeInput" maxlength="6" placeholder="123456" inputmode="numeric" style="width:120px;text-align:center;letter-spacing:.25em">
-        </label>
-        <button id="genCodeBtn">コード生成</button>
-        <button id="saveBtn">保存</button>
-        <button id="loadBtn">読込</button>
-        <button id="openViewBtn">壁表示を開く</button>
-        <button id="resetBtn">リセット</button>
-      </div>
-      <div class="hint">フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>写真タブから写真を追加してフレームに割り当て</div>
-      <div id="canvasWrap"><div id="canvasScaler"><div id="canvas"></div></div></div>
-      <div class="selectedBar">
-        <div class="selectedTitle"><div class="left"><strong>選択フレーム情報</strong><small id="selectedInfo">なし</small></div></div>
-        <div id="selectedStrip" class="strip"></div>
-        <div id="selectedEmpty" class="subnote" style="display:none;">写真タブから写真を追加し、タップしてフレームに割り当て</div>
+
+```
+    <select id="frameType">
+      <option value="portrait">縦</option>
+      <option value="square">正方形</option>
+      <option value="landscape">横</option>
+      <option value="landscape_simple">横シンプル</option>
+      <option value="oval">楕円</option>
+    </select>
+
+    <button id="addFrame">＋ フレーム追加</button>
+    <button id="deleteFrame">選択フレーム削除</button>
+
+    <label class="row" style="gap:8px;">
+      <span style="font-size:12px;color:var(--muted);">コード：</span>
+      <input id="codeInput" maxlength="6" placeholder="123456" inputmode="numeric"
+        style="width:120px;text-align:center;letter-spacing:.25em">
+    </label>
+
+    <button id="genCodeBtn">コード生成</button>
+    <button id="saveBtn">保存</button>
+    <button id="loadBtn">読込</button>
+    <button id="openViewBtn">壁表示を開く</button>
+    <button id="resetBtn">リセット</button>
+  </div>
+
+  <div class="hint">
+    Frames でプリセットを切替（写真はそのまま引き継ぎ）<br>
+    フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
+    楕円は mask_oval.png を使用します。<br>
+    写真タブから PNG を追加してフレームに割り当て
+  </div>
+
+  <div id="canvasWrap"><div id="canvasScaler"><div id="canvas"></div></div></div>
+
+  <div class="selectedBar">
+    <div class="selectedTitle">
+      <div class="left">
+        <strong>選択フレーム情報</strong>
+        <small id="selectedInfo">なし</small>
       </div>
     </div>
-    <div id="panelTray" style="display:none;">
-      <div class="trayTop">
-        <label class="file">写真を追加する<input id="fileInput" type="file" accept="image/*" multiple></label>
-        <button id="saveBtn2">保存</button><button id="loadBtn2">読込</button><button id="resetBtn2">リセット</button>
-      </div>
-      <div class="subnote">タップで選択中フレームに割り当て<br>長押しで写真をライブラリから削除</div>
-      <div id="trayGrid" class="trayGrid"></div>
-      <div id="trayEmpty" class="subnote" style="display:none;">写真がまだありません</div>
+
+    <div id="selectedStrip" class="strip"></div>
+    <div id="selectedEmpty" class="subnote" style="display:none;">
+      写真タブから写真を追加し、タップしてフレームに割り当て
     </div>
   </div>
 </div>
+
+<div id="panelTray" style="display:none;">
+  <div class="trayTop">
+    <label class="file">
+      写真を追加する
+      <input id="fileInput" type="file" accept="image/*" multiple>
+    </label>
+    <button id="saveBtn2">保存</button>
+    <button id="loadBtn2">読込</button>
+    <button id="resetBtn2">リセット</button>
+  </div>
+
+  <div class="subnote">
+    タップで選択中フレームに割り当て<br>
+    長押しで写真をライブラリから削除
+  </div>
+
+  <div id="trayGrid" class="trayGrid"></div>
+  <div id="trayEmpty" class="subnote" style="display:none;">写真がまだありません</div>
+</div>
+```
+
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
+
 <script>
 (() => {
-const PREFIX="kabepic_code_v14_";
-const LONG_PRESS_MS=650;
+  const PREFIX = "kabepic_code_v12_";
+  const LONG_PRESS_MS = 650;
 
-/*
-Frame metadata — CSS-only rendering, no external PNGs needed.
-inset: top right bottom left — defines photo area within frame.
-style: “standard” | “simple” | “oval” — CSS frame style.
-*/
-const FRAME_META={
-portrait:        { inset:“14.4% 18% 14.4% 18%”,    style:“standard”, ar:5/6 },
-portrait_simple: { inset:“15.1% 17.8% 14.8% 19.3%”,style:“simple”,   ar:874/1044 },
-square:          { inset:“17.96% 17.96% 17.96% 17.96%”, style:“standard”, ar:1 },
-landscape:       { inset:“18% 14.4% 18% 14.4%”,    style:“standard”, ar:6/5 },
-landscape_simple:{ inset:“17.8% 14.9% 19.4% 15.0%”,style:“simple”,   ar:1043/873 },
-oval:            { inset:“6.7% 10.1% 6.7% 10.1%”,  style:“oval”,     ar:7/10 }
-};
+  const FRAME_META = {
+    portrait: {
+      src: "frame_vertical.png",
+      inset: "15.7% 18.7% 15.5% 19.9%",
+      mask: "rect",
+      ar: 894 / 1063
+    },
+    square: {
+      src: "frame_square.png",
+      inset: "19.0% 19.9% 20.2% 19.2%",
+      mask: "rect",
+      ar: 1053 / 1052
+    },
+    landscape: {
+      src: "frame_horizontal.png",
+      inset: "18.6% 15.5% 20.0% 15.7%",
+      mask: "rect",
+      ar: 1063 / 894
+    },
+    landscape_simple: {
+      src: "frame_horizontal_simple.png",
+      inset: "17.8% 14.9% 19.4% 15.0%",
+      mask: "rect",
+      ar: 1043 / 873
+    },
+    oval: {
+      src: "frame_oval.png",
+      inset: "7.8% 11.7% 8.4% 12.4%",
+      mask: "oval",
+      maskPng: "mask_oval.png",
+      ar: 694 / 982
+    }
+  };
 
-let photos=[],frames=[],selectedId=null,currentLayout=“scene”;
-const $=id=>document.getElementById(id);
-const canvas=$(“canvas”),trayGrid=$(“trayGrid”),toastEl=$(“toast”);
-const uid=()=>Math.random().toString(36).slice(2,10);
-const codeKey=code=>PREFIX+code;
+  /* ========================================
+     フレームセット プリセット定義
+     ======================================== */
+  const FRAME_PRESETS = {
+    calm: [
+      // Calm（3）: 余白重視・大きな写真・三角構成
+      // [type,             gx,    gy,    w,    bottomAlign]
+      ["portrait",          43.9,   0,    84.5,  null],
+      ["square",           126,    27.6,  56.8,  null],
+      ["landscape",         88,    82.6,  71,    null],
+    ],
+    flow: [
+      // Flow（5）: 自然な流れを持つ軽い物語構成
+      // 1: 縦長（左・中段）小さめ
+      ["portrait",           9.4,  63.3,  37.4,  null],
+      // 2: 縦長（上中央）大きめ
+      ["portrait",          71.7,   6.7,  49.9,  null],
+      // 3: 横長シンプル（右寄り・上段）
+      ["landscape_simple", 127.8,  26.7,  49.9,  null],
+      // 4: 横長シンプル（右端・中段）
+      ["landscape_simple", 193.2,  63.3,  46.8,  null],
+      // 5: 横長（下中央）大きめ
+      ["landscape",         84.2, 103.3,  68.6,  null],
+    ],
+    story: [
+      // Story（8）: 物語が広がるバランス型ギャラリー
+      ["portrait",          -0.2,  57.8,  38,    null],
+      ["square",            42.9,  32.2,  41,    null],
+      ["portrait",          87.4,  16.5,  56.25, null],
+      ["landscape_simple", 144.7,  38.1,  38,    null],
+      ["landscape",        187.5,  48.4,  51,    null],
+      ["landscape",         39.5,  73.1,  47,    null],
+      ["square",            91.7,  76.4,  47,    null],
+      ["portrait",         142.7,  77.0,  41.5,  null],
+    ]
+  };
 
-function showToast(msg,ms=1400){toastEl.textContent=msg;toastEl.style.display=“block”;clearTimeout(showToast._t);showToast._t=setTimeout(()=>{toastEl.style.display=“none”},ms);}
+  let photos = [];
+  let frames = [];
+  let selectedId = null;
+  let currentSet = "story";
 
-function makePlaceholderDataUrl(){
-const c=document.createElement(“canvas”);c.width=800;c.height=800;
-const g=c.getContext(“2d”);
-g.fillStyle=”#f1efe8”;g.fillRect(0,0,800,800);
-g.strokeStyle=“rgba(0,0,0,0.08)”;g.lineWidth=4;g.strokeRect(40,40,720,720);
-g.fillStyle=“rgba(0,0,0,0.18)”;g.font=“48px sans-serif”;g.textAlign=“center”;
-g.fillText(“KABEPIC”,400,380);g.font=“24px sans-serif”;g.fillText(“placeholder”,400,430);
-return c.toDataURL(“image/png”);
-}
+  const $ = (id) => document.getElementById(id);
+  const canvas = $("canvas");
+  const trayGrid = $("trayGrid");
+  const toastEl = $("toast");
 
-function setTab(w){$(“tabCanvas”).classList.toggle(“active”,w===“canvas”);$(“tabTray”).classList.toggle(“active”,w===“tray”);$(“panelCanvas”).style.display=w===“canvas”?””:“none”;$(“panelTray”).style.display=w===“tray”?””:“none”;}
-$(“tabCanvas”).onclick=()=>setTab(“canvas”);
-$(“tabTray”).onclick=()=>setTab(“tray”);
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const codeKey = (code) => PREFIX + code;
 
-function normalizeCodeInput(){const v=($(“codeInput”).value||””).replace(/\D/g,””).slice(0,6);$(“codeInput”).value=v;return v;}
-$(“codeInput”).oninput=normalizeCodeInput;
-$(“genCodeBtn”).onclick=()=>{$(“codeInput”).value=String(Math.floor(100000+Math.random()*900000));showToast(“コードを生成しました”);};
+  function showToast(msg, ms = 1400) {
+    toastEl.textContent = msg;
+    toastEl.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => {
+      toastEl.style.display = "none";
+    }, ms);
+  }
 
-function findFrame(id){return frames.find(f=>f.id===id)||null;}
-function findPhoto(id){return photos.find(p=>p.id===id)||null;}
-function detectOrient(r){if(r>1.05)return”landscape”;if(r<0.95)return”portrait”;return”square”;}
+  function makePlaceholderDataUrl() {
+    const c = document.createElement("canvas");
+    c.width = 1200;
+    c.height = 1200;
+    const g = c.getContext("2d");
+    g.fillStyle = "#f1efe8";
+    g.fillRect(0, 0, c.width, c.height);
+    g.strokeStyle = "rgba(0,0,0,0.12)";
+    g.lineWidth = 12;
+    g.strokeRect(60, 60, c.width - 120, c.height - 120);
+    g.fillStyle = "rgba(0,0,0,0.35)";
+    g.font = "72px sans-serif";
+    g.fillText("KABEPIC", 350, 560);
+    g.font = "34px sans-serif";
+    g.fillText("placeholder", 430, 640);
+    return c.toDataURL("image/png");
+  }
 
-async function readFile(file){
-const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
-const meta=await new Promise(res=>{const img=new Image();img.onload=()=>{const ratio=(img.naturalWidth||1)/(img.naturalHeight||1);res({ratio,orient:detectOrient(ratio)});};img.onerror=()=>res({ratio:1,orient:“square”});img.src=dataUrl;});
-return{id:uid(),name:file.name,dataUrl,…meta};
-}
+  function setTab(which) {
+    $("tabCanvas").classList.toggle("active", which === "canvas");
+    $("tabTray").classList.toggle("active", which === "tray");
+    $("panelCanvas").style.display = which === "canvas" ? "" : "none";
+    $("panelTray").style.display = which === "tray" ? "" : "none";
+  }
 
-const GRID={W:240,H:150};
+  $("tabCanvas").onclick = () => setTab("canvas");
+  $("tabTray").onclick = () => setTab("tray");
 
-function gridToPercent(f){
-const m=FRAME_META[f.kind];const hCells=f.w/m.ar;
-return{
-left:(f.gx/GRID.W*100)+”%”,
-top:(f.gy/GRID.H*100)+”%”,
-width:(f.w/GRID.W*100)+”%”,
-height:(hCells/GRID.H*100)+”%”
-};
-}
+  function normalizeCodeInput() {
+    const v = ($("codeInput").value || "").replace(/\D/g, "").slice(0, 6);
+    $("codeInput").value = v;
+    return v;
+  }
 
-/* ======== Layout Presets ======== */
+  $("codeInput").oninput = normalizeCodeInput;
 
-// Scene (11) — from numbered grid image (80×46 → ×3 → 240×150)
-function seedSceneFrames(){
-const g=[
-[“landscape_simple”,  3,  27, 36],  // #1
-[“square”,           42,  27, 33],  // #2
-[“portrait_simple”, 102,   3, 33],  // #3
-[“portrait”,        147,  27, 30],  // #4
-[“landscape”,       186,  39, 45],  // #5
-[“square”,           15,  75, 30],  // #6
-[“portrait”,         51,  63, 36],  // #7
-[“portrait”,         99,  51, 42],  // #8
-[“landscape”,       147,  75, 48],  // #9
-[“landscape_simple”,195,  75, 42],  // #10
-[“square”,           99, 111, 42],  // #11
-];
-frames=g.map(r=>({id:uid(),kind:r[0],gx:r[1],gy:r[2],w:r[3],photoIds:photos[0]?[photos[0].id]:[],fixedPhotoId:null}));
-}
+  $("genCodeBtn").onclick = () => {
+    $("codeInput").value = String(Math.floor(100000 + Math.random() * 900000));
+    showToast("コードを生成しました");
+  };
 
-// Story (8)
-function seedStoryFrames(){
-const g=[
-[“portrait”,-0.2,57.8,38],[“square”,42.9,32.2,41],[“portrait”,87.4,16.5,56.25],
-[“landscape_simple”,144.7,38.1,38],[“landscape”,187.5,48.4,51],
-[“landscape”,39.5,73.1,47],[“square”,91.7,76.4,47],[“portrait”,142.7,77.0,41.5],
-];
-frames=g.map(r=>({id:uid(),kind:r[0],gx:r[1],gy:r[2],w:r[3],photoIds:photos[0]?[photos[0].id]:[],fixedPhotoId:null}));
-}
+  function findFrame(id) {
+    return frames.find(f => f.id === id) || null;
+  }
 
-// Flow (5)
-function seedFlowFrames(){
-const g=[[“portrait”,10,25,42],[“landscape”,60,15,50],[“square”,120,40,42],[“portrait”,170,20,38],[“landscape”,55,80,50]];
-frames=g.map(r=>({id:uid(),kind:r[0],gx:r[1],gy:r[2],w:r[3],photoIds:photos[0]?[photos[0].id]:[],fixedPhotoId:null}));
-}
+  function findPhoto(id) {
+    return photos.find(p => p.id === id) || null;
+  }
 
-// Calm (3)
-function seedCalmFrames(){
-const g=[[“portrait”,30,20,50],[“square”,95,35,50],[“landscape”,155,55,55]];
-frames=g.map(r=>({id:uid(),kind:r[0],gx:r[1],gy:r[2],w:r[3],photoIds:photos[0]?[photos[0].id]:[],fixedPhotoId:null}));
-}
+  function detectOrient(ratio) {
+    if (ratio > 1.05) return "landscape";
+    if (ratio < 0.95) return "portrait";
+    return "square";
+  }
 
-function seedLayout(layout){
-currentLayout=layout;selectedId=null;
-({calm:seedCalmFrames,flow:seedFlowFrames,story:seedStoryFrames,scene:seedSceneFrames}[layout]||seedStoryFrames)();
-updateLayoutButtons();renderAll();
-}
+  async function readFile(file) {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
 
-function updateLayoutButtons(){document.querySelectorAll(”.layoutBtn”).forEach(b=>b.classList.toggle(“active”,b.dataset.layout===currentLayout));}
+    const meta = await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = (img.naturalWidth || 1) / (img.naturalHeight || 1);
+        resolve({ ratio, orient: detectOrient(ratio) });
+      };
+      img.onerror = () => resolve({ ratio: 1, orient: "square" });
+      img.src = dataUrl;
+    });
 
-document.querySelectorAll(”.layoutBtn”).forEach(b=>{b.addEventListener(“click”,()=>{
-seedLayout(b.dataset.layout);
-showToast({calm:“Calm (3)”,flow:“Flow (5)”,story:“Story (8)”,scene:“Scene (11)”}[b.dataset.layout]+” に切り替えました”);
-});});
+    return {
+      id: uid(),
+      name: file.name,
+      dataUrl,
+      ...meta
+    };
+  }
 
-function updateSelectionUI(){canvas.querySelectorAll(”.frame”).forEach(el=>el.classList.toggle(“selected”,el.dataset.id===selectedId));}
+  async function hydrateAspectRatios() {
+    await Promise.all(
+      Object.values(FRAME_META).map(meta => new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          meta.ar = (img.naturalWidth || 1) / (img.naturalHeight || 1);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = meta.src + "?v=12";
+      }))
+    );
+  }
 
-function attachDrag(el,f){
-let on=false,sx=0,sy=0,ogx=0,ogy=0;
-el.addEventListener(“pointerdown”,e=>{if(e.target.classList.contains(“handle”))return;e.stopPropagation();selectedId=f.id;updateSelectionUI();renderSelected();on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;el.setPointerCapture(e.pointerId);});
-el.addEventListener(“pointermove”,e=>{if(!on)return;const r=canvas.getBoundingClientRect();f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;el.style.left=(f.gx/GRID.W*100)+”%”;el.style.top=(f.gy/GRID.H*100)+”%”;});
-el.addEventListener(“pointerup”,()=>{on=false});el.addEventListener(“pointercancel”,()=>{on=false});
-}
+  function applyOvalMask(el) {
+    el.style.borderRadius = "50%";
+    el.style.webkitMaskImage = `url("${FRAME_META.oval.maskPng}")`;
+    el.style.webkitMaskSize = "100% 100%";
+    el.style.webkitMaskRepeat = "no-repeat";
+    el.style.webkitMaskPosition = "center";
+    el.style.maskImage = `url("${FRAME_META.oval.maskPng}")`;
+    el.style.maskSize = "100% 100%";
+    el.style.maskRepeat = "no-repeat";
+    el.style.maskPosition = "center";
+  }
 
-function attachResize(handle,el,f){
-let on=false,sx=0,sw=0;
-handle.addEventListener(“pointerdown”,e=>{e.stopPropagation();selectedId=f.id;updateSelectionUI();renderSelected();on=true;sx=e.clientX;sw=f.w;handle.setPointerCapture(e.pointerId);});
-handle.addEventListener(“pointermove”,e=>{if(!on)return;const r=canvas.getBoundingClientRect();let nw=sw+(e.clientX-sx)/r.width*GRID.W;if(nw<10)nw=10;f.w=nw;const pct=gridToPercent(f);el.style.width=pct.width;el.style.height=pct.height;});
-handle.addEventListener(“pointerup”,()=>{on=false});handle.addEventListener(“pointercancel”,()=>{on=false});
-}
+  const GRID = { W: 240, H: 150 };
 
-function renderFrames(){
-canvas.innerHTML=””;
-frames.forEach(f=>{
-const m=FRAME_META[f.kind];
-const pct=gridToPercent(f);
+  function gridToPercent(f) {
+    const m = FRAME_META[f.kind];
+    const hCells = f.w / m.ar;
+    if (f.bottomAlign != null) {
+      const bottomFromBottom = GRID.H - f.bottomAlign;
+      return {
+        left: (f.gx / GRID.W * 100) + "%",
+        bottom: (bottomFromBottom / GRID.H * 100) + "%",
+        width:  (f.w / GRID.W * 100) + "%",
+        height: (hCells / GRID.H * 100) + "%",
+        useBottom: true,
+      };
+    }
+    return {
+      left: (f.gx / GRID.W * 100) + "%",
+      top:  (f.gy / GRID.H * 100) + "%",
+      width:  (f.w / GRID.W * 100) + "%",
+      height: (hCells / GRID.H * 100) + "%",
+      useBottom: false,
+    };
+  }
 
-```
-const el=document.createElement("div");
-el.className="frame";el.dataset.id=f.id;
-el.style.left=pct.left;el.style.top=pct.top;
-el.style.width=pct.width;el.style.height=pct.height;
+  function seedFrames(setName) {
+    const preset = FRAME_PRESETS[setName];
+    if (!preset) return;
+    currentSet = setName;
 
-// Photo area
-const photoArea=document.createElement("div");
-photoArea.className="photoArea"+(f.kind==="oval"?" oval-mask":"");
-photoArea.style.inset=m.inset;photoArea.style.position="absolute";
+    frames = preset.map(g => ({
+      id: uid(),
+      kind: g[0],
+      gx: g[1],
+      gy: g[2],
+      w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
 
-const img=document.createElement("img");
-const pid=(f.fixedPhotoId&&f.photoIds.includes(f.fixedPhotoId))?f.fixedPhotoId:(f.photoIds[0]||photos[0]?.id);
-const p=pid?findPhoto(pid):photos[0];
-img.src=p?p.dataUrl:makePlaceholderDataUrl();
-photoArea.appendChild(img);el.appendChild(photoArea);
+  function updateSelectionUI() {
+    canvas.querySelectorAll(".frame").forEach(el => {
+      el.classList.toggle("selected", el.dataset.id === selectedId);
+    });
+  }
 
-// CSS frame border
-const border=document.createElement("div");
-border.className="frame-border style-"+m.style;
-el.appendChild(border);
+  function attachDrag(el, f) {
+    let on = false, sx = 0, sy = 0, ogx = 0, ogy = 0;
 
-// Resize handle
-const h=document.createElement("div");h.className="handle";el.appendChild(h);
+    el.addEventListener("pointerdown", (e) => {
+      if (e.target.classList.contains("handle")) return;
+      e.stopPropagation();
+      selectedId = f.id;
+      updateSelectionUI();
+      renderSelected();
 
-attachDrag(el,f);attachResize(h,el,f);
-canvas.appendChild(el);
-```
+      on = true;
+      sx = e.clientX;
+      sy = e.clientY;
+      ogx = f.gx;
+      ogy = f.gy;
+      el.setPointerCapture(e.pointerId);
+    });
 
-});
-updateSelectionUI();
-}
+    el.addEventListener("pointermove", (e) => {
+      if (!on) return;
+      const r = canvas.getBoundingClientRect();
+      f.gx = ogx + (e.clientX - sx) / r.width * GRID.W;
+      f.gy = ogy + (e.clientY - sy) / r.height * GRID.H;
+      el.style.left = (f.gx / GRID.W * 100) + "%";
+      el.style.top = (f.gy / GRID.H * 100) + "%";
+    });
 
-function renderSelected(){
-const f=selectedId?findFrame(selectedId):null;
-$(“selectedInfo”).textContent=f?`ID: ${f.id} / 種類: ${f.kind} / 写真: ${f.photoIds.length}枚`:“なし”;
-$(“selectedStrip”).innerHTML=””;
-if(!f||!f.photoIds.length){$(“selectedEmpty”).style.display=f?””:“none”;return;}
-$(“selectedEmpty”).style.display=“none”;
-f.photoIds.forEach(pid=>{
-const p=findPhoto(pid);if(!p)return;
-const box=document.createElement(“div”);box.className=“thumb”;
-box.innerHTML=`<img src="${p.dataUrl}"><div class="act"><button class="primary">${f.fixedPhotoId===pid?'固定中':'固定'}</button><button>除外</button></div>`;
-box.querySelectorAll(“button”)[0].onclick=()=>{f.fixedPhotoId=pid;renderFrames();renderSelected();showToast(“固定しました”);};
-box.querySelectorAll(“button”)[1].onclick=()=>{f.photoIds=f.photoIds.filter(x=>x!==pid);if(f.fixedPhotoId===pid)f.fixedPhotoId=null;renderFrames();renderSelected();showToast(“除外しました”);};
-$(“selectedStrip”).appendChild(box);
-});
-}
+    el.addEventListener("pointerup", () => { on = false; });
+    el.addEventListener("pointercancel", () => { on = false; });
+  }
 
-function renderTray(){
-trayGrid.innerHTML=””;
-if(!photos.length){$(“trayEmpty”).style.display=””;return;}
-$(“trayEmpty”).style.display=“none”;
-photos.forEach(p=>{
-const tile=document.createElement(“div”);tile.className=“tile”;
-tile.innerHTML=`<img src="${p.dataUrl}"><div class="badge">${selectedId?'割当':'写真追加済み'}</div>`;
-let timer=null,longPressed=false;
-tile.addEventListener(“pointerdown”,()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;if(!confirm(“この写真をライブラリから削除しますか？\n（フレームからも除外されます）”))return;photos=photos.filter(x=>x.id!==p.id);frames.forEach(fr=>{fr.photoIds=fr.photoIds.filter(x=>x!==p.id);if(fr.fixedPhotoId===p.id)fr.fixedPhotoId=null;});if(!photos.length)photos=[{id:uid(),name:“placeholder”,dataUrl:makePlaceholderDataUrl(),ratio:1,orient:“square”}];renderAll();showToast(“写真を削除しました”);},LONG_PRESS_MS);});
-tile.addEventListener(“pointerup”,()=>{if(timer)clearTimeout(timer);timer=null;if(longPressed)return;if(!selectedId){showToast(“先にフレームを選択してください”);return;}const f=findFrame(selectedId);if(!f)return;if(f.photoIds.includes(p.id)){showToast(“すでに割り当て済みです”);return;}f.photoIds.push(p.id);renderFrames();renderSelected();showToast(“写真を割り当てました”);});
-tile.addEventListener(“pointercancel”,()=>{if(timer)clearTimeout(timer);timer=null;});
-trayGrid.appendChild(tile);
-});
-}
+  function attachResize(handle, el, f) {
+    let on = false, sx = 0, sw = 0;
 
-function renderAll(){renderFrames();renderSelected();renderTray();setTab(“canvas”);}
+    handle.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      selectedId = f.id;
+      updateSelectionUI();
+      renderSelected();
 
-function save(){const c=normalizeCodeInput();if(!/^\d{6}$/.test(c)){showToast(“6桁コードを入力してください”);return;}localStorage.setItem(codeKey(c),JSON.stringify({meta:{savedAt:Date.now(),v:14,layout:currentLayout},photos,frames}));showToast(“保存 “+c+” 完了しました”);}
+      on = true;
+      sx = e.clientX;
+      sw = f.w;
+      handle.setPointerCapture(e.pointerId);
+    });
 
-function load(){const c=normalizeCodeInput();if(!/^\d{6}$/.test(c)){showToast(“6桁コードを入力してください”);return;}const raw=localStorage.getItem(codeKey(c));if(!raw){showToast(“このコードのデータはありません”);return;}try{const d=JSON.parse(raw);photos=(Array.isArray(d.photos)&&d.photos.length)?d.photos:[{id:uid(),name:“placeholder”,dataUrl:makePlaceholderDataUrl(),ratio:1,orient:“square”}];frames=Array.isArray(d.frames)?d.frames:[];if(d.meta&&d.meta.layout){currentLayout=d.meta.layout;updateLayoutButtons();}selectedId=null;renderAll();showToast(“読み込み完了”);}catch{showToast(“読み込み失敗”);}}
+    handle.addEventListener("pointermove", (e) => {
+      if (!on) return;
+      const r = canvas.getBoundingClientRect();
+      let nw = sw + (e.clientX - sx) / r.width * GRID.W;
+      if (nw < 10) nw = 10;
+      f.w = nw;
+      const pct = gridToPercent(f);
+      el.style.width = pct.width;
+      el.style.height = pct.height;
+    });
 
-function reset(){photos=[{id:uid(),name:“placeholder”,dataUrl:makePlaceholderDataUrl(),ratio:1,orient:“square”}];frames=[];selectedId=null;seedLayout(currentLayout);showToast(currentLayout+” にリセットしました”);}
+    handle.addEventListener("pointerup", () => { on = false; });
+    handle.addEventListener("pointercancel", () => { on = false; });
+  }
 
-$(“saveBtn”).onclick=save;$(“saveBtn2”).onclick=save;
-$(“loadBtn”).onclick=load;$(“loadBtn2”).onclick=load;
-$(“resetBtn”).onclick=reset;$(“resetBtn2”).onclick=reset;
+  function renderFrames() {
+    canvas.innerHTML = "";
 
-$(“openViewBtn”).onclick=()=>{const c=normalizeCodeInput();if(!/^\d{6}$/.test(c)){showToast(“6桁コードを入力してください”);return;}save();window.open(“KPview.html?code=”+encodeURIComponent(c),”_blank”);};
+    frames.forEach(f => {
+      const m = FRAME_META[f.kind];
+      const pct = gridToPercent(f);
 
-$(“addFrame”).onclick=()=>{const kind=$(“frameType”).value;const w=[30,35,42][Math.floor(Math.random()*3)];frames.push({id:uid(),kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w,photoIds:photos[0]?[photos[0].id]:[],fixedPhotoId:null});selectedId=frames[frames.length-1].id;renderAll();showToast(“フレームを追加しました”);};
+      const el = document.createElement("div");
+      el.className = "frame";
+      el.dataset.id = f.id;
+      el.style.left = pct.left;
+      if (pct.useBottom) {
+        el.style.bottom = pct.bottom;
+      } else {
+        el.style.top = pct.top;
+      }
+      el.style.width = pct.width;
+      el.style.height = pct.height;
+      el.style.setProperty("--inset", m.inset);
 
-$(“deleteFrame”).onclick=()=>{if(!selectedId){showToast(“フレームを選択してください”);return;}frames=frames.filter(f=>f.id!==selectedId);selectedId=null;renderAll();showToast(“削除しました”);};
+      const mask = document.createElement("div");
+      mask.className = "mask";
+      mask.style.inset = m.inset;
+      if (f.kind === "oval") applyOvalMask(mask);
 
-$(“fileInput”).onchange=async e=>{const files=[…(e.target.files||[])];if(!files.length)return;try{const arr=[];for(const f of files)arr.push(await readFile(f));photos=[…arr,…photos];renderTray();showToast(arr.length+“枚追加しました”);}catch{showToast(“読み込み失敗”);}e.target.value=””;};
+      const img = document.createElement("img");
+      const pid =
+        (f.fixedPhotoId && f.photoIds.includes(f.fixedPhotoId))
+        ? f.fixedPhotoId
+        : (f.photoIds[0] || photos[0]?.id);
+      const p = pid ? findPhoto(pid) : photos[0];
+      img.src = p ? p.dataUrl : makePlaceholderDataUrl();
+      mask.appendChild(img);
+      el.appendChild(mask);
 
-(function init(){
-if(!/^\d{6}$/.test(normalizeCodeInput()))$(“codeInput”).value=String(Math.floor(100000+Math.random()*900000));
-photos=[{id:uid(),name:“placeholder”,dataUrl:makePlaceholderDataUrl(),ratio:1,orient:“square”}];
-seedLayout(currentLayout);
-const scaler=$(“canvasScaler”),wrap=$(“canvasWrap”);
-function fitCanvas(){scaler.style.transform=`scale(${wrap.clientWidth/2400})`;}
-fitCanvas();
-let rt=null;window.addEventListener(“resize”,()=>{clearTimeout(rt);rt=setTimeout(fitCanvas,80);});
-})();
+      const ov = document.createElement("img");
+      ov.className = "overlay";
+      ov.src = m.src;
+      el.appendChild(ov);
+
+      const h = document.createElement("div");
+      h.className = "handle";
+      el.appendChild(h);
+
+      attachDrag(el, f);
+      attachResize(h, el, f);
+
+      canvas.appendChild(el);
+    });
+
+    updateSelectionUI();
+  }
+
+  function renderSelected() {
+    const f = selectedId ? findFrame(selectedId) : null;
+    $("selectedInfo").textContent = f ? `ID: ${f.id} / 種類: ${f.kind} / 写真: ${f.photoIds.length}枚` : "なし";
+    $("selectedStrip").innerHTML = "";
+
+    if (!f || !f.photoIds.length) {
+      $("selectedEmpty").style.display = f ? "" : "none";
+      return;
+    }
+
+    $("selectedEmpty").style.display = "none";
+
+    f.photoIds.forEach(pid => {
+      const p = findPhoto(pid);
+      if (!p) return;
+
+      const box = document.createElement("div");
+      box.className = "thumb";
+      box.innerHTML = `
+        <img src="${p.dataUrl}">
+        <div class="act">
+          <button class="primary">${f.fixedPhotoId === pid ? '固定中' : '固定'}</button>
+          <button>除外</button>
+        </div>
+      `;
+
+      box.querySelectorAll("button")[0].onclick = () => {
+        f.fixedPhotoId = pid;
+        renderFrames();
+        renderSelected();
+        showToast("固定しました");
+      };
+
+      box.querySelectorAll("button")[1].onclick = () => {
+        f.photoIds = f.photoIds.filter(x => x !== pid);
+        if (f.fixedPhotoId === pid) f.fixedPhotoId = null;
+        renderFrames();
+        renderSelected();
+        showToast("除外しました");
+      };
+
+      $("selectedStrip").appendChild(box);
+    });
+  }
+
+  function renderTray() {
+    trayGrid.innerHTML = "";
+
+    if (!photos.length) {
+      $("trayEmpty").style.display = "";
+      return;
+    }
+
+    $("trayEmpty").style.display = "none";
+
+    photos.forEach(p => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.innerHTML = `
+        <img src="${p.dataUrl}">
+        <div class="badge">${selectedId ? '割当' : '写真追加済み'}</div>
+      `;
+
+      let timer = null;
+      let longPressed = false;
+
+      tile.addEventListener("pointerdown", () => {
+        longPressed = false;
+        timer = setTimeout(() => {
+          longPressed = true;
+          if (!confirm("この写真をライブラリから削除しますか？\n（フレームからも除外されます）")) return;
+
+          photos = photos.filter(x => x.id !== p.id);
+          frames.forEach(fr => {
+            fr.photoIds = fr.photoIds.filter(x => x !== p.id);
+            if (fr.fixedPhotoId === p.id) fr.fixedPhotoId = null;
+          });
+
+          if (!photos.length) {
+            photos = [{
+              id: uid(),
+              name: "placeholder",
+              dataUrl: makePlaceholderDataUrl(),
+              ratio: 1,
+              orient: "square"
+            }];
+          }
+
+          renderAll();
+          showToast("写真を削除しました");
+        }, LONG_PRESS_MS);
+      });
+
+      tile.addEventListener("pointerup", () => {
+        if (timer) clearTimeout(timer);
+        timer = null;
+        if (longPressed) return;
+
+        if (!selectedId) {
+          showToast("先にフレームを選択してください");
+          return;
+        }
+
+        const f = findFrame(selectedId);
+        if (!f) return;
+
+        if (f.photoIds.includes(p.id)) {
+          showToast("すでに割り当て済みです");
+          return;
+        }
+
+        f.photoIds.push(p.id);
+        renderFrames();
+        renderSelected();
+        showToast("写真を割り当てました");
+      });
+
+      tile.addEventListener("pointercancel", () => {
+        if (timer) clearTimeout(timer);
+        timer = null;
+      });
+
+      trayGrid.appendChild(tile);
+    });
+  }
+
+  function renderAll() {
+    renderFrames();
+    renderSelected();
+    renderTray();
+    setTab("canvas");
+  }
+
+  function save() {
+    const c = normalizeCodeInput();
+    if (!/^\d{6}$/.test(c)) {
+      showToast("6桁コードを入力してください");
+      return;
+    }
+
+    localStorage.setItem(
+      codeKey(c),
+      JSON.stringify({
+        meta: { savedAt: Date.now(), v: 12 },
+        photos,
+        frames
+      })
+    );
+
+    showToast("保存 " + c + " 完了しました");
+  }
+
+  function load() {
+    const c = normalizeCodeInput();
+    if (!/^\d{6}$/.test(c)) {
+      showToast("6桁コードを入力してください");
+      return;
+    }
+
+    const raw = localStorage.getItem(codeKey(c));
+    if (!raw) {
+      showToast("このコードのデータはありません");
+      return;
+    }
+
+    try {
+      const d = JSON.parse(raw);
+      photos = (Array.isArray(d.photos) && d.photos.length)
+        ? d.photos
+        : [{
+            id: uid(),
+            name: "placeholder",
+            dataUrl: makePlaceholderDataUrl(),
+            ratio: 1,
+            orient: "square"
+          }];
+      frames = Array.isArray(d.frames) ? d.frames : [];
+      selectedId = null;
+      renderAll();
+      showToast("読み込み完了");
+    } catch {
+      showToast("読み込み失敗");
+    }
+  }
+
+  function reset() {
+    photos = [{
+      id: uid(),
+      name: "placeholder",
+      dataUrl: makePlaceholderDataUrl(),
+      ratio: 1,
+      orient: "square"
+    }];
+    frames = [];
+    selectedId = null;
+    const set = $("frameSet").value;
+    seedFrames(set);
+    renderAll();
+    const labels = { calm: "Calm 3枚", flow: "Flow 5枚", story: "Story 8枚" };
+    showToast(`リセットしました（${labels[set] || set}）`);
+  }
+
+  /* フレームセット切替 */
+  $("frameSet").onchange = () => {
+    const set = $("frameSet").value;
+    selectedId = null;
+    seedFrames(set);
+    renderAll();
+    const labels = { calm: "Calm（3）", flow: "Flow（5）", story: "Story（8）" };
+    showToast(`${labels[set] || set} に切替しました`);
+  };
+
+  $("saveBtn").onclick = save;
+  $("saveBtn2").onclick = save;
+  $("loadBtn").onclick = load;
+  $("loadBtn2").onclick = load;
+  $("resetBtn").onclick = reset;
+  $("resetBtn2").onclick = reset;
+
+  $("openViewBtn").onclick = () => {
+    const c = normalizeCodeInput();
+    if (!/^\d{6}$/.test(c)) {
+      showToast("6桁コードを入力してください");
+      return;
+    }
+    save();
+    window.open("KPview.html?code=" + encodeURIComponent(c), "_blank");
+  };
+
+  $("addFrame").onclick = () => {
+    const kind = $("frameType").value;
+    const wPresets = [30, 35, 42];
+    const w = wPresets[Math.floor(Math.random() * wPresets.length)];
+
+    frames.push({
+      id: uid(),
+      kind,
+      gx: 24 + Math.random() * 140,
+      gy: 15 + Math.random() * 90,
+      w,
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    });
+
+    selectedId = frames[frames.length - 1].id;
+    renderAll();
+    showToast("フレームを追加しました");
+  };
+
+  $("deleteFrame").onclick = () => {
+    if (!selectedId) {
+      showToast("フレームを選択してください");
+      return;
+    }
+    frames = frames.filter(f => f.id !== selectedId);
+    selectedId = null;
+    renderAll();
+    showToast("削除しました");
+  };
+
+  $("fileInput").onchange = async (e) => {
+    const files = [...(e.target.files || [])];
+    if (!files.length) return;
+
+    try {
+      const arr = [];
+      for (const f of files) {
+        arr.push(await readFile(f));
+      }
+      photos = [...arr, ...photos];
+      renderTray();
+      showToast(arr.length + "枚追加しました");
+    } catch {
+      showToast("読み込み失敗");
+    }
+
+    e.target.value = "";
+  };
+
+  (async function init() {
+    if (!/^\d{6}$/.test(normalizeCodeInput())) {
+      $("codeInput").value = String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    photos = [{
+      id: uid(),
+      name: "placeholder",
+      dataUrl: makePlaceholderDataUrl(),
+      ratio: 1,
+      orient: "square"
+    }];
+
+    await hydrateAspectRatios();
+    seedFrames(currentSet);
+    renderAll();
+
+    const scaler = $("canvasScaler");
+    const wrap = $("canvasWrap");
+
+    function fitCanvas() {
+      const wrapW = wrap.clientWidth;
+      const scale = wrapW / 2400;
+      scaler.style.transform = `scale(${scale})`;
+    }
+
+    fitCanvas();
+    let rt = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => { fitCanvas(); }, 80);
+    });
+  })();
 })();
 </script>
 
