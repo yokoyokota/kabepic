@@ -14,7 +14,7 @@
   --bg:#f6f6f6;
   --accent:#007aff;
 }
-*{box-sizing:border-box;}
+*{ box-sizing:border-box; }
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -48,11 +48,11 @@ header{
   .row{gap:6px;}
   button,select,input[type="text"]{padding:6px 10px;font-size:12px;}
 }
-.brand{display:flex;align-items:baseline;gap:10px;}
-.brand h1{font-size:16px;margin:0;letter-spacing:.02em;}
-.brand span{font-size:12px;color:var(--muted);}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand h1{ font-size:16px; margin:0; letter-spacing:.02em; }
+.brand span{ font-size:12px; color:var(--muted); }
 
-.tabs{margin-top:10px;display:flex;gap:8px;}
+.tabs{ margin-top:10px; display:flex; gap:8px; }
 .tabbtn{
 flex:1;
 padding:10px 12px;
@@ -64,21 +64,21 @@ color:var(–ink);
 cursor:pointer;
 }
 .tabbtn.active{
-border-color:rgba(17,17,17,0.5);
-background:rgba(17,17,17,0.04);
+border-color: rgba(17,17,17,0.5);
+background: rgba(17,17,17,0.04);
 font-weight:600;
 }
 
-.content{padding:14px;}
+.content{ padding:14px; }
 .panel{
 background:var(–card);
 border:1px solid var(–border);
 border-radius:14px;
 padding:12px;
 }
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
-button,select,input[type=“text”]{
+button, select, input[type=“text”]{
 padding:10px 12px;
 border-radius:12px;
 border:1px solid var(–border);
@@ -160,20 +160,18 @@ z-index:3;
 
 .handle{
 position:absolute;
-width:60px;
-height:60px;
-right:-30px;
-bottom:-30px;
+width:22px;
+height:22px;
+right:-12px;
+bottom:-12px;
 border-radius:50%;
 background:var(–accent);
-border:4px solid #fff;
-box-shadow:0 2px 8px rgba(0,0,0,0.25);
+border:3px solid #fff;
 display:none;
 z-index:5;
 cursor:nwse-resize;
-touch-action:none;
 }
-.frame.selected .handle{display:block;}
+.frame.selected .handle{ display:block; }
 
 .selectedBar{
 margin-top:12px;
@@ -192,8 +190,8 @@ display:flex;
 flex-direction:column;
 gap:2px;
 }
-.selectedTitle .left strong{font-size:13px;}
-.selectedTitle .left small{font-size:11px;color:var(–muted);}
+.selectedTitle .left strong{ font-size:13px; }
+.selectedTitle .left small{ font-size:11px; color:var(–muted); }
 
 .strip{
 display:flex;
@@ -253,7 +251,7 @@ background:#fff;
 font-size:13px;
 cursor:pointer;
 }
-input[type=“file”]{display:none;}
+input[type=“file”]{ display:none; }
 
 .trayGrid{
 display:grid;
@@ -313,6 +311,26 @@ z-index:50;
 box-shadow:0 10px 30px rgba(0,0,0,0.18);
 display:none;
 }
+
+.layoutRow{
+display:flex;
+gap:6px;
+margin-bottom:10px;
+}
+.layoutBtn{
+padding:8px 14px;
+border-radius:10px;
+border:1px solid var(–border);
+background:#fff;
+font-size:12px;
+cursor:pointer;
+color:var(–ink);
+}
+.layoutBtn.active{
+border-color:rgba(17,17,17,0.5);
+background:rgba(17,17,17,0.06);
+font-weight:600;
+}
 </style>
 
 </head>
@@ -335,16 +353,19 @@ display:none;
 
   <div class="content">
     <div class="panel" id="panelCanvas">
-      <div class="row">
-        <select id="frameSet">
-          <option value="calm">Calm（3）</option>
-          <option value="flow">Flow（5）</option>
-          <option value="story" selected>Story（8）</option>
-        </select>
 
 ```
+  <div class="layoutRow">
+    <button class="layoutBtn" data-layout="calm">Calm (3)</button>
+    <button class="layoutBtn" data-layout="flow">Flow (5)</button>
+    <button class="layoutBtn" data-layout="story">Story (8)</button>
+    <button class="layoutBtn active" data-layout="scene">Scene (11)</button>
+  </div>
+
+  <div class="row">
     <select id="frameType">
       <option value="portrait">縦</option>
+      <option value="portrait_simple">縦シンプル</option>
       <option value="square">正方形</option>
       <option value="landscape">横</option>
       <option value="landscape_simple">横シンプル</option>
@@ -368,7 +389,6 @@ display:none;
   </div>
 
   <div class="hint">
-    Frames でプリセットを切替（写真はそのまま引き継ぎ）<br>
     フレームをドラッグで移動 ／ 右下ハンドルでサイズ変更<br>
     楕円は mask_oval.png を使用します。<br>
     写真タブから PNG を追加してフレームに割り当て
@@ -429,6 +449,12 @@ display:none;
       mask: "rect",
       ar: 894 / 1063
     },
+    portrait_simple: {
+      src: "frame_vertical_simple.png",
+      inset: "15.1% 17.8% 14.8% 19.3%",
+      mask: "rect",
+      ar: 874 / 1044
+    },
     square: {
       src: "frame_square.png",
       inset: "19.0% 19.9% 20.2% 19.2%",
@@ -456,47 +482,10 @@ display:none;
     }
   };
 
-  /* ========================================
-     フレームセット プリセット定義
-     ======================================== */
-  const FRAME_PRESETS = {
-    calm: [
-      // Calm（3）: 余白重視・大きな写真・三角構成
-      // [type,             gx,    gy,    w,    bottomAlign]
-      ["portrait",          43.9,   0,    84.5,  null],
-      ["square",           126,    27.6,  56.8,  null],
-      ["landscape",         88,    82.6,  71,    null],
-    ],
-    flow: [
-      // Flow（5）: 自然な流れを持つ軽い物語構成
-      // 1: 縦長（左・中段）
-      ["portrait",          -0.6,  53.8,  59.5,  null],
-      // 2: 縦長（上中央）
-      ["portrait",          52.7,   8.7,  72.0,  null],
-      // 3: 正方形（右寄り・上段）
-      ["square",           123.3,  30.7,  49.9,  null],
-      // 4: 横長シンプル（右端・中段）
-      ["landscape_simple", 177.2,  53.3,  60.8,  null],
-      // 5: 横長（下中央）大きめ
-      ["landscape",         79.2,  79.3,  68.6,  null],
-    ],
-    story: [
-      // Story（8）: 物語が広がるバランス型ギャラリー
-      ["portrait",          -0.2,  57.8,  38,    null],
-      ["square",            42.9,  32.2,  41,    null],
-      ["portrait",          87.4,  16.5,  56.25, null],
-      ["landscape_simple", 144.7,  38.1,  38,    null],
-      ["landscape",        187.5,  48.4,  51,    null],
-      ["landscape",         39.5,  73.1,  47,    null],
-      ["square",            91.7,  76.4,  47,    null],
-      ["portrait",         142.7,  77.0,  41.5,  null],
-    ]
-  };
-
   let photos = [];
   let frames = [];
   let selectedId = null;
-  let currentSet = "story";
+  let currentLayout = "scene";
 
   const $ = (id) => document.getElementById(id);
   const canvas = $("canvas");
@@ -646,22 +635,125 @@ display:none;
     };
   }
 
-  function seedFrames(setName) {
-    const preset = FRAME_PRESETS[setName];
-    if (!preset) return;
-    currentSet = setName;
+  /* ======== Layout Presets ======== */
 
-    frames = preset.map(g => ({
-      id: uid(),
-      kind: g[0],
-      gx: g[1],
-      gy: g[2],
-      w: g[3],
+  // Story (8枚) — 既存確定
+  function seedStoryFrames() {
+    const grid = [
+      ["portrait",         -0.2, 57.8, 38,   null],
+      ["square",           42.9, 32.2, 41,   null],
+      ["portrait",         87.4, 16.5, 56.25,null],
+      ["landscape_simple", 144.7,38.1, 38,   null],
+      ["landscape",        187.5,48.4, 51,   null],
+      ["landscape",        39.5, 73.1, 47,   null],
+      ["square",           91.7, 76.4, 47,   null],
+      ["portrait",         142.7,77.0, 41.5, null],
+    ];
+    frames = grid.map(g => ({
+      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
       bottomAlign: g[4],
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     }));
   }
+
+  /*
+    Scene (11枚) — 番号付きグリッド画像から読み取り
+    80×46グリッド座標 → ×3 → 240×150
+
+    #1  横長シンプル    (1,9)-(13,21)     gx=3,  gy=27, w=36
+    #2  正方形          (14,9)-(25,21)    gx=42, gy=27, w=33
+    #3  縦長シンプル    (34,1)-(45,17)    gx=102,gy=3,  w=33
+    #4  縦長            (49,9)-(59,21)    gx=147,gy=27, w=30
+    #5  横長            (62,13)-(77,23)   gx=186,gy=39, w=45
+    #6  正方形          (5,25)-(15,35)    gx=15, gy=75, w=30
+    #7  縦長            (17,21)-(29,37)   gx=51, gy=63, w=36
+    #8  縦長            (33,17)-(47,37)   gx=99, gy=51, w=42
+    #9  横長            (49,25)-(65,37)   gx=147,gy=75, w=48
+    #10 横長シンプル    (65,25)-(79,35)   gx=195,gy=75, w=42
+    #11 正方形          (33,37)-(47,47)   gx=99, gy=111,w=42
+  */
+  function seedSceneFrames() {
+    const grid = [
+      ["landscape_simple",  3,  27, 36, null],  // #1
+      ["square",           42,  27, 33, null],  // #2
+      ["portrait_simple", 102,   3, 33, null],  // #3
+      ["portrait",        147,  27, 30, null],  // #4
+      ["landscape",       186,  39, 45, null],  // #5
+      ["square",           15,  75, 30, null],  // #6
+      ["portrait",         51,  63, 36, null],  // #7
+      ["portrait",         99,  51, 42, null],  // #8
+      ["landscape",       147,  75, 48, null],  // #9
+      ["landscape_simple",195,  75, 42, null],  // #10
+      ["square",           99, 111, 42, null],  // #11
+    ];
+    frames = grid.map(g => ({
+      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  // Calm (3枚)
+  function seedCalmFrames() {
+    const grid = [
+      ["portrait",   30,  20,  50, null],
+      ["square",     95,  35,  50, null],
+      ["landscape", 155,  55,  55, null],
+    ];
+    frames = grid.map(g => ({
+      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  // Flow (5枚)
+  function seedFlowFrames() {
+    const grid = [
+      ["portrait",    10,  25,  42, null],
+      ["landscape",   60,  15,  50, null],
+      ["square",     120,  40,  42, null],
+      ["portrait",   170,  20,  38, null],
+      ["landscape",   55,  80,  50, null],
+    ];
+    frames = grid.map(g => ({
+      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
+      bottomAlign: g[4],
+      photoIds: photos[0] ? [photos[0].id] : [],
+      fixedPhotoId: null
+    }));
+  }
+
+  function seedLayout(layout) {
+    currentLayout = layout;
+    selectedId = null;
+    switch (layout) {
+      case "calm":  seedCalmFrames(); break;
+      case "flow":  seedFlowFrames(); break;
+      case "story": seedStoryFrames(); break;
+      case "scene": seedSceneFrames(); break;
+      default:      seedStoryFrames(); break;
+    }
+    updateLayoutButtons();
+    renderAll();
+  }
+
+  function updateLayoutButtons() {
+    document.querySelectorAll(".layoutBtn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.layout === currentLayout);
+    });
+  }
+
+  document.querySelectorAll(".layoutBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      seedLayout(btn.dataset.layout);
+      const names = { calm:"Calm (3)", flow:"Flow (5)", story:"Story (8)", scene:"Scene (11)" };
+      showToast(names[btn.dataset.layout] + " に切り替えました");
+    });
+  });
 
   function updateSelectionUI() {
     canvas.querySelectorAll(".frame").forEach(el => {
@@ -926,7 +1018,7 @@ display:none;
     localStorage.setItem(
       codeKey(c),
       JSON.stringify({
-        meta: { savedAt: Date.now(), v: 12 },
+        meta: { savedAt: Date.now(), v: 12, layout: currentLayout },
         photos,
         frames
       })
@@ -960,6 +1052,10 @@ display:none;
             orient: "square"
           }];
       frames = Array.isArray(d.frames) ? d.frames : [];
+      if (d.meta && d.meta.layout) {
+        currentLayout = d.meta.layout;
+        updateLayoutButtons();
+      }
       selectedId = null;
       renderAll();
       showToast("読み込み完了");
@@ -978,22 +1074,9 @@ display:none;
     }];
     frames = [];
     selectedId = null;
-    const set = $("frameSet").value;
-    seedFrames(set);
-    renderAll();
-    const labels = { calm: "Calm 3枚", flow: "Flow 5枚", story: "Story 8枚" };
-    showToast(`リセットしました（${labels[set] || set}）`);
+    seedLayout(currentLayout);
+    showToast(currentLayout + " にリセットしました");
   }
-
-  /* フレームセット切替 */
-  $("frameSet").onchange = () => {
-    const set = $("frameSet").value;
-    selectedId = null;
-    seedFrames(set);
-    renderAll();
-    const labels = { calm: "Calm（3）", flow: "Flow（5）", story: "Story（8）" };
-    showToast(`${labels[set] || set} に切替しました`);
-  };
 
   $("saveBtn").onclick = save;
   $("saveBtn2").onclick = save;
@@ -1023,6 +1106,7 @@ display:none;
       gx: 24 + Math.random() * 140,
       gy: 15 + Math.random() * 90,
       w,
+      bottomAlign: null,
       photoIds: photos[0] ? [photos[0].id] : [],
       fixedPhotoId: null
     });
@@ -1076,8 +1160,7 @@ display:none;
     }];
 
     await hydrateAspectRatios();
-    seedFrames(currentSet);
-    renderAll();
+    seedLayout(currentLayout);
 
     const scaler = $("canvasScaler");
     const wrap = $("canvasWrap");
