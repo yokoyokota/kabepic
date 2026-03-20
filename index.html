@@ -675,17 +675,17 @@ font-weight:600;
   */
   function seedSceneFrames() {
     const grid = [
-      ["landscape_simple",  3,  42, 36, null],  // #1  5マス下げ
-      ["square",           42,  27, 39, null],  // #2  2回り大きく
-      ["portrait_simple", 102,   3, 36, null],  // #3  1回り大きく
-      ["portrait",        147,  42, 36, null],  // #4  2回り大きく+5マス下げ
-      ["landscape",       186,  39, 39, null],  // #5  2回り小さく
-      ["square",           15,  75, 33, null],  // #6  1回り大きく
-      ["portrait",         51,  78, 36, null],  // #7  5マス下げ
-      ["portrait",         99,  51, 51, null],  // #8  3回り大きく
-      ["landscape",       147,  75, 54, null],  // #9  2回り大きく
-      ["landscape_simple",195,  75, 42, null],  // #10 変更なし
-      ["square",           99, 120, 42, null],  // #11 3マス下げ
+      ["landscape_simple",  3,  42, 39,   null],  // #1  w+1マス
+      ["square",           42,  27, 45,   null],  // #2  w+2マス
+      ["portrait_simple", 102,   3, 39,   null],  // #3  w+1マス
+      ["portrait",        138,  42, 39,   null],  // #4  w+1マス,左3マス
+      ["landscape",       186,  39, 33,   null],  // #5  w-2マス
+      ["square",           15,  75, 31.5, null],  // #6  w-0.5マス
+      ["portrait",         51,  78, 36,   null],  // #7  変更なし
+      ["portrait",         84,  51, 60,   null],  // #8  w+3マス,左5マス
+      ["landscape",       138,  75, 54,   null],  // #9  左3マス
+      ["landscape_simple",195,  75, 39,   null],  // #10 w-1マス
+      ["square",           90, 108, 42,   null],  // #11 左3マス,上4マス
     ];
     frames = grid.map(g => ({
       id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
