@@ -395,6 +395,23 @@ input[type=“file”]{display:none;}
   }
 
   /* ===== Canvas Rendering ===== */
+  // Fallback insets (used when mask PNG is not available)
+  const FALLBACK_INSET = {
+    portrait: "16.57% 24.17% 15.83% 25.09%",
+    portrait_simple: "16.57% 24.17% 15.83% 25.09%",
+    square: "20.09% 20.83% 20.74% 20.09%",
+    landscape: "24.17% 15.83% 25.09% 16.57%",
+    landscape_simple: "24.17% 15.83% 25.09% 16.57%",
+    oval: "13.52% 24.81% 11.85% 26.85%",
+  };
+
+  // Test if mask PNGs are available
+  let masksAvailable = false;
+  const testMask = new Image();
+  testMask.onload = () => { masksAvailable = true; };
+  testMask.onerror = () => { masksAvailable = false; };
+  testMask.src = "mask_vertical.png";
+
   function applyMask(el, maskPng){
     const url=`url("${maskPng}")`;
     el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";
@@ -412,8 +429,13 @@ input[type=“file”]{display:none;}
       el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
       const mask=document.createElement("div");
-      mask.className="mask";mask.style.inset="0";
-      applyMask(mask, m.maskPng);
+      mask.className="mask";
+      if(masksAvailable){
+        mask.style.inset="0";
+        applyMask(mask, m.maskPng);
+      } else {
+        mask.style.inset=FALLBACK_INSET[f.kind]||"15% 20% 15% 20%";
+      }
       const img=document.createElement("img");img.src=getPhotoSrc(f);
       mask.appendChild(img);el.appendChild(mask);
 
