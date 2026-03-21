@@ -12,168 +12,28 @@
   --bg:#f5f0ea;
   --card:#fff;
   --border:rgba(0,0,0,0.08);
-  --accent:#222;
-  --nav-h:56px;
+  --nav-h:52px;
   --safe-b:env(safe-area-inset-bottom, 0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
+html,body{height:100%;overflow:hidden;touch-action:manipulation;}
 body{
   font-family:"Hiragino Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,sans-serif;
   color:var(--ink);
   background:var(--bg);
   display:flex;
   flex-direction:column;
+  position:relative;
 }
 
-/* ===== Bottom Navigation ===== */
-.bottomNav{
-display:flex;
-height:var(–nav-h);
-padding-bottom:var(–safe-b);
-background:#fff;
-border-top:1px solid var(–border);
-flex-shrink:0;
-z-index:20;
-}
-.navItem{
-flex:1;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:2px;
-font-size:10px;
-color:var(–muted);
-cursor:pointer;
-border:none;
-background:none;
--webkit-tap-highlight-color:transparent;
-transition:color 0.15s;
-}
-.navItem.active{color:var(–ink);font-weight:600;}
-.navItem svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-
-/* ===== Main Content ===== */
-.mainContent{
-flex:1;
-overflow:hidden;
-position:relative;
-}
-.page{
-position:absolute;inset:0;
-overflow-y:auto;
-display:none;
--webkit-overflow-scrolling:touch;
-}
-.page.active{display:flex;flex-direction:column;}
-
-/* ===== Photo Page ===== */
-.photoPage{background:var(–bg);}
-.photoHeader{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:16px 20px 12px;
-position:sticky;top:0;
-background:var(–bg);
-z-index:5;
-}
-.photoHeader h2{font-size:17px;font-weight:600;letter-spacing:0.01em;}
-.photoCount{font-size:12px;color:var(–muted);margin-left:8px;}
-.addBtn{
-font-size:13px;
-color:var(–ink);
-background:none;
-border:1px solid rgba(0,0,0,0.15);
-border-radius:20px;
-padding:7px 16px;
-cursor:pointer;
-font-weight:500;
-}
-.photoGrid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:3px;
-padding:0 3px 20px;
-}
-.photoCell{
-aspect-ratio:1;
-overflow:hidden;
-cursor:pointer;
-position:relative;
-}
-.photoCell img{width:100%;height:100%;object-fit:cover;display:block;}
-.photoEmpty{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-padding:60px 20px;
-color:var(–muted);
-font-size:14px;
-text-align:center;
-gap:16px;
-flex:1;
-}
-.photoEmpty .bigAdd{
-width:56px;height:56px;
-border-radius:50%;
-border:2px dashed rgba(0,0,0,0.2);
-display:flex;align-items:center;justify-content:center;
-font-size:28px;color:var(–muted);
-}
-
-/* ===== Frames Page ===== */
-.framesPage{background:var(–bg);}
-.framesPage h2{font-size:17px;font-weight:600;padding:16px 20px 12px;letter-spacing:0.01em;}
-.layoutList{
-display:flex;
-flex-direction:column;
-gap:12px;
-padding:0 20px 24px;
-}
-.layoutCard{
-background:#fff;
-border-radius:16px;
-padding:16px 20px;
-cursor:pointer;
-border:2px solid transparent;
-transition:border-color 0.2s, background 0.2s;
-}
-.layoutCard.active{border-color:var(–ink);}
-.layoutCard .name{font-size:15px;font-weight:600;margin-bottom:2px;}
-.layoutCard .desc{font-size:12px;color:var(–muted);line-height:1.4;}
-
-/* ===== Edit Page ===== */
-.editPage{background:var(–bg);display:flex;flex-direction:column;}
-.editToolbar{
-display:flex;
-gap:8px;
-padding:10px 16px;
-overflow-x:auto;
-flex-shrink:0;
-}
-.editToolbar button{
-padding:8px 14px;
-border-radius:20px;
-border:1px solid var(–border);
-background:#fff;
-font-size:12px;
-cursor:pointer;
-white-space:nowrap;
-color:var(–ink);
-}
+/* ===== Canvas (Always Visible) ===== */
 #canvasArea{
 flex:1;
 position:relative;
 overflow:hidden;
-margin:0 8px 8px;
-border-radius:14px;
 }
 #canvasScaler{
-position:absolute;
-top:0;left:0;
+position:absolute;top:0;left:0;
 width:2400px;height:1500px;
 transform-origin:top left;
 }
@@ -185,53 +45,184 @@ overflow:hidden;
 touch-action:none;
 }
 
-.frame{position:absolute;overflow:visible;touch-action:none;}
+/* Frames on canvas */
+.frame{position:absolute;overflow:visible;touch-action:none;pointer-events:none;}
+.frame.editable{pointer-events:auto;cursor:grab;}
+.frame.editable:active{cursor:grabbing;}
 .frame.selected{outline:2px solid var(–ink);outline-offset:1px;}
 .mask{position:absolute;overflow:hidden;background:transparent;}
 .mask img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none;}
 .overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none;z-index:3;}
-.handle{position:absolute;width:20px;height:20px;right:-10px;bottom:-10px;border-radius:50%;background:var(–ink);border:2px solid #fff;display:none;z-index:5;cursor:nwse-resize;}
+.handle{position:absolute;width:20px;height:20px;right:-10px;bottom:-10px;border-radius:50%;background:var(–ink);border:2px solid #fff;display:none;z-index:5;cursor:nwse-resize;pointer-events:auto;}
 .frame.selected .handle{display:block;}
 
-/* ===== Display Page ===== */
-.displayPage{
-background:#F6F6F6;
+/* ===== Edit Toolbar (top, only in edit mode) ===== */
+#editBar{
+position:absolute;top:0;left:0;right:0;
+display:none;
+padding:8px 12px;
+background:rgba(255,255,255,0.92);
+backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+border-bottom:1px solid var(–border);
+z-index:15;
+gap:8px;
+align-items:center;
+}
+#editBar.show{display:flex;}
+#editBar select, #editBar button{
+padding:7px 12px;
+border-radius:20px;
+border:1px solid var(–border);
+background:#fff;
+font-size:12px;
+cursor:pointer;
+color:var(–ink);
+}
+.editLabel{
+font-size:13px;
+font-weight:600;
+margin-right:auto;
+display:flex;align-items:center;gap:6px;
+}
+.editDot{
+width:8px;height:8px;border-radius:50%;
+background:#34c759;
+display:inline-block;
+}
+
+/* ===== Bottom Navigation ===== */
+#bottomNav{
 display:flex;
+height:var(–nav-h);
+padding-bottom:var(–safe-b);
+background:rgba(255,255,255,0.95);
+backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+border-top:1px solid var(–border);
+flex-shrink:0;
+z-index:20;
+position:relative;
+}
+.navItem{
+flex:1;
+display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
+gap:1px;
+font-size:11px;
+font-weight:500;
+color:var(–muted);
+cursor:pointer;
+border:none;background:none;
+-webkit-tap-highlight-color:transparent;
+transition:color 0.15s;
 }
-#displayWall{
-position:relative;
-width:100%;
-aspect-ratio:16/10;
-max-height:100%;
-}
-#displayScaler{
-position:absolute;top:0;left:0;
-width:2400px;height:1500px;
-transform-origin:top left;
-}
-#displayCanvas{
-position:relative;
-width:2400px;height:1500px;
+.navItem.active{color:var(–ink);font-weight:600;}
+
+/* ===== Bottom Sheet (Photo / Frames) ===== */
+.sheet{
+position:absolute;
+bottom:var(–nav-h);
+left:0;right:0;
+max-height:60vh;
+background:#fff;
+border-radius:20px 20px 0 0;
+box-shadow:0 -4px 30px rgba(0,0,0,0.1);
+z-index:18;
+transform:translateY(100%);
+transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);
 overflow:hidden;
+display:flex;flex-direction:column;
 }
-.displayFrame{position:absolute;overflow:visible;}
-.displayFrame .mask{position:absolute;overflow:hidden;}
-.displayFrame .mask img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity 1.2s ease;}
-.displayFrame .overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+.sheet.open{transform:translateY(0);}
+.sheetHandle{
+width:36px;height:4px;border-radius:2px;
+background:rgba(0,0,0,0.15);
+margin:10px auto 6px;
+flex-shrink:0;
+}
+.sheetHeader{
+display:flex;justify-content:space-between;align-items:center;
+padding:4px 20px 12px;
+flex-shrink:0;
+}
+.sheetHeader h3{font-size:16px;font-weight:600;}
+.sheetBody{
+overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+padding:0 16px 20px;
+flex:1;
+}
+.closeBtn{
+font-size:13px;color:var(–muted);
+background:none;border:none;cursor:pointer;
+padding:4px 8px;
+}
+
+/* Photo sheet */
+.photoMeta{font-size:12px;color:var(–muted);margin-bottom:4px;}
+.addBtn{
+font-size:13px;color:#fff;
+background:var(–ink);
+border:none;border-radius:20px;
+padding:7px 16px;cursor:pointer;font-weight:500;
+}
+.photoGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:4px;
+margin-top:12px;
+}
+.photoCell{
+aspect-ratio:1;overflow:hidden;border-radius:8px;
+position:relative;cursor:pointer;
+}
+.photoCell img{width:100%;height:100%;object-fit:cover;display:block;}
+.photoCell .delBtn{
+position:absolute;top:4px;right:4px;
+width:22px;height:22px;border-radius:50%;
+background:rgba(255,255,255,0.9);
+border:none;cursor:pointer;
+display:flex;align-items:center;justify-content:center;
+font-size:12px;color:#e33;
+box-shadow:0 1px 4px rgba(0,0,0,0.15);
+}
+.photoEmpty{
+text-align:center;color:var(–muted);
+font-size:13px;padding:30px 0;
+}
+
+/* Frames sheet */
+.layoutList{display:flex;flex-direction:column;gap:10px;}
+.layoutCard{
+background:#f8f8f8;border-radius:14px;
+padding:14px 18px;cursor:pointer;
+border:2px solid transparent;
+transition:border-color 0.2s;
+}
+.layoutCard.active{border-color:var(–ink);}
+.layoutCard .name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.layoutCard .desc{font-size:12px;color:var(–muted);}
+
+/* ===== Display Mode (fullscreen) ===== */
+body.displayMode #canvasArea{background:#F6F6F6;}
+body.displayMode #canvas{background:#F6F6F6;}
+body.displayMode #bottomNav{display:none;}
+body.displayMode #editBar{display:none!important;}
+body.displayMode .sheet{display:none;}
 
 /* ===== Toast ===== */
 .toast{
-position:fixed;left:50%;bottom:calc(var(–nav-h) + 16px + var(–safe-b));
+position:fixed;left:50%;
+bottom:calc(var(–nav-h) + 20px + var(–safe-b));
 transform:translateX(-50%);
-background:rgba(30,30,30,0.92);
-color:#fff;padding:10px 18px;
-border-radius:12px;font-size:13px;
-z-index:50;display:none;
-box-shadow:0 4px 20px rgba(0,0,0,0.15);
+background:rgba(30,30,30,0.9);color:#fff;
+padding:9px 18px;border-radius:20px;
+font-size:13px;z-index:50;
+opacity:0;transition:opacity 0.2s;
+pointer-events:none;
 }
-.toast.show{display:block;}
+.toast.show{opacity:1;}
 
 input[type=“file”]{display:none;}
 </style>
@@ -239,116 +230,94 @@ input[type=“file”]{display:none;}
 </head>
 <body>
 
-<!-- Main Content Area -->
+<!-- Edit Toolbar (top, edit mode only) -->
 
-<div class="mainContent">
+<div id="editBar">
+  <div class="editLabel"><span class="editDot"></span> 編集ON</div>
+  <select id="frameType">
+    <option value="portrait">縦</option>
+    <option value="portrait_simple">縦シンプル</option>
+    <option value="square">正方形</option>
+    <option value="landscape">横</option>
+    <option value="landscape_simple">横シンプル</option>
+    <option value="oval">楕円</option>
+  </select>
+  <button id="addFrameBtn">＋追加</button>
+  <button id="deleteFrameBtn">削除</button>
+</div>
 
-  <!-- Photo Page -->
+<!-- Canvas (Always Visible) -->
 
-  <div id="pagePhoto" class="page photoPage active">
-    <div class="photoHeader">
-      <div style="display:flex;align-items:baseline;">
-        <h2>Photo</h2>
-        <span class="photoCount" id="photoCount"></span>
-      </div>
-      <label class="addBtn">
-        追加
-        <input id="fileInput" type="file" accept="image/*" multiple>
-      </label>
+<div id="canvasArea">
+  <div id="canvasScaler">
+    <div id="canvas"></div>
+  </div>
+</div>
+
+<!-- Photo Sheet -->
+
+<div id="sheetPhoto" class="sheet">
+  <div class="sheetHandle"></div>
+  <div class="sheetHeader">
+    <div>
+      <h3>写真一覧</h3>
+      <div class="photoMeta" id="photoMeta"></div>
     </div>
-    <div id="photoGridWrap">
-      <div id="photoGrid" class="photoGrid"></div>
-      <div id="photoEmpty" class="photoEmpty">
-        <div class="bigAdd">＋</div>
-        <div>写真を追加して<br>壁に飾りましょう</div>
-      </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <label class="addBtn">追加<input id="fileInput" type="file" accept="image/*" multiple></label>
+      <button class="closeBtn" id="closePhoto">閉じる</button>
     </div>
   </div>
+  <div class="sheetBody">
+    <div id="photoGrid" class="photoGrid"></div>
+    <div id="photoEmpty" class="photoEmpty">写真を追加して壁に飾りましょう</div>
+  </div>
+</div>
 
-  <!-- Frames Page -->
+<!-- Frames Sheet -->
 
-  <div id="pageFrames" class="page framesPage">
-    <h2>Frames</h2>
+<div id="sheetFrames" class="sheet">
+  <div class="sheetHandle"></div>
+  <div class="sheetHeader">
+    <h3>Frames</h3>
+    <button class="closeBtn" id="closeFrames">閉じる</button>
+  </div>
+  <div class="sheetBody">
     <div class="layoutList">
       <div class="layoutCard" data-layout="calm">
-        <div class="name">Calm</div>
-        <div class="desc">3枚 — 余白重視。大きな写真を見せる構成。</div>
-      </div>
-      <div class="layoutCard active" data-layout="story">
-        <div class="name">Story</div>
-        <div class="desc">8枚 — 物語が広がるバランス型ギャラリー。</div>
+        <div class="name">Calm — 3枚</div>
+        <div class="desc">余白重視。大きな写真を見せる構成。</div>
       </div>
       <div class="layoutCard" data-layout="flow">
-        <div class="name">Flow</div>
-        <div class="desc">5枚 — 自然な流れを持つ軽い物語構成。</div>
+        <div class="name">Flow — 5枚</div>
+        <div class="desc">自然な流れを持つ軽い物語構成。</div>
+      </div>
+      <div class="layoutCard active" data-layout="story">
+        <div class="name">Story — 8枚</div>
+        <div class="desc">物語が広がるバランス型ギャラリー。</div>
       </div>
       <div class="layoutCard" data-layout="scene">
-        <div class="name">Scene</div>
-        <div class="desc">11枚 — 壁として完成する物語構成。</div>
+        <div class="name">Scene — 11枚</div>
+        <div class="desc">壁として完成する物語構成。</div>
       </div>
     </div>
   </div>
-
-  <!-- Edit Page -->
-
-  <div id="pageEdit" class="page editPage">
-    <div class="editToolbar">
-      <select id="frameType" style="border-radius:20px;padding:8px 12px;border:1px solid var(--border);font-size:12px;background:#fff;">
-        <option value="portrait">縦</option>
-        <option value="portrait_simple">縦シンプル</option>
-        <option value="square">正方形</option>
-        <option value="landscape">横</option>
-        <option value="landscape_simple">横シンプル</option>
-        <option value="oval">楕円</option>
-      </select>
-      <button id="addFrame">＋ 追加</button>
-      <button id="deleteFrame">削除</button>
-    </div>
-    <div id="canvasArea">
-      <div id="canvasScaler">
-        <div id="canvas"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Display Page -->
-
-  <div id="pageDisplay" class="page displayPage">
-    <div id="displayWall">
-      <div id="displayScaler">
-        <div id="displayCanvas"></div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <!-- Bottom Navigation -->
 
-<nav class="bottomNav">
-  <button class="navItem active" data-page="photo">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-    <span>Photo</span>
-  </button>
-  <button class="navItem" data-page="frames">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    <span>Frames</span>
-  </button>
-  <button class="navItem" data-page="edit">
-    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    <span>Edit</span>
-  </button>
-  <button class="navItem" data-page="display">
-    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-    <span>Display</span>
-  </button>
+<nav id="bottomNav">
+  <button class="navItem" data-action="photo">Photo</button>
+  <button class="navItem" data-action="frames">Frames</button>
+  <button class="navItem" data-action="edit">Edit</button>
+  <button class="navItem" data-action="display">Display</button>
 </nav>
 
 <div id="toast" class="toast"></div>
 
 <script>
 (() => {
-  /* ===== Core Data ===== */
+  /* ===== Data ===== */
   const FRAME_META = {
     portrait:        { src:"frame_vertical.png",        inset:"15.7% 18.7% 15.5% 19.9%", mask:"rect",  ar:894/1063 },
     portrait_simple: { src:"frame_vertical_simple.png",  inset:"15.1% 17.8% 14.8% 19.3%", mask:"rect",  ar:874/1044 },
@@ -358,432 +327,350 @@ input[type=“file”]{display:none;}
     oval:            { src:"frame_oval.png",             inset:"7.8% 11.7% 8.4% 12.4%",   mask:"oval",  maskPng:"mask_oval.png", ar:694/982 }
   };
 
-  const GRID = { W:240, H:150 };
-  const MAX_PHOTOS = 100;
-  let photos = [];
-  let frames = [];
-  let selectedId = null;
-  let currentLayout = "story";
-  let displayTimers = [];
+  const LAYOUTS = {
+    calm: [
+      ["portrait",43.9,0,84.5,null],["square",126,27.6,56.8,null],["landscape",88,82.6,71,null],
+    ],
+    flow: [
+      ["portrait",-0.6,53.8,59.5,null],["portrait",52.7,8.7,72.0,null],["square",123.3,30.7,49.9,null],
+      ["landscape_simple",177.2,53.3,60.8,null],["landscape",79.2,79.3,68.6,null],
+    ],
+    story: [
+      ["portrait",-0.2,57.8,38,null],["square",42.9,32.2,41,null],["portrait",87.4,16.5,56.25,null],
+      ["landscape_simple",144.7,38.1,38,null],["landscape",187.5,48.4,51,null],
+      ["landscape",39.5,73.1,47,null],["square",91.7,76.4,47,null],["portrait",142.7,77.0,41.5,null],
+    ],
+    scene: [
+      ["landscape_simple",1.5,42.3,39,null],["square",42.75,33.5,45,null],["portrait_simple",96.15,3,39,null],
+      ["portrait",141,38.7,39,null],["landscape",180,47.4,33,null],["square",21.3,81.5,31.5,null],
+      ["portrait",54.6,81.5,36.6,null],["portrait",85.5,43.55,60,null],["landscape",142.5,77.0,53.4,null],
+      ["landscape_simple",198.75,78.5,39,null],["square",94.8,106.2,42,null],
+    ],
+  };
 
-  const $ = id => document.getElementById(id);
-  const uid = () => Math.random().toString(36).slice(2,10);
+  const GRID={W:240,H:150}, MAX_PHOTOS=100;
+  let photos=[], frames=[], selectedId=null, currentLayout="story";
+  let editMode=false, displayMode=false, displayTimers=[];
 
-  /* ===== Toast ===== */
-  function showToast(msg, ms=1400) {
-    const t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => t.classList.remove("show"), ms);
+  const $=id=>document.getElementById(id);
+  const uid=()=>Math.random().toString(36).slice(2,10);
+
+  /* ===== Helpers ===== */
+  function showToast(msg,ms=1400){
+    const t=$("toast");t.textContent=msg;t.classList.add("show");
+    clearTimeout(showToast._t);showToast._t=setTimeout(()=>t.classList.remove("show"),ms);
   }
-
-  /* ===== Placeholder ===== */
-  function makePlaceholder() {
-    const c = document.createElement("canvas"); c.width=800; c.height=800;
-    const g = c.getContext("2d");
-    g.fillStyle = "#f1efe8"; g.fillRect(0,0,800,800);
-    g.strokeStyle = "rgba(0,0,0,0.08)"; g.lineWidth=4; g.strokeRect(40,40,720,720);
-    g.fillStyle = "rgba(0,0,0,0.18)"; g.textAlign="center"; g.font="48px sans-serif";
-    g.fillText("KABEPIC",400,380); g.font="22px sans-serif"; g.fillText("placeholder",400,425);
+  function makePlaceholder(){
+    const c=document.createElement("canvas");c.width=800;c.height=800;
+    const g=c.getContext("2d");
+    g.fillStyle="#f1efe8";g.fillRect(0,0,800,800);
+    g.strokeStyle="rgba(0,0,0,0.08)";g.lineWidth=4;g.strokeRect(40,40,720,720);
+    g.fillStyle="rgba(0,0,0,0.18)";g.textAlign="center";g.font="48px sans-serif";
+    g.fillText("KABEPIC",400,380);g.font="22px sans-serif";g.fillText("placeholder",400,425);
     return c.toDataURL("image/png");
   }
-  const placeholderUrl = makePlaceholder();
-
-  /* ===== Navigation ===== */
-  let currentPage = "photo";
-
-  function switchPage(page) {
-    currentPage = page;
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.querySelectorAll(".navItem").forEach(n => n.classList.toggle("active", n.dataset.page === page));
-    $("page" + page.charAt(0).toUpperCase() + page.slice(1)).classList.add("active");
-
-    if (page === "edit") { renderEditCanvas(); fitEditCanvas(); }
-    if (page === "display") { startDisplay(); }
-    else { stopDisplay(); }
+  const placeholderUrl=makePlaceholder();
+  function findPhoto(id){return photos.find(p=>p.id===id)||null;}
+  function findFrame(id){return frames.find(f=>f.id===id)||null;}
+  function detectOrient(r){return r>1.05?"landscape":r<0.95?"portrait":"square";}
+  function gridToPercent(f){
+    const m=FRAME_META[f.kind],hCells=f.w/m.ar;
+    return{left:(f.gx/GRID.W*100)+"%",top:(f.gy/GRID.H*100)+"%",width:(f.w/GRID.W*100)+"%",height:(hCells/GRID.H*100)+"%"};
+  }
+  function getPhotoSrc(f){
+    const pid=(f.fixedPhotoId&&f.photoIds.includes(f.fixedPhotoId))?f.fixedPhotoId:(f.photoIds[0]||null);
+    const p=pid?findPhoto(pid):null;
+    return p?p.dataUrl:placeholderUrl;
   }
 
-  document.querySelectorAll(".navItem").forEach(btn => {
-    btn.addEventListener("click", () => switchPage(btn.dataset.page));
-  });
-
-  /* ===== Photo Management ===== */
-  function detectOrient(r) { return r > 1.05 ? "landscape" : r < 0.95 ? "portrait" : "square"; }
-
-  async function readFile(file) {
-    const dataUrl = await new Promise((res,rej) => { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-    const meta = await new Promise(res => {
-      const img = new Image();
-      img.onload = () => { const ratio=(img.naturalWidth||1)/(img.naturalHeight||1); res({ratio, orient:detectOrient(ratio)}); };
-      img.onerror = () => res({ratio:1, orient:"square"});
-      img.src = dataUrl;
+  /* ===== File Reading ===== */
+  async function readFile(file){
+    const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+    const meta=await new Promise(res=>{
+      const img=new Image();
+      img.onload=()=>{const ratio=(img.naturalWidth||1)/(img.naturalHeight||1);res({ratio,orient:detectOrient(ratio)});};
+      img.onerror=()=>res({ratio:1,orient:"square"});img.src=dataUrl;
     });
-    return { id:uid(), name:file.name, dataUrl, ...meta };
+    return{id:uid(),name:file.name,dataUrl,...meta};
   }
 
-  function findPhoto(id) { return photos.find(p => p.id === id) || null; }
+  /* ===== Canvas Rendering ===== */
+  function applyOvalMask(el){
+    el.style.borderRadius="50%";
+    const url=`url("${FRAME_META.oval.maskPng}")`;
+    el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";
+    el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";
+  }
 
-  function renderPhotoGrid() {
-    const grid = $("photoGrid");
-    const empty = $("photoEmpty");
-    const count = $("photoCount");
-    const realPhotos = photos.filter(p => p.name !== "placeholder");
+  function renderCanvas(){
+    const canvas=$("canvas");
+    canvas.innerHTML="";
+    frames.forEach(f=>{
+      const m=FRAME_META[f.kind],pct=gridToPercent(f);
+      const el=document.createElement("div");
+      el.className="frame"+(editMode?" editable":"");
+      el.dataset.id=f.id;
+      el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
-    count.textContent = realPhotos.length + " / " + MAX_PHOTOS;
+      const mask=document.createElement("div");
+      mask.className="mask";mask.style.inset=m.inset;
+      if(f.kind==="oval")applyOvalMask(mask);
+      const img=document.createElement("img");img.src=getPhotoSrc(f);
+      mask.appendChild(img);el.appendChild(mask);
 
-    if (!realPhotos.length) {
-      grid.style.display = "none";
-      empty.style.display = "flex";
-      return;
-    }
-    grid.style.display = "grid";
-    empty.style.display = "none";
-    grid.innerHTML = "";
+      const ov=document.createElement("img");ov.className="overlay";ov.src=m.src;el.appendChild(ov);
 
-    realPhotos.forEach(p => {
-      const cell = document.createElement("div");
-      cell.className = "photoCell";
-      cell.innerHTML = `<img src="${p.dataUrl}">`;
-      // Long press to delete
-      let timer = null, lp = false;
-      cell.addEventListener("pointerdown", () => {
-        lp = false;
-        timer = setTimeout(() => {
-          lp = true;
-          if (!confirm("この写真を削除しますか？")) return;
-          photos = photos.filter(x => x.id !== p.id);
-          frames.forEach(fr => {
-            fr.photoIds = fr.photoIds.filter(x => x !== p.id);
-            if (fr.fixedPhotoId === p.id) fr.fixedPhotoId = null;
-          });
-          renderPhotoGrid();
-          showToast("削除しました");
-        }, 650);
-      });
-      cell.addEventListener("pointerup", () => { if(timer) clearTimeout(timer); });
-      cell.addEventListener("pointercancel", () => { if(timer) clearTimeout(timer); });
+      if(editMode){
+        const h=document.createElement("div");h.className="handle";el.appendChild(h);
+        attachDrag(el,f);attachResize(h,el,f);
+      }
+      canvas.appendChild(el);
+    });
+    if(editMode)updateSelectionUI();
+  }
+
+  function fitCanvas(){
+    const area=$("canvasArea");
+    const w=area.clientWidth,h=area.clientHeight;
+    const scale=Math.min(w/2400,h/1500);
+    $("canvasScaler").style.transform=`scale(${scale})`;
+  }
+
+  function updateSelectionUI(){
+    $("canvas").querySelectorAll(".frame").forEach(el=>el.classList.toggle("selected",el.dataset.id===selectedId));
+  }
+
+  /* ===== Drag & Resize ===== */
+  function attachDrag(el,f){
+    let on=false,sx=0,sy=0,ogx=0,ogy=0;
+    el.addEventListener("pointerdown",e=>{
+      if(e.target.classList.contains("handle"))return;
+      e.stopPropagation();selectedId=f.id;updateSelectionUI();
+      on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener("pointermove",e=>{
+      if(!on)return;const r=$("canvas").getBoundingClientRect();
+      f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;
+      el.style.left=(f.gx/GRID.W*100)+"%";el.style.top=(f.gy/GRID.H*100)+"%";
+    });
+    el.addEventListener("pointerup",()=>{on=false});
+    el.addEventListener("pointercancel",()=>{on=false});
+  }
+  function attachResize(handle,el,f){
+    let on=false,sx=0,sw=0;
+    handle.addEventListener("pointerdown",e=>{
+      e.stopPropagation();selectedId=f.id;updateSelectionUI();
+      on=true;sx=e.clientX;sw=f.w;handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener("pointermove",e=>{
+      if(!on)return;const r=$("canvas").getBoundingClientRect();
+      let nw=sw+(e.clientX-sx)/r.width*GRID.W;if(nw<10)nw=10;f.w=nw;
+      const pct=gridToPercent(f);el.style.width=pct.width;el.style.height=pct.height;
+    });
+    handle.addEventListener("pointerup",()=>{on=false});
+    handle.addEventListener("pointercancel",()=>{on=false});
+  }
+
+  /* ===== Layout ===== */
+  function seedLayout(layout){
+    currentLayout=layout;selectedId=null;
+    const grid=LAYOUTS[layout]||LAYOUTS.story;
+    const pids=photos.filter(p=>p.name!=="placeholder").map(p=>p.id);
+    frames=grid.map(g=>({
+      id:uid(),kind:g[0],gx:g[1],gy:g[2],w:g[3],bottomAlign:g[4],
+      photoIds:pids.length?[...pids]:[],fixedPhotoId:null
+    }));
+    document.querySelectorAll(".layoutCard").forEach(c=>c.classList.toggle("active",c.dataset.layout===layout));
+    renderCanvas();
+  }
+
+  /* ===== Sheets ===== */
+  let openSheet=null;
+  function openSheetEl(id){
+    closeAllSheets();
+    $(id).classList.add("open");
+    openSheet=id;
+  }
+  function closeAllSheets(){
+    document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("open"));
+    openSheet=null;
+  }
+
+  $("closePhoto").onclick=closeAllSheets;
+  $("closeFrames").onclick=closeAllSheets;
+
+  /* ===== Photo Sheet ===== */
+  function renderPhotoSheet(){
+    const real=photos.filter(p=>p.name!=="placeholder");
+    $("photoMeta").textContent=`写真 ${real.length} / ${MAX_PHOTOS}　残り ${MAX_PHOTOS-real.length} 枚`;
+    const grid=$("photoGrid"),empty=$("photoEmpty");
+    if(!real.length){grid.style.display="none";empty.style.display="block";return;}
+    grid.style.display="grid";empty.style.display="none";
+    grid.innerHTML="";
+    real.forEach(p=>{
+      const cell=document.createElement("div");cell.className="photoCell";
+      cell.innerHTML=`<img src="${p.dataUrl}"><button class="delBtn">✕</button>`;
+      cell.querySelector(".delBtn").onclick=(e)=>{
+        e.stopPropagation();
+        photos=photos.filter(x=>x.id!==p.id);
+        frames.forEach(fr=>{fr.photoIds=fr.photoIds.filter(x=>x!==p.id);if(fr.fixedPhotoId===p.id)fr.fixedPhotoId=null;});
+        renderPhotoSheet();renderCanvas();
+        showToast("削除しました");
+      };
       grid.appendChild(cell);
     });
   }
 
-  $("fileInput").onchange = async (e) => {
-    const files = [...(e.target.files || [])];
-    if (!files.length) return;
-    const remaining = MAX_PHOTOS - photos.filter(p=>p.name!=="placeholder").length;
-    if (remaining <= 0) { showToast("写真上限に達しています"); return; }
-    const toAdd = files.slice(0, remaining);
-    try {
-      const arr = [];
-      for (const f of toAdd) arr.push(await readFile(f));
-      photos = [...arr, ...photos.filter(p=>p.name!=="placeholder")];
-      // Auto-assign to frames
-      frames.forEach(fr => {
-        if (!fr.photoIds.length || (fr.photoIds.length===1 && findPhoto(fr.photoIds[0])?.name==="placeholder")) {
-          fr.photoIds = photos.map(p=>p.id);
-        }
-      });
-      renderPhotoGrid();
-      showToast(arr.length + "枚追加しました");
-    } catch { showToast("読み込み失敗"); }
-    e.target.value = "";
+  $("fileInput").onchange=async e=>{
+    const files=[...(e.target.files||[])];if(!files.length)return;
+    const remaining=MAX_PHOTOS-photos.filter(p=>p.name!=="placeholder").length;
+    if(remaining<=0){showToast("写真上限に達しています");return;}
+    try{
+      const arr=[];
+      for(const f of files.slice(0,remaining))arr.push(await readFile(f));
+      photos=[...arr,...photos.filter(p=>p.name!=="placeholder")];
+      frames.forEach(fr=>{fr.photoIds=photos.map(p=>p.id);});
+      renderPhotoSheet();renderCanvas();
+      showToast(arr.length+"枚追加しました");
+    }catch{showToast("読み込み失敗");}
+    e.target.value="";
   };
 
-  /* ===== Frames (Layout Selection) ===== */
-  const LAYOUTS = {
-    calm: [
-      ["portrait",    43.9,   0,    84.5,  null],
-      ["square",     126,    27.6,  56.8,  null],
-      ["landscape",   88,    82.6,  71,    null],
-    ],
-    flow: [
-      ["portrait",          -0.6,  53.8,  59.5,  null],
-      ["portrait",          52.7,   8.7,  72.0,  null],
-      ["square",           123.3,  30.7,  49.9,  null],
-      ["landscape_simple", 177.2,  53.3,  60.8,  null],
-      ["landscape",         79.2,  79.3,  68.6,  null],
-    ],
-    story: [
-      ["portrait",         -0.2, 57.8, 38,    null],
-      ["square",           42.9, 32.2, 41,    null],
-      ["portrait",         87.4, 16.5, 56.25, null],
-      ["landscape_simple", 144.7,38.1, 38,    null],
-      ["landscape",        187.5,48.4, 51,    null],
-      ["landscape",        39.5, 73.1, 47,    null],
-      ["square",           91.7, 76.4, 47,    null],
-      ["portrait",         142.7,77.0, 41.5,  null],
-    ],
-    scene: [
-      ["landscape_simple",  1.5, 42.3, 39,    null],
-      ["square",           42.75,33.5, 45,    null],
-      ["portrait_simple",  96.15, 3,   39,    null],
-      ["portrait",        141,   38.7, 39,    null],
-      ["landscape",       180,   47.4, 33,    null],
-      ["square",           21.3, 81.5, 31.5,  null],
-      ["portrait",         54.6, 81.5, 36.6,  null],
-      ["portrait",         85.5, 43.55,60,    null],
-      ["landscape",       142.5, 77.0, 53.4,  null],
-      ["landscape_simple",198.75,78.5, 39,    null],
-      ["square",           94.8,106.2, 42,    null],
-    ],
-  };
-
-  function seedLayout(layout) {
-    currentLayout = layout;
-    selectedId = null;
-    const grid = LAYOUTS[layout] || LAYOUTS.story;
-    const photoIds = photos.length ? photos.map(p=>p.id) : [];
-    frames = grid.map(g => ({
-      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
-      bottomAlign: g[4],
-      photoIds: photoIds.length ? [...photoIds] : [],
-      fixedPhotoId: null
-    }));
-    updateLayoutCards();
-  }
-
-  function updateLayoutCards() {
-    document.querySelectorAll(".layoutCard").forEach(c => c.classList.toggle("active", c.dataset.layout === currentLayout));
-  }
-
-  document.querySelectorAll(".layoutCard").forEach(card => {
-    card.addEventListener("click", () => {
+  /* ===== Frames Sheet ===== */
+  document.querySelectorAll(".layoutCard").forEach(card=>{
+    card.addEventListener("click",()=>{
       seedLayout(card.dataset.layout);
-      const names = {calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"};
-      showToast(names[card.dataset.layout] + " に切り替えました");
+      const names={calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"};
+      showToast(names[card.dataset.layout]+" に切り替えました");
     });
   });
 
-  /* ===== Edit Canvas ===== */
-  function gridToPercent(f) {
-    const m = FRAME_META[f.kind];
-    const hCells = f.w / m.ar;
-    return {
-      left: (f.gx / GRID.W * 100) + "%",
-      top:  (f.gy / GRID.H * 100) + "%",
-      width: (f.w / GRID.W * 100) + "%",
-      height:(hCells / GRID.H * 100) + "%"
-    };
-  }
-
-  function applyOvalMask(el) {
-    el.style.borderRadius = "50%";
-    const url = `url("${FRAME_META.oval.maskPng}")`;
-    el.style.webkitMaskImage = url; el.style.webkitMaskSize="100% 100%"; el.style.webkitMaskRepeat="no-repeat"; el.style.webkitMaskPosition="center";
-    el.style.maskImage = url; el.style.maskSize="100% 100%"; el.style.maskRepeat="no-repeat"; el.style.maskPosition="center";
-  }
-
-  function findFrame(id) { return frames.find(f=>f.id===id)||null; }
-
-  function getPhotoSrc(f) {
-    const pid = (f.fixedPhotoId && f.photoIds.includes(f.fixedPhotoId)) ? f.fixedPhotoId : (f.photoIds[0] || null);
-    const p = pid ? findPhoto(pid) : null;
-    return p ? p.dataUrl : placeholderUrl;
-  }
-
-  function attachDrag(el, f) {
-    let on=false,sx=0,sy=0,ogx=0,ogy=0;
-    el.addEventListener("pointerdown", e => {
-      if(e.target.classList.contains("handle")) return;
-      e.stopPropagation(); selectedId=f.id; updateSelectionUI();
-      on=true; sx=e.clientX; sy=e.clientY; ogx=f.gx; ogy=f.gy;
-      el.setPointerCapture(e.pointerId);
-    });
-    el.addEventListener("pointermove", e => {
-      if(!on) return;
-      const r=$("canvas").getBoundingClientRect();
-      f.gx = ogx + (e.clientX-sx)/r.width*GRID.W;
-      f.gy = ogy + (e.clientY-sy)/r.height*GRID.H;
-      el.style.left = (f.gx/GRID.W*100)+"%";
-      el.style.top = (f.gy/GRID.H*100)+"%";
-    });
-    el.addEventListener("pointerup", ()=>{on=false});
-    el.addEventListener("pointercancel", ()=>{on=false});
-  }
-
-  function attachResize(handle, el, f) {
-    let on=false,sx=0,sw=0;
-    handle.addEventListener("pointerdown", e => {
-      e.stopPropagation(); selectedId=f.id; updateSelectionUI();
-      on=true; sx=e.clientX; sw=f.w; handle.setPointerCapture(e.pointerId);
-    });
-    handle.addEventListener("pointermove", e => {
-      if(!on) return;
-      const r=$("canvas").getBoundingClientRect();
-      let nw = sw + (e.clientX-sx)/r.width*GRID.W;
-      if(nw<10) nw=10; f.w=nw;
-      const pct = gridToPercent(f);
-      el.style.width=pct.width; el.style.height=pct.height;
-    });
-    handle.addEventListener("pointerup", ()=>{on=false});
-    handle.addEventListener("pointercancel", ()=>{on=false});
-  }
-
-  function updateSelectionUI() {
-    $("canvas").querySelectorAll(".frame").forEach(el => el.classList.toggle("selected", el.dataset.id===selectedId));
-  }
-
-  function renderEditCanvas() {
-    const canvas = $("canvas");
-    canvas.innerHTML = "";
-    frames.forEach(f => {
-      const m = FRAME_META[f.kind];
-      const pct = gridToPercent(f);
-      const el = document.createElement("div");
-      el.className="frame"; el.dataset.id=f.id;
-      el.style.left=pct.left; el.style.top=pct.top;
-      el.style.width=pct.width; el.style.height=pct.height;
-
-      const mask = document.createElement("div");
-      mask.className="mask"; mask.style.inset=m.inset;
-      if(f.kind==="oval") applyOvalMask(mask);
-      const img = document.createElement("img");
-      img.src = getPhotoSrc(f);
-      mask.appendChild(img); el.appendChild(mask);
-
-      const ov = document.createElement("img");
-      ov.className="overlay"; ov.src=m.src; el.appendChild(ov);
-
-      const h = document.createElement("div");
-      h.className="handle"; el.appendChild(h);
-
-      attachDrag(el,f); attachResize(h,el,f);
-      canvas.appendChild(el);
-    });
-    updateSelectionUI();
-  }
-
-  function fitEditCanvas() {
-    const area = $("canvasArea");
-    if(!area) return;
-    const w = area.clientWidth;
-    const h = area.clientHeight;
-    const scaleW = w / 2400;
-    const scaleH = h / 1500;
-    const scale = Math.min(scaleW, scaleH);
-    $("canvasScaler").style.transform = `scale(${scale})`;
-  }
-
-  $("addFrame").onclick = () => {
-    const kind = $("frameType").value;
-    const w = [30,35,42][Math.floor(Math.random()*3)];
-    frames.push({
-      id:uid(), kind, gx:24+Math.random()*140, gy:15+Math.random()*90, w,
-      bottomAlign:null, photoIds:photos.map(p=>p.id), fixedPhotoId:null
-    });
-    selectedId = frames[frames.length-1].id;
-    renderEditCanvas();
-    showToast("フレームを追加しました");
-  };
-
-  $("deleteFrame").onclick = () => {
-    if(!selectedId){showToast("フレームを選択してください");return;}
-    frames = frames.filter(f=>f.id!==selectedId);
+  /* ===== Edit Mode ===== */
+  function setEditMode(on){
+    editMode=on;
+    $("editBar").classList.toggle("show",on);
     selectedId=null;
-    renderEditCanvas();
-    showToast("削除しました");
+    renderCanvas();
+    // Update nav highlight
+    document.querySelectorAll(".navItem").forEach(n=>n.classList.toggle("active",
+      (on && n.dataset.action==="edit")||false
+    ));
+  }
+
+  $("addFrameBtn").onclick=()=>{
+    const kind=$("frameType").value;
+    const w=[30,35,42][Math.floor(Math.random()*3)];
+    frames.push({id:uid(),kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w,bottomAlign:null,photoIds:photos.map(p=>p.id),fixedPhotoId:null});
+    selectedId=frames[frames.length-1].id;
+    renderCanvas();showToast("追加しました");
+  };
+  $("deleteFrameBtn").onclick=()=>{
+    if(!selectedId){showToast("フレームを選択してください");return;}
+    frames=frames.filter(f=>f.id!==selectedId);selectedId=null;
+    renderCanvas();showToast("削除しました");
   };
 
   /* ===== Display Mode ===== */
-  function startDisplay() {
-    stopDisplay();
-    const dc = $("displayCanvas");
-    dc.innerHTML = "";
+  function enterDisplay(){
+    displayMode=true;
+    document.body.classList.add("displayMode");
+    closeAllSheets();
+    setEditMode(false);
+    $("canvas").style.background="#F6F6F6";
+    renderCanvas();
+    startCrossfade();
+  }
+  function exitDisplay(){
+    displayMode=false;
+    document.body.classList.remove("displayMode");
+    $("canvas").style.background="var(--bg)";
+    stopCrossfade();
+    renderCanvas();
+  }
 
-    // Fit scaler
-    const wall = $("displayWall");
-    const fitDisplay = () => {
-      const w = wall.clientWidth;
-      const h = wall.clientHeight;
-      const scale = Math.min(w/2400, h/1500);
-      $("displayScaler").style.transform = `scale(${scale})`;
-    };
-    fitDisplay();
-    window._displayResize = fitDisplay;
-    window.addEventListener("resize", fitDisplay);
-
-    const realPhotos = photos.filter(p=>p.name!=="placeholder");
-
-    frames.forEach(f => {
-      const m = FRAME_META[f.kind];
-      const pct = gridToPercent(f);
-
-      const el = document.createElement("div");
-      el.className = "displayFrame";
-      el.style.left=pct.left; el.style.top=pct.top;
-      el.style.width=pct.width; el.style.height=pct.height;
-
-      const mask = document.createElement("div");
-      mask.className="mask"; mask.style.inset=m.inset; mask.style.position="absolute";
-      if(f.kind==="oval") applyOvalMask(mask);
-
-      const img = document.createElement("img");
-      img.src = getPhotoSrc(f);
-      mask.appendChild(img); el.appendChild(mask);
-
-      const ov = document.createElement("img");
-      ov.className="overlay"; ov.src=m.src; el.appendChild(ov);
-
-      dc.appendChild(el);
-
-      // Auto-cycle photos with crossfade
-      if(realPhotos.length > 1) {
-        let lastIdx = 0;
-        const cycle = () => {
-          let nextIdx;
-          do { nextIdx = Math.floor(Math.random()*realPhotos.length); } while(nextIdx===lastIdx && realPhotos.length>1);
-          lastIdx = nextIdx;
-
-          const newImg = document.createElement("img");
-          newImg.src = realPhotos[nextIdx].dataUrl;
-          newImg.style.opacity = "0";
-          newImg.style.position = "absolute"; newImg.style.inset="0";
-          newImg.style.width="100%"; newImg.style.height="100%";
-          newImg.style.objectFit="cover"; newImg.style.display="block";
-          newImg.style.transition = "opacity 1.2s ease";
-          mask.appendChild(newImg);
-
-          requestAnimationFrame(() => { newImg.style.opacity = "1"; });
-          setTimeout(() => {
-            while(mask.children.length > 2) mask.removeChild(mask.children[0]);
-          }, 1400);
-        };
-        const delay = 25000 + Math.random()*10000; // 25-35s
-        const timer = setInterval(cycle, delay);
-        displayTimers.push(timer);
-      }
+  function startCrossfade(){
+    stopCrossfade();
+    const real=photos.filter(p=>p.name!=="placeholder");
+    if(real.length<2)return;
+    $("canvas").querySelectorAll(".frame").forEach(frameEl=>{
+      const mask=frameEl.querySelector(".mask");if(!mask)return;
+      let lastIdx=0;
+      const cycle=()=>{
+        let nextIdx;
+        do{nextIdx=Math.floor(Math.random()*real.length);}while(nextIdx===lastIdx&&real.length>1);
+        lastIdx=nextIdx;
+        const newImg=document.createElement("img");
+        newImg.src=real[nextIdx].dataUrl;
+        newImg.style.cssText="opacity:0;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 1.2s ease;";
+        mask.appendChild(newImg);
+        requestAnimationFrame(()=>{newImg.style.opacity="1";});
+        setTimeout(()=>{while(mask.children.length>2)mask.removeChild(mask.children[0]);},1400);
+      };
+      const timer=setInterval(cycle,25000+Math.random()*10000);
+      displayTimers.push(timer);
     });
   }
+  function stopCrossfade(){displayTimers.forEach(t=>clearInterval(t));displayTimers=[];}
 
-  function stopDisplay() {
-    displayTimers.forEach(t => clearInterval(t));
-    displayTimers = [];
-    if(window._displayResize) {
-      window.removeEventListener("resize", window._displayResize);
-      window._displayResize = null;
-    }
-  }
+  // Tap to exit display
+  $("canvasArea").addEventListener("click",()=>{
+    if(displayMode)exitDisplay();
+  });
 
-  /* ===== Hydrate Aspect Ratios ===== */
-  async function hydrateAspectRatios() {
-    await Promise.all(Object.values(FRAME_META).map(meta => new Promise(res => {
-      const img = new Image();
-      img.onload = () => { meta.ar=(img.naturalWidth||1)/(img.naturalHeight||1); res(); };
-      img.onerror = () => res();
-      img.src = meta.src + "?v=15";
+  /* ===== Navigation ===== */
+  document.querySelectorAll(".navItem").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const action=btn.dataset.action;
+
+      if(action==="display"){
+        enterDisplay();
+        return;
+      }
+
+      // Exit display if active
+      if(displayMode)exitDisplay();
+
+      if(action==="photo"){
+        if(openSheet==="sheetPhoto"){closeAllSheets();}
+        else{setEditMode(false);openSheetEl("sheetPhoto");renderPhotoSheet();}
+      }
+      else if(action==="frames"){
+        if(openSheet==="sheetFrames"){closeAllSheets();}
+        else{setEditMode(false);openSheetEl("sheetFrames");}
+      }
+      else if(action==="edit"){
+        closeAllSheets();
+        setEditMode(!editMode);
+      }
+
+      // Update nav highlights
+      document.querySelectorAll(".navItem").forEach(n=>{
+        const a=n.dataset.action;
+        n.classList.toggle("active",
+          (a==="photo"&&openSheet==="sheetPhoto")||
+          (a==="frames"&&openSheet==="sheetFrames")||
+          (a==="edit"&&editMode)
+        );
+      });
+    });
+  });
+
+  /* ===== Hydrate & Init ===== */
+  async function hydrateAspectRatios(){
+    await Promise.all(Object.values(FRAME_META).map(meta=>new Promise(res=>{
+      const img=new Image();
+      img.onload=()=>{meta.ar=(img.naturalWidth||1)/(img.naturalHeight||1);res();};
+      img.onerror=()=>res();img.src=meta.src+"?v=15";
     })));
   }
 
-  /* ===== Init ===== */
-  (async function init() {
+  (async function init(){
     await hydrateAspectRatios();
-    photos = [{ id:uid(), name:"placeholder", dataUrl:placeholderUrl, ratio:1, orient:"square" }];
+    photos=[{id:uid(),name:"placeholder",dataUrl:placeholderUrl,ratio:1,orient:"square"}];
     seedLayout(currentLayout);
-    renderPhotoGrid();
-
-    window.addEventListener("resize", () => {
-      if(currentPage==="edit") fitEditCanvas();
-    });
+    fitCanvas();
+    window.addEventListener("resize",fitCanvas);
   })();
 
 })();
