@@ -319,12 +319,12 @@ input[type=“file”]{display:none;}
 (() => {
   /* ===== Data ===== */
   const FRAME_META = {
-    portrait:        { src:"frame_vertical.png",        inset:"14.8% 22.5% 14.0% 23.5%", mask:"rect",  ar:874/1044 },
-    portrait_simple: { src:"frame_vertical_simple.png",  inset:"14.8% 22.5% 14.0% 23.5%", mask:"rect",  ar:874/1044 },
-    square:          { src:"frame_square.png",           inset:"18.5% 19.3% 19.2% 18.5%", mask:"rect",  ar:1033/1033 },
-    landscape:       { src:"frame_horizontal.png",       inset:"22.5% 14.0% 23.5% 14.8%", mask:"rect",  ar:1044/874 },
-    landscape_simple:{ src:"frame_horizontal_simple.png",inset:"22.5% 14.0% 23.5% 14.8%", mask:"rect",  ar:1044/874 },
-    oval:            { src:"frame_oval.png",             inset:"11.5% 22.8% 9.8% 24.8%", mask:"oval",  maskPng:"mask_oval.png", ar:675/963 }
+    portrait:        { src:"frame_vertical.png",        maskPng:"mask_vertical.png",    ar:874/1044 },
+    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",    ar:874/1044 },
+    square:          { src:"frame_square.png",           maskPng:"mask_square.png",      ar:1033/1033 },
+    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png",  ar:1044/874 },
+    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png",  ar:1044/874 },
+    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",        ar:675/963 }
   };
 
   const LAYOUTS = {
@@ -395,9 +395,8 @@ input[type=“file”]{display:none;}
   }
 
   /* ===== Canvas Rendering ===== */
-  function applyOvalMask(el){
-    el.style.borderRadius="50%";
-    const url=`url("${FRAME_META.oval.maskPng}")`;
+  function applyMask(el, maskPng){
+    const url=`url("${maskPng}")`;
     el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";
     el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";
   }
@@ -413,8 +412,8 @@ input[type=“file”]{display:none;}
       el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
       const mask=document.createElement("div");
-      mask.className="mask";mask.style.inset=m.inset;
-      if(f.kind==="oval")applyOvalMask(mask);
+      mask.className="mask";mask.style.inset="0";
+      applyMask(mask, m.maskPng);
       const img=document.createElement("img");img.src=getPhotoSrc(f);
       mask.appendChild(img);el.appendChild(mask);
 
