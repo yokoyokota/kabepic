@@ -698,9 +698,9 @@ font-weight:600;
   // Calm (3枚)
   function seedCalmFrames() {
     const grid = [
-      ["portrait",   30,  20,  50, null],
-      ["square",     95,  35,  50, null],
-      ["landscape", 155,  55,  55, null],
+      ["portrait",    43.9,   0,    84.5,  null],
+      ["square",     126,    27.6,  56.8,  null],
+      ["landscape",   88,    82.6,  71,    null],
     ];
     frames = grid.map(g => ({
       id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
@@ -713,11 +713,11 @@ font-weight:600;
   // Flow (5枚)
   function seedFlowFrames() {
     const grid = [
-      ["portrait",    10,  25,  42, null],
-      ["landscape",   60,  15,  50, null],
-      ["square",     120,  40,  42, null],
-      ["portrait",   170,  20,  38, null],
-      ["landscape",   55,  80,  50, null],
+      ["portrait",          -0.6,  53.8,  59.5,  null],
+      ["portrait",          52.7,   8.7,  72.0,  null],
+      ["square",           123.3,  30.7,  49.9,  null],
+      ["landscape_simple", 177.2,  53.3,  60.8,  null],
+      ["landscape",         79.2,  79.3,  68.6,  null],
     ];
     frames = grid.map(g => ({
       id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
