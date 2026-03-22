@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
@@ -6,375 +7,98 @@
 <title>KABEPIC</title>
 <style>
 :root{
-  --ink:#222;
-  --muted:#999;
-  --bg:#f5f0ea;
-  --card:#fff;
-  --border:rgba(0,0,0,0.08);
-  --nav-h:52px;
+  --ink:#222;--muted:#999;--bg:#f5f0ea;--card:#fff;
+  --border:rgba(0,0,0,0.08);--nav-h:52px;
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;touch-action:manipulation;}
-body{
-  font-family:"Hiragino Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,sans-serif;
-  color:var(--ink);
-  background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  position:relative;
-}
+body{font-family:"Hiragino Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;position:relative;}
 
 /* Canvas */
-#canvasArea{
-  flex:1;
-  position:relative;
-  overflow:hidden;
-}
-#canvasScaler{
-  position:absolute;
-  top:0;
-  left:0;
-  width:2400px;
-  height:1500px;
-  transform-origin:top left;
-}
-#canvas{
-  position:relative;
-  width:2400px;
-  height:1500px;
-  background:var(--bg);
-  overflow:hidden;
-  touch-action:none;
-}
+#canvasArea{flex:1;position:relative;overflow:hidden;}
+#canvasScaler{position:absolute;top:0;left:0;width:2400px;height:1500px;transform-origin:top left;}
+#canvas{position:relative;width:2400px;height:1500px;background:var(–bg);overflow:hidden;touch-action:none;}
 
 /* Frames */
-.frame{
-  position:absolute;
-  overflow:visible;
-  touch-action:none;
-  pointer-events:none;
-}
-.frame.editable{
-  pointer-events:auto;
-  cursor:grab;
-}
-.frame.editable:active{
-  cursor:grabbing;
-}
-.frame.selected{
-  outline:2px solid var(--ink);
-  outline-offset:1px;
-}
-.photoMask{
-  position:absolute;
-  overflow:hidden;
-  background:transparent;
-}
+.frame{position:absolute;overflow:visible;touch-action:none;pointer-events:none;}
+.frame.editable{pointer-events:auto;cursor:grab;}
+.frame.editable:active{cursor:grabbing;}
+.frame.selected{outline:2px solid var(–ink);outline-offset:1px;}
+.photoMask{position:absolute;overflow:hidden;background:transparent;}
 .photoMask img{
-  position:absolute;
-  left:50%;
-  top:50%;
-  display:block;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
-  max-width:none;
-  max-height:none;
-  transform:translate(-50%,-50%);
+width:100%;
+height:100%;
+object-fit:cover;
+object-position:center;
+display:block;
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
 }
-.overlay{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-drag:none;
-  z-index:3;
-}
-.handle{
-  position:absolute;
-  width:20px;
-  height:20px;
-  right:-10px;
-  bottom:-10px;
-  border-radius:50%;
-  background:var(--ink);
-  border:2px solid #fff;
-  display:none;
-  z-index:5;
-  cursor:nwse-resize;
-  pointer-events:auto;
-}
+.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none;z-index:3;}
+.handle{position:absolute;width:20px;height:20px;right:-10px;bottom:-10px;border-radius:50%;background:var(–ink);border:2px solid #fff;display:none;z-index:5;cursor:nwse-resize;pointer-events:auto;}
 .frame.selected .handle{display:block;}
 
 /* Edit bar */
-#editBar{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  display:none;
-  padding:8px 12px;
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  z-index:15;
-  gap:8px;
-  align-items:center;
-}
+#editBar{position:absolute;top:0;left:0;right:0;display:none;padding:8px 12px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(–border);z-index:15;gap:8px;align-items:center;}
 #editBar.show{display:flex;}
-#editBar select,
-#editBar button{
-  padding:7px 12px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-size:12px;
-  cursor:pointer;
-  color:var(--ink);
-}
-.editLabel{
-  font-size:13px;
-  font-weight:600;
-  margin-right:auto;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.editDot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#34c759;
-  display:inline-block;
-}
+#editBar select,#editBar button{padding:7px 12px;border-radius:20px;border:1px solid var(–border);background:#fff;font-size:12px;cursor:pointer;color:var(–ink);}
+.editLabel{font-size:13px;font-weight:600;margin-right:auto;display:flex;align-items:center;gap:6px;}
+.editDot{width:8px;height:8px;border-radius:50%;background:#34c759;display:inline-block;}
 
 /* Bottom nav */
-#bottomNav{
-  display:flex;
-  height:var(--nav-h);
-  padding-bottom:var(--safe-b);
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-top:1px solid var(--border);
-  flex-shrink:0;
-  z-index:20;
-  position:relative;
-}
-.navItem{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:1px;
-  font-size:11px;
-  font-weight:500;
-  color:var(--muted);
-  cursor:pointer;
-  border:none;
-  background:none;
-  -webkit-tap-highlight-color:transparent;
-  transition:color 0.15s;
-}
-.navItem.active{
-  color:var(--ink);
-  font-weight:600;
-}
+#bottomNav{display:flex;height:var(–nav-h);padding-bottom:var(–safe-b);background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(–border);flex-shrink:0;z-index:20;position:relative;}
+.navItem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:11px;font-weight:500;color:var(–muted);cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:color 0.15s;}
+.navItem.active{color:var(–ink);font-weight:600;}
 
 /* Sheets */
-.sheet{
-  position:absolute;
-  bottom:var(--nav-h);
-  left:0;
-  right:0;
-  max-height:60vh;
-  background:#fff;
-  border-radius:20px 20px 0 0;
-  box-shadow:0 -4px 30px rgba(0,0,0,0.1);
-  z-index:18;
-  transform:translateY(100%);
-  transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
+.sheet{position:absolute;bottom:var(–nav-h);left:0;right:0;max-height:60vh;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,0.1);z-index:18;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);overflow:hidden;display:flex;flex-direction:column;}
 .sheet.open{transform:translateY(0);}
-.sheetHandle{
-  width:36px;
-  height:4px;
-  border-radius:2px;
-  background:rgba(0,0,0,0.15);
-  margin:10px auto 6px;
-  flex-shrink:0;
-}
-.sheetHeader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:4px 20px 12px;
-  flex-shrink:0;
-}
-.sheetHeader h3{
-  font-size:16px;
-  font-weight:600;
-}
-.sheetBody{
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:0 16px 20px;
-  flex:1;
-}
-.closeBtn{
-  font-size:13px;
-  color:var(--muted);
-  background:none;
-  border:none;
-  cursor:pointer;
-  padding:4px 8px;
-}
+.sheetHandle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,0.15);margin:10px auto 6px;flex-shrink:0;}
+.sheetHeader{display:flex;justify-content:space-between;align-items:center;padding:4px 20px 12px;flex-shrink:0;}
+.sheetHeader h3{font-size:16px;font-weight:600;}
+.sheetBody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 20px;flex:1;}
+.closeBtn{font-size:13px;color:var(–muted);background:none;border:none;cursor:pointer;padding:4px 8px;}
 
 /* Photo sheet */
-.photoMeta{
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-.addBtn{
-  font-size:13px;
-  color:#fff;
-  background:var(--ink);
-  border:none;
-  border-radius:20px;
-  padding:7px 16px;
-  cursor:pointer;
-  font-weight:500;
-}
-.photoGrid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:4px;
-  margin-top:12px;
-}
-.photoCell{
-  aspect-ratio:1;
-  overflow:hidden;
-  border-radius:8px;
-  position:relative;
-  cursor:pointer;
-}
-.photoCell img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.photoCell .delBtn{
-  position:absolute;
-  top:4px;
-  right:4px;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.9);
-  border:none;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  color:#e33;
-  box-shadow:0 1px 4px rgba(0,0,0,0.15);
-}
-.photoCell.fixed{
-  outline:2px solid var(--ink);
-  outline-offset:-2px;
-}
-.photoCell .fixedBadge{
-  position:absolute;
-  left:4px;
-  bottom:4px;
-  background:rgba(34,34,34,0.82);
-  color:#fff;
-  font-size:11px;
-  border-radius:999px;
-  padding:4px 8px;
-}
-.photoEmpty{
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-  padding:30px 0;
-}
+.photoMeta{font-size:12px;color:var(–muted);margin-bottom:4px;}
+.addBtn{font-size:13px;color:#fff;background:var(–ink);border:none;border-radius:20px;padding:7px 16px;cursor:pointer;font-weight:500;}
+.photoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:12px;}
+.photoCell{aspect-ratio:1;overflow:hidden;border-radius:8px;position:relative;cursor:pointer;}
+.photoCell img{width:100%;height:100%;object-fit:cover;display:block;}
+.photoCell .delBtn{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:#e33;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.photoCell.fixed{outline:2px solid var(–ink);outline-offset:-2px;}
+.photoCell .fixedBadge{position:absolute;left:4px;bottom:4px;background:rgba(34,34,34,0.82);color:#fff;font-size:11px;border-radius:999px;padding:4px 8px;}
+.photoEmpty{text-align:center;color:var(–muted);font-size:13px;padding:30px 0;}
 
 /* Frames sheet */
-.layoutList{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.layoutCard{
-  background:#f8f8f8;
-  border-radius:14px;
-  padding:14px 18px;
-  cursor:pointer;
-  border:2px solid transparent;
-  transition:border-color 0.2s;
-}
-.layoutCard.active{border-color:var(--ink);}
-.layoutCard .name{
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:2px;
-}
-.layoutCard .desc{
-  font-size:12px;
-  color:var(--muted);
-}
+.layoutList{display:flex;flex-direction:column;gap:10px;}
+.layoutCard{background:#f8f8f8;border-radius:14px;padding:14px 18px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;}
+.layoutCard.active{border-color:var(–ink);}
+.layoutCard .name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.layoutCard .desc{font-size:12px;color:var(–muted);}
 
 /* Display mode */
 body.displayMode #canvasArea{background:#F6F6F6;}
 body.displayMode #canvas{background:#F6F6F6;}
-body.displayMode #bottomNav,
-body.displayMode #editBar,
-body.displayMode .sheet{display:none!important;}
+body.displayMode #bottomNav,body.displayMode #editBar,body.displayMode .sheet{display:none!important;}
 
 /* Toast */
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:calc(var(--nav-h) + 20px + var(--safe-b));
-  transform:translateX(-50%);
-  background:rgba(30,30,30,0.9);
-  color:#fff;
-  padding:9px 18px;
-  border-radius:20px;
-  font-size:13px;
-  z-index:50;
-  opacity:0;
-  transition:opacity 0.2s;
-  pointer-events:none;
-}
+.toast{position:fixed;left:50%;bottom:calc(var(–nav-h) + 20px + var(–safe-b));transform:translateX(-50%);background:rgba(30,30,30,0.9);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:50;opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .toast.show{opacity:1;}
-
-input[type="file"]{display:none;}
+input[type=“file”]{display:none;}
 </style>
+
 </head>
 <body>
 
 <div id="editBar">
   <div class="editLabel"><span class="editDot"></span> 編集ON</div>
   <select id="frameType">
-    <option value="portrait">縦</option>
-    <option value="portrait_simple">縦シンプル</option>
-    <option value="square">正方形</option>
-    <option value="landscape">横</option>
-    <option value="landscape_simple">横シンプル</option>
-    <option value="oval">楕円</option>
+    <option value="portrait">縦</option><option value="portrait_simple">縦シンプル</option>
+    <option value="square">正方形</option><option value="landscape">横</option>
+    <option value="landscape_simple">横シンプル</option><option value="oval">楕円</option>
   </select>
   <button id="addFrameBtn">＋追加</button>
   <button id="deleteFrameBtn">削除</button>
@@ -387,10 +111,7 @@ input[type="file"]{display:none;}
 <div id="sheetPhoto" class="sheet">
   <div class="sheetHandle"></div>
   <div class="sheetHeader">
-    <div>
-      <h3>写真一覧</h3>
-      <div class="photoMeta" id="photoMeta"></div>
-    </div>
+    <div><h3>写真一覧</h3><div class="photoMeta" id="photoMeta"></div></div>
     <div style="display:flex;gap:8px;align-items:center;">
       <label class="addBtn">追加<input id="fileInput" type="file" accept="image/*" multiple></label>
       <button class="closeBtn" id="closePhoto">閉じる</button>
@@ -426,7 +147,6 @@ input[type="file"]{display:none;}
 
 <script>
 (async () => {
-  /* ===== Frame definitions ===== */
   const FRAME_META = {
     portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.6% 24.2% 15.8% 25.1%", ar:874/1044 },
     portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.6% 24.2% 15.8% 25.1%", ar:874/1044 },
@@ -436,52 +156,11 @@ input[type="file"]{display:none;}
     oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"13.5% 24.8% 11.9% 26.9%", ar:675/963 }
   };
 
-  /* 位置はいじらず、種類ごとに少しだけ見え方を安定化 */
-  const SCALE_FIX = {
-    portrait:1.03,
-    portrait_simple:1.03,
-    square:1.01,
-    landscape:1.00,
-    landscape_simple:1.00,
-    oval:1.03
-  };
-
   const LAYOUTS = {
-    calm: [
-      ["portrait",43.9,0,84.5,null],
-      ["square",126,27.6,56.8,null],
-      ["landscape",88,82.6,71,null]
-    ],
-    flow: [
-      ["portrait",-0.6,53.8,59.5,null],
-      ["portrait",52.7,8.7,72.0,null],
-      ["square",123.3,30.7,49.9,null],
-      ["landscape_simple",177.2,53.3,60.8,null],
-      ["landscape",79.2,79.3,68.6,null]
-    ],
-    story: [
-      ["portrait",-0.2,57.8,38,null],
-      ["square",42.9,32.2,41,null],
-      ["portrait",87.4,16.5,56.25,null],
-      ["landscape_simple",144.7,38.1,38,null],
-      ["landscape",187.5,48.4,51,null],
-      ["landscape",39.5,73.1,47,null],
-      ["square",91.7,76.4,47,null],
-      ["portrait",142.7,77.0,41.5,null]
-    ],
-    scene: [
-      ["landscape_simple",1.5,42.3,39,null],
-      ["square",42.75,33.5,45,null],
-      ["portrait_simple",96.15,3,39,null],
-      ["portrait",141,38.7,39,null],
-      ["landscape",180,47.4,33,null],
-      ["square",21.3,81.5,31.5,null],
-      ["portrait",54.6,81.5,36.6,null],
-      ["portrait",85.5,43.55,60,null],
-      ["landscape",142.5,77.0,53.4,null],
-      ["landscape_simple",198.75,78.5,39,null],
-      ["square",94.8,106.2,42,null]
-    ]
+    calm: [["portrait",43.9,0,84.5,null],["square",126,27.6,56.8,null],["landscape",88,82.6,71,null]],
+    flow: [["portrait",-0.6,53.8,59.5,null],["portrait",52.7,8.7,72.0,null],["square",123.3,30.7,49.9,null],["landscape_simple",177.2,53.3,60.8,null],["landscape",79.2,79.3,68.6,null]],
+    story: [["portrait",-0.2,57.8,38,null],["square",42.9,32.2,41,null],["portrait",87.4,16.5,56.25,null],["landscape_simple",144.7,38.1,38,null],["landscape",187.5,48.4,51,null],["landscape",39.5,73.1,47,null],["square",91.7,76.4,47,null],["portrait",142.7,77.0,41.5,null]],
+    scene: [["landscape_simple",1.5,42.3,39,null],["square",42.75,33.5,45,null],["portrait_simple",96.15,3,39,null],["portrait",141,38.7,39,null],["landscape",180,47.4,33,null],["square",21.3,81.5,31.5,null],["portrait",54.6,81.5,36.6,null],["portrait",85.5,43.55,60,null],["landscape",142.5,77.0,53.4,null],["landscape_simple",198.75,78.5,39,null],["square",94.8,106.2,42,null]],
   };
 
   const GRID={W:240,H:150}, MAX_PHOTOS=100;
@@ -492,398 +171,147 @@ input[type="file"]{display:none;}
   const $=id=>document.getElementById(id);
   const uid=()=>Math.random().toString(36).slice(2,10);
 
-  /* ===== Check mask availability ===== */
   async function checkMasks(){
     return new Promise(resolve=>{
       const img=new Image();
       img.onload=()=>{masksAvailable=true;resolve(true);};
       img.onerror=()=>{masksAvailable=false;resolve(false);};
-      img.src="mask_vertical.png?t="+Date.now();
+      img.src="mask_vertical.png";
     });
   }
 
-  /* ===== Helpers ===== */
-  function showToast(msg,ms=1400){
-    const t=$("toast");
-    t.textContent=msg;
-    t.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t=setTimeout(()=>t.classList.remove("show"),ms);
-  }
-
-  function makePlaceholder(){
-    const c=document.createElement("canvas");
-    c.width=800;
-    c.height=800;
-    const g=c.getContext("2d");
-    g.fillStyle="#f1efe8";
-    g.fillRect(0,0,800,800);
-    g.strokeStyle="rgba(0,0,0,0.08)";
-    g.lineWidth=4;
-    g.strokeRect(40,40,720,720);
-    g.fillStyle="rgba(0,0,0,0.18)";
-    g.textAlign="center";
-    g.font="48px sans-serif";
-    g.fillText("KABEPIC",400,380);
-    g.font="22px sans-serif";
-    g.fillText("placeholder",400,425);
-    return c.toDataURL("image/png");
-  }
-
+  function showToast(msg,ms=1400){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(showToast._t);showToast._t=setTimeout(()=>t.classList.remove("show"),ms);}
+  function makePlaceholder(){const c=document.createElement("canvas");c.width=800;c.height=800;const g=c.getContext("2d");g.fillStyle="#f1efe8";g.fillRect(0,0,800,800);g.strokeStyle="rgba(0,0,0,0.08)";g.lineWidth=4;g.strokeRect(40,40,720,720);g.fillStyle="rgba(0,0,0,0.18)";g.textAlign="center";g.font="48px sans-serif";g.fillText("KABEPIC",400,380);g.font="22px sans-serif";g.fillText("placeholder",400,425);return c.toDataURL("image/png");}
   const placeholderUrl=makePlaceholder();
 
   function findPhoto(id){return photos.find(p=>p.id===id)||null;}
   function findFrame(id){return frames.find(f=>f.id===id)||null;}
   function detectOrient(r){return r>1.05?"landscape":r<0.95?"portrait":"square";}
+  function getRealPhotos(){return photos.filter(p=>p.name!=="placeholder");}
+
   function gridToPercent(f){
-    const m=FRAME_META[f.kind];
-    const h=f.w/m.ar;
-    return{
-      left:(f.gx/GRID.W*100)+"%",
-      top:(f.gy/GRID.H*100)+"%",
-      width:(f.w/GRID.W*100)+"%",
-      height:(h/GRID.H*100)+"%"
-    };
+    const m=FRAME_META[f.kind],h=f.w/m.ar;
+    return{left:(f.gx/GRID.W*100)+"%",top:(f.gy/GRID.H*100)+"%",width:(f.w/GRID.W*100)+"%",height:(h/GRID.H*100)+"%"};
   }
 
   function getFrameBucket(kind){
     if(kind==="square") return "square";
-    if(kind==="oval") return "portrait";
-    if(kind.includes("portrait")) return "portrait";
+    if(kind==="oval"||kind.includes("portrait")) return "portrait";
     if(kind.includes("landscape")) return "landscape";
     return "square";
   }
 
-  function getRealPhotos(){
-    return photos.filter(p=>p.name!=="placeholder");
-  }
-
   function getCompatiblePool(kind, sourcePhotos){
-    const real = sourcePhotos || getRealPhotos();
-    const portrait = real.filter(p=>p.orient==="portrait");
-    const landscape = real.filter(p=>p.orient==="landscape");
-    const square = real.filter(p=>p.orient==="square");
-    const bucket = getFrameBucket(kind);
-
-    if(bucket==="portrait"){
-      return portrait.length ? portrait : (square.length ? square : real);
-    }
-    if(bucket==="landscape"){
-      return landscape.length ? landscape : (square.length ? square : real);
-    }
-    if(bucket==="square"){
-      if(square.length) return square;
-      const merged = [...portrait, ...landscape];
-      return merged.length ? merged : real;
-    }
+    const real=sourcePhotos||getRealPhotos();
+    const portrait=real.filter(p=>p.orient==="portrait");
+    const landscape=real.filter(p=>p.orient==="landscape");
+    const square=real.filter(p=>p.orient==="square");
+    const bucket=getFrameBucket(kind);
+    if(bucket==="portrait") return portrait.length?portrait:(square.length?square:real);
+    if(bucket==="landscape") return landscape.length?landscape:(square.length?square:real);
+    if(bucket==="square"){if(square.length)return square;const m=[...portrait,...landscape];return m.length?m:real;}
     return real;
   }
 
   function autoAssignPhotos(){
-    const real = getRealPhotos();
-    if(!real.length){
-      frames.forEach(f=>{
-        if(!f.fixedPhotoId){
-          f.photoIds=[];
-          f.currentPhotoId=null;
-        }
-      });
-      return;
-    }
-
-    const indexMap = {
-      portrait:0,
-      landscape:0,
-      square:0
-    };
-
+    const real=getRealPhotos();
+    if(!real.length){frames.forEach(f=>{if(!f.fixedPhotoId){f.photoIds=[];f.currentPhotoId=null;}});return;}
+    const indexMap={portrait:0,landscape:0,square:0};
     frames.forEach(frame=>{
-      if(frame.fixedPhotoId){
-        const fixed=findPhoto(frame.fixedPhotoId);
-        if(fixed){
-          frame.photoIds=[fixed.id];
-          frame.currentPhotoId=fixed.id;
-          return;
-        }
-        frame.fixedPhotoId=null;
-      }
-
+      if(frame.fixedPhotoId){const fixed=findPhoto(frame.fixedPhotoId);if(fixed){frame.photoIds=[fixed.id];frame.currentPhotoId=fixed.id;return;}frame.fixedPhotoId=null;}
       const bucket=getFrameBucket(frame.kind);
-      const pool=getCompatiblePool(frame.kind, real);
-      if(!pool.length){
-        frame.photoIds=[];
-        frame.currentPhotoId=null;
-        return;
-      }
-
-      const nextIndex=indexMap[bucket] % pool.length;
+      const pool=getCompatiblePool(frame.kind,real);
+      if(!pool.length){frame.photoIds=[];frame.currentPhotoId=null;return;}
+      const nextIndex=indexMap[bucket]%pool.length;
       const photo=pool[nextIndex];
       indexMap[bucket]+=1;
-
       frame.photoIds=[photo.id];
       frame.currentPhotoId=photo.id;
     });
   }
 
   function getCurrentPhoto(frame){
-    if(frame.fixedPhotoId){
-      const fixed=findPhoto(frame.fixedPhotoId);
-      if(fixed) return fixed;
-    }
-
-    if(frame.currentPhotoId){
-      const current=findPhoto(frame.currentPhotoId);
-      if(current) return current;
-    }
-
-    if(Array.isArray(frame.photoIds) && frame.photoIds.length){
-      const first=findPhoto(frame.photoIds[0]);
-      if(first) return first;
-    }
-
-    return photos[0] || null;
+    if(frame.fixedPhotoId){const f=findPhoto(frame.fixedPhotoId);if(f)return f;}
+    if(frame.currentPhotoId){const c=findPhoto(frame.currentPhotoId);if(c)return c;}
+    if(Array.isArray(frame.photoIds)&&frame.photoIds.length){const f=findPhoto(frame.photoIds[0]);if(f)return f;}
+    return null;
   }
 
   async function readFile(file){
-    const dataUrl=await new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=()=>res(r.result);
-      r.onerror=rej;
-      r.readAsDataURL(file);
-    });
-
-    const meta=await new Promise(res=>{
-      const img=new Image();
-      img.onload=()=>{
-        const ratio=(img.naturalWidth||1)/(img.naturalHeight||1);
-        res({
-          ratio,
-          orient:detectOrient(ratio),
-          width:img.naturalWidth||1,
-          height:img.naturalHeight||1
-        });
-      };
-      img.onerror=()=>res({
-        ratio:1,
-        orient:"square",
-        width:1,
-        height:1
-      });
-      img.src=dataUrl;
-    });
-
-    return{
-      id:uid(),
-      name:file.name,
-      dataUrl,
-      ...meta
-    };
+    const dataUrl=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+    const meta=await new Promise(res=>{const img=new Image();img.onload=()=>{const ratio=(img.naturalWidth||1)/(img.naturalHeight||1);res({ratio,orient:detectOrient(ratio),width:img.naturalWidth||1,height:img.naturalHeight||1});};img.onerror=()=>res({ratio:1,orient:"square",width:1,height:1});img.src=dataUrl;});
+    return{id:uid(),name:file.name,dataUrl,...meta};
   }
 
   /* ===== Canvas Rendering ===== */
-  function applyMaskImage(el, maskPng){
+  function applyMaskImage(el,maskPng){
     const url=`url("${maskPng}")`;
-    el.style.webkitMaskImage=url;
-    el.style.webkitMaskSize="100% 100%";
-    el.style.webkitMaskRepeat="no-repeat";
-    el.style.webkitMaskPosition="center";
-    el.style.webkitMaskMode="luminance";
-    el.style.maskImage=url;
-    el.style.maskSize="100% 100%";
-    el.style.maskRepeat="no-repeat";
-    el.style.maskPosition="center";
-    el.style.maskMode="luminance";
-  }
-
-  function applyBetterCrop(img, frame, photo){
-    const scaleFix = SCALE_FIX[frame.kind] || 1;
-    img.style.width = (100 * scaleFix) + "%";
-    img.style.height = (100 * scaleFix) + "%";
-    img.style.left = "50%";
-    img.style.top = "50%";
-    img.style.transform = "translate(-50%,-50%)";
+    el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";el.style.webkitMaskMode="luminance";
+    el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";el.style.maskMode="luminance";
   }
 
   function renderCanvas(){
-    const canvas=$("canvas");
-    canvas.innerHTML="";
-
+    const canvas=$("canvas");canvas.innerHTML="";
     frames.forEach(f=>{
-      const m=FRAME_META[f.kind];
-      const pct=gridToPercent(f);
-
+      const m=FRAME_META[f.kind],pct=gridToPercent(f);
       const el=document.createElement("div");
       el.className="frame"+(editMode?" editable":"");
       el.dataset.id=f.id;
-      el.style.left=pct.left;
-      el.style.top=pct.top;
-      el.style.width=pct.width;
-      el.style.height=pct.height;
+      el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
       const pmask=document.createElement("div");
       pmask.className="photoMask";
+      if(masksAvailable){pmask.style.inset="0";applyMaskImage(pmask,m.maskPng);}
+      else{pmask.style.inset=m.inset;}
 
-      if(masksAvailable){
-        pmask.style.inset="0";
-        applyMaskImage(pmask, m.maskPng);
-      }else{
-        pmask.style.inset=m.inset;
-      }
-
+      const photo=getCurrentPhoto(f);
       const img=document.createElement("img");
-      const photo=getCurrentPhoto(f) || {
-        id:"placeholder",
-        name:"placeholder",
-        dataUrl:placeholderUrl,
-        ratio:1,
-        orient:"square"
-      };
-      img.src=photo.dataUrl;
-      applyBetterCrop(img, f, photo);
-
+      img.src=photo?photo.dataUrl:placeholderUrl;
       pmask.appendChild(img);
       el.appendChild(pmask);
 
-      const ov=document.createElement("img");
-      ov.className="overlay";
-      ov.src=m.src;
+      const ov=document.createElement("img");ov.className="overlay";ov.src=m.src;
       el.appendChild(ov);
 
-      if(editMode){
-        const h=document.createElement("div");
-        h.className="handle";
-        el.appendChild(h);
-        attachDrag(el,f);
-        attachResize(h,el,f);
-      }
-
+      if(editMode){const h=document.createElement("div");h.className="handle";el.appendChild(h);attachDrag(el,f);attachResize(h,el,f);}
       canvas.appendChild(el);
     });
-
-    if(editMode) updateSelectionUI();
+    if(editMode)updateSelectionUI();
   }
 
-  function fitCanvas(){
-    const area=$("canvasArea");
-    const scale=Math.min(area.clientWidth/2400,area.clientHeight/1500);
-    $("canvasScaler").style.transform=`scale(${scale})`;
-  }
-
-  function updateSelectionUI(){
-    $("canvas").querySelectorAll(".frame").forEach(el=>{
-      el.classList.toggle("selected",el.dataset.id===selectedId);
-    });
-  }
+  function fitCanvas(){const area=$("canvasArea");$("canvasScaler").style.transform=`scale(${Math.min(area.clientWidth/2400,area.clientHeight/1500)})`;}
+  function updateSelectionUI(){$("canvas").querySelectorAll(".frame").forEach(el=>el.classList.toggle("selected",el.dataset.id===selectedId));}
 
   /* ===== Drag & Resize ===== */
   function attachDrag(el,f){
-    if(el._dragBound) return;
-    el._dragBound = true;
-
+    if(el._dragBound)return;el._dragBound=true;
     let on=false,sx=0,sy=0,ogx=0,ogy=0;
-
-    el.addEventListener("pointerdown",e=>{
-      if(!editMode) return;
-      if(e.target.classList.contains("handle")) return;
-      e.stopPropagation();
-      selectedId=f.id;
-      updateSelectionUI();
-      renderPhotoSheet();
-
-      on=true;
-      sx=e.clientX;
-      sy=e.clientY;
-      ogx=f.gx;
-      ogy=f.gy;
-      el.setPointerCapture(e.pointerId);
-    });
-
-    el.addEventListener("pointermove",e=>{
-      if(!on) return;
-      const r=$("canvas").getBoundingClientRect();
-      f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;
-      f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;
-      el.style.left=(f.gx/GRID.W*100)+"%";
-      el.style.top=(f.gy/GRID.H*100)+"%";
-    });
-
-    el.addEventListener("pointerup",()=>{on=false;});
-    el.addEventListener("pointercancel",()=>{on=false;});
+    el.addEventListener("pointerdown",e=>{if(!editMode||e.target.classList.contains("handle"))return;e.stopPropagation();selectedId=f.id;updateSelectionUI();renderPhotoSheet();on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;el.setPointerCapture(e.pointerId);});
+    el.addEventListener("pointermove",e=>{if(!on)return;const r=$("canvas").getBoundingClientRect();f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;el.style.left=(f.gx/GRID.W*100)+"%";el.style.top=(f.gy/GRID.H*100)+"%";});
+    el.addEventListener("pointerup",()=>{on=false});el.addEventListener("pointercancel",()=>{on=false});
   }
-
   function attachResize(handle,el,f){
-    if(handle._resizeBound) return;
-    handle._resizeBound = true;
-
+    if(handle._resizeBound)return;handle._resizeBound=true;
     let on=false,sx=0,sw=0;
-
-    handle.addEventListener("pointerdown",e=>{
-      if(!editMode) return;
-      e.stopPropagation();
-      selectedId=f.id;
-      updateSelectionUI();
-      renderPhotoSheet();
-
-      on=true;
-      sx=e.clientX;
-      sw=f.w;
-      handle.setPointerCapture(e.pointerId);
-    });
-
-    handle.addEventListener("pointermove",e=>{
-      if(!on) return;
-      const r=$("canvas").getBoundingClientRect();
-      let nw=sw+(e.clientX-sx)/r.width*GRID.W;
-      if(nw<10) nw=10;
-      f.w=nw;
-      const pct=gridToPercent(f);
-      el.style.width=pct.width;
-      el.style.height=pct.height;
-    });
-
-    handle.addEventListener("pointerup",()=>{on=false;});
-    handle.addEventListener("pointercancel",()=>{on=false;});
+    handle.addEventListener("pointerdown",e=>{if(!editMode)return;e.stopPropagation();selectedId=f.id;updateSelectionUI();renderPhotoSheet();on=true;sx=e.clientX;sw=f.w;handle.setPointerCapture(e.pointerId);});
+    handle.addEventListener("pointermove",e=>{if(!on)return;const r=$("canvas").getBoundingClientRect();let nw=sw+(e.clientX-sx)/r.width*GRID.W;if(nw<10)nw=10;f.w=nw;const pct=gridToPercent(f);el.style.width=pct.width;el.style.height=pct.height;});
+    handle.addEventListener("pointerup",()=>{on=false});handle.addEventListener("pointercancel",()=>{on=false});
   }
 
   /* ===== Layout ===== */
   function seedLayout(layout){
-    currentLayout=layout;
-    selectedId=null;
+    currentLayout=layout;selectedId=null;
     const grid=LAYOUTS[layout]||LAYOUTS.story;
-
-    frames=grid.map(g=>({
-      id:uid(),
-      kind:g[0],
-      gx:g[1],
-      gy:g[2],
-      w:g[3],
-      bottomAlign:g[4],
-      photoIds:[],
-      fixedPhotoId:null,
-      currentPhotoId:null
-    }));
-
+    frames=grid.map(g=>({id:uid(),kind:g[0],gx:g[1],gy:g[2],w:g[3],bottomAlign:g[4],photoIds:[],fixedPhotoId:null,currentPhotoId:null}));
     autoAssignPhotos();
-
-    document.querySelectorAll(".layoutCard").forEach(c=>{
-      c.classList.toggle("active",c.dataset.layout===layout);
-    });
-
-    renderCanvas();
-    renderPhotoSheet();
+    document.querySelectorAll(".layoutCard").forEach(c=>c.classList.toggle("active",c.dataset.layout===layout));
+    renderCanvas();renderPhotoSheet();
   }
 
   /* ===== Sheets ===== */
   let openSheet=null;
-  function openSheetEl(id){
-    closeAllSheets();
-    $(id).classList.add("open");
-    openSheet=id;
-  }
-  function closeAllSheets(){
-    document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("open"));
-    openSheet=null;
-  }
+  function openSheetEl(id){closeAllSheets();$(id).classList.add("open");openSheet=id;}
+  function closeAllSheets(){document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("open"));openSheet=null;}
   $("closePhoto").onclick=closeAllSheets;
   $("closeFrames").onclick=closeAllSheets;
 
@@ -891,312 +319,80 @@ input[type="file"]{display:none;}
   function renderPhotoSheet(){
     const real=getRealPhotos();
     $("photoMeta").textContent=`写真 ${real.length} / ${MAX_PHOTOS}　残り ${MAX_PHOTOS-real.length} 枚`;
-
-    const grid=$("photoGrid");
-    const empty=$("photoEmpty");
-
-    if(!real.length){
-      grid.style.display="none";
-      empty.style.display="block";
-      grid.innerHTML="";
-      return;
-    }
-
-    grid.style.display="grid";
-    empty.style.display="none";
-    grid.innerHTML="";
-
-    const selectedFrame = selectedId ? findFrame(selectedId) : null;
-
+    const grid=$("photoGrid"),empty=$("photoEmpty");
+    if(!real.length){grid.style.display="none";empty.style.display="block";grid.innerHTML="";return;}
+    grid.style.display="grid";empty.style.display="none";grid.innerHTML="";
+    const selectedFrame=selectedId?findFrame(selectedId):null;
     real.forEach(photo=>{
-      const cell=document.createElement("div");
-      cell.className="photoCell";
-
-      if(selectedFrame && selectedFrame.fixedPhotoId===photo.id){
-        cell.classList.add("fixed");
-      }
-
+      const cell=document.createElement("div");cell.className="photoCell";
+      if(selectedFrame&&selectedFrame.fixedPhotoId===photo.id)cell.classList.add("fixed");
       cell.innerHTML=`<img src="${photo.dataUrl}"><button class="delBtn">✕</button>`;
-
-      if(selectedFrame && selectedFrame.fixedPhotoId===photo.id){
-        const badge=document.createElement("div");
-        badge.className="fixedBadge";
-        badge.textContent="固定中";
-        cell.appendChild(badge);
-      }
-
+      if(selectedFrame&&selectedFrame.fixedPhotoId===photo.id){const badge=document.createElement("div");badge.className="fixedBadge";badge.textContent="固定中";cell.appendChild(badge);}
       cell.addEventListener("click",()=>{
-        if(!selectedFrame){
-          showToast("先にフレームを選択してください");
-          return;
-        }
-        selectedFrame.fixedPhotoId=photo.id;
-        selectedFrame.photoIds=[photo.id];
-        selectedFrame.currentPhotoId=photo.id;
-        renderCanvas();
-        renderPhotoSheet();
-        showToast("選択中フレームに固定しました");
+        if(!selectedFrame){showToast("先にフレームを選択してください");return;}
+        selectedFrame.fixedPhotoId=photo.id;selectedFrame.photoIds=[photo.id];selectedFrame.currentPhotoId=photo.id;
+        renderCanvas();renderPhotoSheet();showToast("選択中フレームに固定しました");
       });
-
       cell.querySelector(".delBtn").addEventListener("click",e=>{
-        e.stopPropagation();
-
-        photos=photos.filter(p=>p.id!==photo.id);
-
-        frames.forEach(frame=>{
-          frame.photoIds=(frame.photoIds||[]).filter(id=>id!==photo.id);
-          if(frame.fixedPhotoId===photo.id){
-            frame.fixedPhotoId=null;
-          }
-          if(frame.currentPhotoId===photo.id){
-            frame.currentPhotoId=null;
-          }
-        });
-
-        autoAssignPhotos();
-        renderPhotoSheet();
-        renderCanvas();
-        showToast("削除しました");
+        e.stopPropagation();photos=photos.filter(p=>p.id!==photo.id);
+        frames.forEach(fr=>{fr.photoIds=(fr.photoIds||[]).filter(id=>id!==photo.id);if(fr.fixedPhotoId===photo.id)fr.fixedPhotoId=null;if(fr.currentPhotoId===photo.id)fr.currentPhotoId=null;});
+        autoAssignPhotos();renderPhotoSheet();renderCanvas();showToast("削除しました");
       });
-
       grid.appendChild(cell);
     });
   }
 
   $("fileInput").onchange=async e=>{
-    const files=[...(e.target.files||[])];
-    if(!files.length) return;
-
+    const files=[...(e.target.files||[])];if(!files.length)return;
     const remaining=MAX_PHOTOS-getRealPhotos().length;
-    if(remaining<=0){
-      showToast("写真上限に達しています");
-      return;
-    }
-
+    if(remaining<=0){showToast("写真上限に達しています");return;}
     try{
-      const arr=[];
-      for(const f of files.slice(0,remaining)){
-        arr.push(await readFile(f));
-      }
-
-      photos=[...getRealPhotos(), ...arr];
-
-      frames.forEach(frame=>{
-        if(!frame.fixedPhotoId){
-          frame.photoIds=[];
-          frame.currentPhotoId=null;
-        }else{
-          const fixed=findPhoto(frame.fixedPhotoId);
-          if(!fixed){
-            frame.fixedPhotoId=null;
-            frame.photoIds=[];
-            frame.currentPhotoId=null;
-          }
-        }
-      });
-
-      autoAssignPhotos();
-      renderPhotoSheet();
-      renderCanvas();
-      showToast(arr.length+"枚追加しました");
-    }catch{
-      showToast("読み込み失敗");
-    }
-
+      const arr=[];for(const f of files.slice(0,remaining))arr.push(await readFile(f));
+      photos=[...getRealPhotos(),...arr];
+      frames.forEach(fr=>{if(!fr.fixedPhotoId){fr.photoIds=[];fr.currentPhotoId=null;}else{const fixed=findPhoto(fr.fixedPhotoId);if(!fixed){fr.fixedPhotoId=null;fr.photoIds=[];fr.currentPhotoId=null;}}});
+      autoAssignPhotos();renderPhotoSheet();renderCanvas();showToast(arr.length+"枚追加しました");
+    }catch{showToast("読み込み失敗");}
     e.target.value="";
   };
 
-  /* ===== Frames Sheet ===== */
-  document.querySelectorAll(".layoutCard").forEach(card=>{
-    card.addEventListener("click",()=>{
-      seedLayout(card.dataset.layout);
-      showToast({calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"}[card.dataset.layout]+" に切り替えました");
-    });
-  });
+  document.querySelectorAll(".layoutCard").forEach(card=>{card.addEventListener("click",()=>{seedLayout(card.dataset.layout);showToast({calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"}[card.dataset.layout]+" に切り替えました");});});
 
   /* ===== Edit Mode ===== */
-  function setEditMode(on){
-    editMode=on;
-    $("editBar").classList.toggle("show",on);
-    if(!on) selectedId=null;
-    renderCanvas();
-    renderPhotoSheet();
-  }
-
-  $("addFrameBtn").onclick=()=>{
-    const kind=$("frameType").value;
-    const w=[30,35,42][Math.floor(Math.random()*3)];
-    const frame={
-      id:uid(),
-      kind,
-      gx:24+Math.random()*140,
-      gy:15+Math.random()*90,
-      w,
-      bottomAlign:null,
-      photoIds:[],
-      fixedPhotoId:null,
-      currentPhotoId:null
-    };
-
-    frames.push(frame);
-    autoAssignPhotos();
-    selectedId=frame.id;
-    renderCanvas();
-    renderPhotoSheet();
-    showToast("追加しました");
-  };
-
-  $("deleteFrameBtn").onclick=()=>{
-    if(!selectedId){
-      showToast("フレームを選択してください");
-      return;
-    }
-    frames=frames.filter(f=>f.id!==selectedId);
-    selectedId=null;
-    renderCanvas();
-    renderPhotoSheet();
-    showToast("削除しました");
-  };
+  function setEditMode(on){editMode=on;$("editBar").classList.toggle("show",on);if(!on)selectedId=null;renderCanvas();renderPhotoSheet();}
+  $("addFrameBtn").onclick=()=>{const kind=$("frameType").value;const w=[30,35,42][Math.floor(Math.random()*3)];const frame={id:uid(),kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w,bottomAlign:null,photoIds:[],fixedPhotoId:null,currentPhotoId:null};frames.push(frame);autoAssignPhotos();selectedId=frame.id;renderCanvas();renderPhotoSheet();showToast("追加しました");};
+  $("deleteFrameBtn").onclick=()=>{if(!selectedId){showToast("フレームを選択してください");return;}frames=frames.filter(f=>f.id!==selectedId);selectedId=null;renderCanvas();renderPhotoSheet();showToast("削除しました");};
 
   /* ===== Display Mode ===== */
-  function nextPhotoForFrame(frame){
-    const pool=getCompatiblePool(frame.kind);
-    if(pool.length<2) return null;
-
-    const current=getCurrentPhoto(frame);
-    if(!current) return pool[0];
-
-    const idx=pool.findIndex(p=>p.id===current.id);
-    if(idx===-1) return pool[0];
-    return pool[(idx+1)%pool.length];
-  }
-
-  function enterDisplay(){
-    displayMode=true;
-    document.body.classList.add("displayMode");
-    closeAllSheets();
-    setEditMode(false);
-    $("canvas").style.background="#F6F6F6";
-    renderCanvas();
-    startCrossfade();
-  }
-
-  function exitDisplay(){
-    displayMode=false;
-    document.body.classList.remove("displayMode");
-    $("canvas").style.background="var(--bg)";
-    stopCrossfade();
-    renderCanvas();
-  }
-
+  function nextPhotoForFrame(frame){const pool=getCompatiblePool(frame.kind);if(pool.length<2)return null;const current=getCurrentPhoto(frame);if(!current)return pool[0];const idx=pool.findIndex(p=>p.id===current.id);if(idx===-1)return pool[0];return pool[(idx+1)%pool.length];}
+  function enterDisplay(){displayMode=true;document.body.classList.add("displayMode");closeAllSheets();setEditMode(false);$("canvas").style.background="#F6F6F6";renderCanvas();startCrossfade();}
+  function exitDisplay(){displayMode=false;document.body.classList.remove("displayMode");$("canvas").style.background="var(--bg)";stopCrossfade();renderCanvas();}
   function startCrossfade(){
-    stopCrossfade();
-
-    if(getRealPhotos().length<2) return;
-
+    stopCrossfade();if(getRealPhotos().length<2)return;
     frames.forEach(frame=>{
-      if(frame.fixedPhotoId) return;
-
-      const timer=setInterval(()=>{
-        const next=nextPhotoForFrame(frame);
-        if(!next) return;
-        frame.currentPhotoId=next.id;
-        frame.photoIds=[next.id];
-        renderCanvas();
-      }, 25000 + Math.random()*10000);
-
+      if(frame.fixedPhotoId)return;
+      const timer=setInterval(()=>{const next=nextPhotoForFrame(frame);if(!next)return;frame.currentPhotoId=next.id;frame.photoIds=[next.id];renderCanvas();},25000+Math.random()*10000);
       displayTimers.push(timer);
     });
   }
-
-  function stopCrossfade(){
-    displayTimers.forEach(t=>clearInterval(t));
-    displayTimers=[];
-  }
-
-  $("canvasArea").addEventListener("click",()=>{
-    if(displayMode){
-      exitDisplay();
-      return;
-    }
-
-    if(editMode){
-      selectedId=null;
-      updateSelectionUI();
-      renderPhotoSheet();
-    }
-  });
+  function stopCrossfade(){displayTimers.forEach(t=>clearInterval(t));displayTimers=[];}
+  $("canvasArea").addEventListener("click",()=>{if(displayMode){exitDisplay();return;}if(editMode){selectedId=null;updateSelectionUI();renderPhotoSheet();}});
 
   /* ===== Navigation ===== */
-  document.querySelectorAll(".navItem").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const action=btn.dataset.action;
-
-      if(action==="display"){
-        enterDisplay();
-        document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));
-        btn.classList.add("active");
-        return;
-      }
-
-      if(displayMode) exitDisplay();
-
-      if(action==="photo"){
-        if(openSheet==="sheetPhoto"){
-          closeAllSheets();
-        }else{
-          setEditMode(false);
-          openSheetEl("sheetPhoto");
-          renderPhotoSheet();
-        }
-      }else if(action==="frames"){
-        if(openSheet==="sheetFrames"){
-          closeAllSheets();
-        }else{
-          setEditMode(false);
-          openSheetEl("sheetFrames");
-        }
-      }else if(action==="edit"){
-        closeAllSheets();
-        setEditMode(!editMode);
-      }
-
-      document.querySelectorAll(".navItem").forEach(n=>{
-        const a=n.dataset.action;
-        n.classList.toggle("active",
-          (a==="photo"&&openSheet==="sheetPhoto")||
-          (a==="frames"&&openSheet==="sheetFrames")||
-          (a==="edit"&&editMode)
-        );
-      });
-    });
-  });
-
-  /* ===== Hydrate AR from PNG ===== */
-  async function hydrateAR(){
-    await Promise.all(Object.values(FRAME_META).map(m=>new Promise(res=>{
-      const img=new Image();
-      img.onload=()=>{
-        m.ar=(img.naturalWidth||1)/(img.naturalHeight||1);
-        res();
-      };
-      img.onerror=()=>res();
-      img.src=m.src;
-    })));
-  }
+  document.querySelectorAll(".navItem").forEach(btn=>{btn.addEventListener("click",()=>{
+    const action=btn.dataset.action;
+    if(action==="display"){enterDisplay();document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));btn.classList.add("active");return;}
+    if(displayMode)exitDisplay();
+    if(action==="photo"){if(openSheet==="sheetPhoto")closeAllSheets();else{setEditMode(false);openSheetEl("sheetPhoto");renderPhotoSheet();}}
+    else if(action==="frames"){if(openSheet==="sheetFrames")closeAllSheets();else{setEditMode(false);openSheetEl("sheetFrames");}}
+    else if(action==="edit"){closeAllSheets();setEditMode(!editMode);}
+    document.querySelectorAll(".navItem").forEach(n=>{const a=n.dataset.action;n.classList.toggle("active",(a==="photo"&&openSheet==="sheetPhoto")||(a==="frames"&&openSheet==="sheetFrames")||(a==="edit"&&editMode));});
+  });});
 
   /* ===== Init ===== */
   await checkMasks();
-  await hydrateAR();
-
-  photos=[{
-    id:uid(),
-    name:"placeholder",
-    dataUrl:placeholderUrl,
-    ratio:1,
-    orient:"square"
-  }];
-
+  console.log("Masks available:",masksAvailable);
+  await Promise.all(Object.values(FRAME_META).map(m=>new Promise(res=>{const img=new Image();img.onload=()=>{m.ar=(img.naturalWidth||1)/(img.naturalHeight||1);res();};img.onerror=()=>res();img.src=m.src;})));
+  photos=[{id:uid(),name:"placeholder",dataUrl:placeholderUrl,ratio:1,orient:"square"}];
   seedLayout(currentLayout);
   fitCanvas();
   window.addEventListener("resize",fitCanvas);
