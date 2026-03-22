@@ -261,8 +261,30 @@ input[type=“file”]{display:none;}
 
       const pmask=document.createElement("div");
       pmask.className="photoMask";
-      if(f.kind==="oval"&&masksAvailable){pmask.style.inset="0";applyMaskImage(pmask,m.maskPng);}
-      else{pmask.style.inset=m.inset;}
+      pmask.style.inset=m.inset;
+
+      // Apply mask-image if available, scaled to cover the full frame
+      // (mask PNG is 1080x1080 for the full frame, but photoMask is inset)
+      if(masksAvailable){
+        const url=`url("${m.maskPng}")`;
+        // Parse inset percentages to calculate mask position/size relative to photoMask
+        const ins=m.inset.split(/\s+/).map(s=>parseFloat(s));
+        // ins = [top%, right%, bottom%, left%]
+        const maskW = 100 / (1 - (ins[1]+ins[3])/100) ;
+        const maskH = 100 / (1 - (ins[0]+ins[2])/100) ;
+        const maskX = -ins[3] / (100 - ins[1] - ins[3]) * 100;
+        const maskY = -ins[0] / (100 - ins[0] - ins[2]) * 100;
+        pmask.style.webkitMaskImage=url;
+        pmask.style.webkitMaskSize=maskW+"% "+maskH+"%";
+        pmask.style.webkitMaskPosition=maskX+"% "+maskY+"%";
+        pmask.style.webkitMaskRepeat="no-repeat";
+        pmask.style.webkitMaskMode="luminance";
+        pmask.style.maskImage=url;
+        pmask.style.maskSize=maskW+"% "+maskH+"%";
+        pmask.style.maskPosition=maskX+"% "+maskY+"%";
+        pmask.style.maskRepeat="no-repeat";
+        pmask.style.maskMode="luminance";
+      }
 
       const photo=getCurrentPhoto(f);
       const img=document.createElement("img");
