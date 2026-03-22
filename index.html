@@ -1,4 +1,4 @@
-　<!doctype html>
+<!doctype html>
 
 <html lang="ja">
 <head>
@@ -25,7 +25,8 @@ body{font-family:"Hiragino Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont
 .frame.editable{pointer-events:auto;cursor:grab;}
 .frame.editable:active{cursor:grabbing;}
 .frame.selected{outline:2px solid var(–ink);outline-offset:1px;}
-.photoMask{position:absolute;overflow:hidden;background:transparent;}
+.photoWrap{position:absolute;inset:0;overflow:hidden;}
+.photoMask{position:absolute;overflow:visible;background:transparent;}
 .photoMask img{
 width:100%;
 height:100%;
@@ -148,12 +149,12 @@ input[type=“file”]{display:none;}
 <script>
 (async () => {
   const FRAME_META = {
-    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.23% 23.92% 15.49% 24.84%", ar:874/1044 },
-    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.23% 23.92% 15.49% 24.84%", ar:874/1044 },
-    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"19.91% 20.25% 20.23% 19.71%", ar:1033/1033 },
-    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"23.92% 15.49% 24.84% 16.23%", ar:1044/874 },
-    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"23.92% 15.49% 24.84% 16.23%", ar:1044/874 },
-    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"12.39% 24.33% 10.81% 26.37%", ar:675/963 }
+    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.0% 23.5% 15.3% 24.4%", ar:874/1044 },
+    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.0% 23.5% 15.3% 24.4%", ar:874/1044 },
+    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"19.2% 19.8% 19.8% 19.1%", ar:1033/1033 },
+    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"23.5% 15.3% 24.4% 16.0%", ar:1044/874 },
+    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"23.5% 15.3% 24.4% 16.0%", ar:1044/874 },
+    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"12.0% 24.0% 10.5% 26.0%", ar:675/963 }
   };
 
   const LAYOUTS = {
@@ -259,20 +260,22 @@ input[type=“file”]{display:none;}
       el.dataset.id=f.id;
       el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
+      // Photo wrapper: covers full frame, applies mask-image for precise clipping
+      const pwrap=document.createElement("div");
+      pwrap.className="photoWrap";
+      if(masksAvailable){applyMaskImage(pwrap,m.maskPng);}
+
+      // Photo mask: sized by inset for correct object-fit:cover, overflow visible
       const pmask=document.createElement("div");
       pmask.className="photoMask";
-      if(f.kind==="oval"&&masksAvailable){
-        pmask.style.inset="0";
-        applyMaskImage(pmask,m.maskPng);
-      }else{
-        pmask.style.inset=m.inset;
-      }
+      pmask.style.inset=m.inset;
 
       const photo=getCurrentPhoto(f);
       const img=document.createElement("img");
       img.src=photo?photo.dataUrl:placeholderUrl;
       pmask.appendChild(img);
-      el.appendChild(pmask);
+      pwrap.appendChild(pmask);
+      el.appendChild(pwrap);
 
       const ov=document.createElement("img");ov.className="overlay";ov.src=m.src;
       el.appendChild(ov);
