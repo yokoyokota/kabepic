@@ -148,12 +148,12 @@ input[type=“file”]{display:none;}
 <script>
 (async () => {
   const FRAME_META = {
-    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.48% 24.17% 15.74% 25.09%", ar:874/1044 },
-    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.48% 24.17% 15.74% 25.09%", ar:874/1044 },
-    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"19.63% 20.28% 20.28% 19.54%", ar:1033/1033 },
-    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"24.17% 15.74% 25.09% 16.48%", ar:1044/874 },
-    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"24.17% 15.74% 25.09% 16.48%", ar:1044/874 },
-    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"12.69% 24.63% 11.11% 26.67%", ar:675/963 }
+    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.18% 23.87% 15.44% 24.79%", ar:874/1044 },
+    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.18% 23.87% 15.44% 24.79%", ar:874/1044 },
+    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"19.33% 19.98% 19.98% 19.24%", ar:1033/1033 },
+    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"23.87% 15.44% 24.79% 16.18%", ar:1044/874 },
+    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"23.87% 15.44% 24.79% 16.18%", ar:1044/874 },
+    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"12.39% 24.33% 10.81% 26.37%", ar:675/963 }
   };
 
   const LAYOUTS = {
@@ -261,29 +261,11 @@ input[type=“file”]{display:none;}
 
       const pmask=document.createElement("div");
       pmask.className="photoMask";
-      pmask.style.inset=m.inset;
-
-      // Apply mask-image if available, scaled to cover the full frame
-      // (mask PNG is 1080x1080 for the full frame, but photoMask is inset)
-      if(masksAvailable){
-        const url=`url("${m.maskPng}")`;
-        // Parse inset percentages to calculate mask position/size relative to photoMask
-        const ins=m.inset.split(/\s+/).map(s=>parseFloat(s));
-        // ins = [top%, right%, bottom%, left%]
-        const maskW = 100 / (1 - (ins[1]+ins[3])/100) ;
-        const maskH = 100 / (1 - (ins[0]+ins[2])/100) ;
-        const maskX = -ins[3] / (100 - ins[1] - ins[3]) * 100;
-        const maskY = -ins[0] / (100 - ins[0] - ins[2]) * 100;
-        pmask.style.webkitMaskImage=url;
-        pmask.style.webkitMaskSize=maskW+"% "+maskH+"%";
-        pmask.style.webkitMaskPosition=maskX+"% "+maskY+"%";
-        pmask.style.webkitMaskRepeat="no-repeat";
-        pmask.style.webkitMaskMode="luminance";
-        pmask.style.maskImage=url;
-        pmask.style.maskSize=maskW+"% "+maskH+"%";
-        pmask.style.maskPosition=maskX+"% "+maskY+"%";
-        pmask.style.maskRepeat="no-repeat";
-        pmask.style.maskMode="luminance";
+      if(f.kind==="oval"&&masksAvailable){
+        pmask.style.inset="0";
+        applyMaskImage(pmask,m.maskPng);
+      }else{
+        pmask.style.inset=m.inset;
       }
 
       const photo=getCurrentPhoto(f);
