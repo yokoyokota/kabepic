@@ -6,8 +6,12 @@
 <title>KABEPIC</title>
 <style>
 :root{
-  --ink:#222;--muted:#999;--bg:#f5f0ea;--card:#fff;
-  --border:rgba(0,0,0,0.08);--nav-h:52px;
+  --ink:#222;
+  --muted:#999;
+  --bg:#f5f0ea;
+  --card:#fff;
+  --border:rgba(0,0,0,0.08);
+  --nav-h:52px;
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -22,8 +26,19 @@ body{
 }
 
 /* Canvas */
-#canvasArea{flex:1;position:relative;overflow:hidden;}
-#canvasScaler{position:absolute;top:0;left:0;width:2400px;height:1500px;transform-origin:top left;}
+#canvasArea{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+}
+#canvasScaler{
+  position:absolute;
+  top:0;
+  left:0;
+  width:2400px;
+  height:1500px;
+  transform-origin:top left;
+}
 #canvas{
   position:relative;
   width:2400px;
@@ -34,20 +49,39 @@ body{
 }
 
 /* Frames */
-.frame{position:absolute;overflow:visible;touch-action:none;pointer-events:none;}
-.frame.editable{pointer-events:auto;cursor:grab;}
-.frame.editable:active{cursor:grabbing;}
-.frame.selected{outline:2px solid var(--ink);outline-offset:1px;}
-.photoMask{position:absolute;overflow:hidden;background:transparent;}
+.frame{
+  position:absolute;
+  overflow:visible;
+  touch-action:none;
+  pointer-events:none;
+}
+.frame.editable{
+  pointer-events:auto;
+  cursor:grab;
+}
+.frame.editable:active{
+  cursor:grabbing;
+}
+.frame.selected{
+  outline:2px solid var(--ink);
+  outline-offset:1px;
+}
+.photoMask{
+  position:absolute;
+  overflow:hidden;
+  background:transparent;
+}
 .photoMask img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
+  position:absolute;
+  left:50%;
+  top:50%;
   display:block;
   pointer-events:none;
   user-select:none;
   -webkit-user-drag:none;
+  max-width:none;
+  max-height:none;
+  transform:translate(-50%,-50%);
 }
 .overlay{
   position:absolute;
@@ -92,7 +126,8 @@ body{
   align-items:center;
 }
 #editBar.show{display:flex;}
-#editBar select,#editBar button{
+#editBar select,
+#editBar button{
   padding:7px 12px;
   border-radius:20px;
   border:1px solid var(--border);
@@ -184,7 +219,10 @@ body{
   padding:4px 20px 12px;
   flex-shrink:0;
 }
-.sheetHeader h3{font-size:16px;font-weight:600;}
+.sheetHeader h3{
+  font-size:16px;
+  font-weight:600;
+}
 .sheetBody{
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
@@ -201,7 +239,11 @@ body{
 }
 
 /* Photo sheet */
-.photoMeta{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.photoMeta{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
 .addBtn{
   font-size:13px;
   color:#fff;
@@ -212,7 +254,12 @@ body{
   cursor:pointer;
   font-weight:500;
 }
-.photoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:12px;}
+.photoGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4px;
+  margin-top:12px;
+}
 .photoCell{
   aspect-ratio:1;
   overflow:hidden;
@@ -220,7 +267,12 @@ body{
   position:relative;
   cursor:pointer;
 }
-.photoCell img{width:100%;height:100%;object-fit:cover;display:block;}
+.photoCell img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
 .photoCell .delBtn{
   position:absolute;
   top:4px;
@@ -238,10 +290,33 @@ body{
   color:#e33;
   box-shadow:0 1px 4px rgba(0,0,0,0.15);
 }
-.photoEmpty{text-align:center;color:var(--muted);font-size:13px;padding:30px 0;}
+.photoCell.fixed{
+  outline:2px solid var(--ink);
+  outline-offset:-2px;
+}
+.photoCell .fixedBadge{
+  position:absolute;
+  left:4px;
+  bottom:4px;
+  background:rgba(34,34,34,0.82);
+  color:#fff;
+  font-size:11px;
+  border-radius:999px;
+  padding:4px 8px;
+}
+.photoEmpty{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  padding:30px 0;
+}
 
 /* Frames sheet */
-.layoutList{display:flex;flex-direction:column;gap:10px;}
+.layoutList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 .layoutCard{
   background:#f8f8f8;
   border-radius:14px;
@@ -251,8 +326,15 @@ body{
   transition:border-color 0.2s;
 }
 .layoutCard.active{border-color:var(--ink);}
-.layoutCard .name{font-size:14px;font-weight:600;margin-bottom:2px;}
-.layoutCard .desc{font-size:12px;color:var(--muted);}
+.layoutCard .name{
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.layoutCard .desc{
+  font-size:12px;
+  color:var(--muted);
+}
 
 /* Display mode */
 body.displayMode #canvasArea{background:#F6F6F6;}
@@ -322,10 +404,7 @@ input[type="file"]{display:none;}
 
 <div id="sheetFrames" class="sheet">
   <div class="sheetHandle"></div>
-  <div class="sheetHeader">
-    <h3>Frames</h3>
-    <button class="closeBtn" id="closeFrames">閉じる</button>
-  </div>
+  <div class="sheetHeader"><h3>Frames</h3><button class="closeBtn" id="closeFrames">閉じる</button></div>
   <div class="sheetBody">
     <div class="layoutList">
       <div class="layoutCard" data-layout="calm"><div class="name">Calm — 3枚</div><div class="desc">余白重視。大きな写真を見せる構成。</div></div>
@@ -355,6 +434,16 @@ input[type="file"]{display:none;}
     landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"24.2% 15.8% 25.1% 16.6%", ar:1044/874 },
     landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"24.2% 15.8% 25.1% 16.6%", ar:1044/874 },
     oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"13.5% 24.8% 11.9% 26.9%", ar:675/963 }
+  };
+
+  /* 位置はいじらず、種類ごとに少しだけ見え方を安定化 */
+  const SCALE_FIX = {
+    portrait:1.03,
+    portrait_simple:1.03,
+    square:1.01,
+    landscape:1.00,
+    landscape_simple:1.00,
+    oval:1.03
   };
 
   const LAYOUTS = {
@@ -424,7 +513,8 @@ input[type="file"]{display:none;}
 
   function makePlaceholder(){
     const c=document.createElement("canvas");
-    c.width=800;c.height=800;
+    c.width=800;
+    c.height=800;
     const g=c.getContext("2d");
     g.fillStyle="#f1efe8";
     g.fillRect(0,0,800,800);
@@ -446,18 +536,112 @@ input[type="file"]{display:none;}
   function findFrame(id){return frames.find(f=>f.id===id)||null;}
   function detectOrient(r){return r>1.05?"landscape":r<0.95?"portrait":"square";}
   function gridToPercent(f){
-    const m=FRAME_META[f.kind],h=f.w/m.ar;
-    return {
+    const m=FRAME_META[f.kind];
+    const h=f.w/m.ar;
+    return{
       left:(f.gx/GRID.W*100)+"%",
       top:(f.gy/GRID.H*100)+"%",
       width:(f.w/GRID.W*100)+"%",
       height:(h/GRID.H*100)+"%"
     };
   }
-  function getPhotoSrc(f){
-    const pid=(f.fixedPhotoId&&f.photoIds.includes(f.fixedPhotoId))?f.fixedPhotoId:(f.photoIds[0]||null);
-    const p=pid?findPhoto(pid):null;
-    return p?p.dataUrl:placeholderUrl;
+
+  function getFrameBucket(kind){
+    if(kind==="square") return "square";
+    if(kind==="oval") return "portrait";
+    if(kind.includes("portrait")) return "portrait";
+    if(kind.includes("landscape")) return "landscape";
+    return "square";
+  }
+
+  function getRealPhotos(){
+    return photos.filter(p=>p.name!=="placeholder");
+  }
+
+  function getCompatiblePool(kind, sourcePhotos){
+    const real = sourcePhotos || getRealPhotos();
+    const portrait = real.filter(p=>p.orient==="portrait");
+    const landscape = real.filter(p=>p.orient==="landscape");
+    const square = real.filter(p=>p.orient==="square");
+    const bucket = getFrameBucket(kind);
+
+    if(bucket==="portrait"){
+      return portrait.length ? portrait : (square.length ? square : real);
+    }
+    if(bucket==="landscape"){
+      return landscape.length ? landscape : (square.length ? square : real);
+    }
+    if(bucket==="square"){
+      if(square.length) return square;
+      const merged = [...portrait, ...landscape];
+      return merged.length ? merged : real;
+    }
+    return real;
+  }
+
+  function autoAssignPhotos(){
+    const real = getRealPhotos();
+    if(!real.length){
+      frames.forEach(f=>{
+        if(!f.fixedPhotoId){
+          f.photoIds=[];
+          f.currentPhotoId=null;
+        }
+      });
+      return;
+    }
+
+    const indexMap = {
+      portrait:0,
+      landscape:0,
+      square:0
+    };
+
+    frames.forEach(frame=>{
+      if(frame.fixedPhotoId){
+        const fixed=findPhoto(frame.fixedPhotoId);
+        if(fixed){
+          frame.photoIds=[fixed.id];
+          frame.currentPhotoId=fixed.id;
+          return;
+        }
+        frame.fixedPhotoId=null;
+      }
+
+      const bucket=getFrameBucket(frame.kind);
+      const pool=getCompatiblePool(frame.kind, real);
+      if(!pool.length){
+        frame.photoIds=[];
+        frame.currentPhotoId=null;
+        return;
+      }
+
+      const nextIndex=indexMap[bucket] % pool.length;
+      const photo=pool[nextIndex];
+      indexMap[bucket]+=1;
+
+      frame.photoIds=[photo.id];
+      frame.currentPhotoId=photo.id;
+    });
+  }
+
+  function getCurrentPhoto(frame){
+    if(frame.fixedPhotoId){
+      const fixed=findPhoto(frame.fixedPhotoId);
+      if(fixed) return fixed;
+    }
+
+    if(frame.currentPhotoId){
+      const current=findPhoto(frame.currentPhotoId);
+      if(current) return current;
+    }
+
+    if(Array.isArray(frame.photoIds) && frame.photoIds.length){
+      const first=findPhoto(frame.photoIds[0]);
+      if(first) return first;
+    }
+
+    return photos[0] || null;
   }
 
   async function readFile(file){
@@ -467,16 +651,33 @@ input[type="file"]{display:none;}
       r.onerror=rej;
       r.readAsDataURL(file);
     });
+
     const meta=await new Promise(res=>{
       const img=new Image();
       img.onload=()=>{
         const ratio=(img.naturalWidth||1)/(img.naturalHeight||1);
-        res({ratio,orient:detectOrient(ratio)});
+        res({
+          ratio,
+          orient:detectOrient(ratio),
+          width:img.naturalWidth||1,
+          height:img.naturalHeight||1
+        });
       };
-      img.onerror=()=>res({ratio:1,orient:"square"});
+      img.onerror=()=>res({
+        ratio:1,
+        orient:"square",
+        width:1,
+        height:1
+      });
       img.src=dataUrl;
     });
-    return{id:uid(),name:file.name,dataUrl,...meta};
+
+    return{
+      id:uid(),
+      name:file.name,
+      dataUrl,
+      ...meta
+    };
   }
 
   /* ===== Canvas Rendering ===== */
@@ -494,11 +695,22 @@ input[type="file"]{display:none;}
     el.style.maskMode="luminance";
   }
 
+  function applyBetterCrop(img, frame, photo){
+    const scaleFix = SCALE_FIX[frame.kind] || 1;
+    img.style.width = (100 * scaleFix) + "%";
+    img.style.height = (100 * scaleFix) + "%";
+    img.style.left = "50%";
+    img.style.top = "50%";
+    img.style.transform = "translate(-50%,-50%)";
+  }
+
   function renderCanvas(){
     const canvas=$("canvas");
     canvas.innerHTML="";
+
     frames.forEach(f=>{
-      const m=FRAME_META[f.kind],pct=gridToPercent(f);
+      const m=FRAME_META[f.kind];
+      const pct=gridToPercent(f);
 
       const el=document.createElement("div");
       el.className="frame"+(editMode?" editable":"");
@@ -519,7 +731,16 @@ input[type="file"]{display:none;}
       }
 
       const img=document.createElement("img");
-      img.src=getPhotoSrc(f);
+      const photo=getCurrentPhoto(f) || {
+        id:"placeholder",
+        name:"placeholder",
+        dataUrl:placeholderUrl,
+        ratio:1,
+        orient:"square"
+      };
+      img.src=photo.dataUrl;
+      applyBetterCrop(img, f, photo);
+
       pmask.appendChild(img);
       el.appendChild(pmask);
 
@@ -535,9 +756,11 @@ input[type="file"]{display:none;}
         attachDrag(el,f);
         attachResize(h,el,f);
       }
+
       canvas.appendChild(el);
     });
-    if(editMode)updateSelectionUI();
+
+    if(editMode) updateSelectionUI();
   }
 
   function fitCanvas(){
@@ -554,48 +777,70 @@ input[type="file"]{display:none;}
 
   /* ===== Drag & Resize ===== */
   function attachDrag(el,f){
+    if(el._dragBound) return;
+    el._dragBound = true;
+
     let on=false,sx=0,sy=0,ogx=0,ogy=0;
+
     el.addEventListener("pointerdown",e=>{
-      if(e.target.classList.contains("handle"))return;
+      if(!editMode) return;
+      if(e.target.classList.contains("handle")) return;
       e.stopPropagation();
       selectedId=f.id;
       updateSelectionUI();
+      renderPhotoSheet();
+
       on=true;
-      sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;
+      sx=e.clientX;
+      sy=e.clientY;
+      ogx=f.gx;
+      ogy=f.gy;
       el.setPointerCapture(e.pointerId);
     });
+
     el.addEventListener("pointermove",e=>{
-      if(!on)return;
+      if(!on) return;
       const r=$("canvas").getBoundingClientRect();
       f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;
       f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;
       el.style.left=(f.gx/GRID.W*100)+"%";
       el.style.top=(f.gy/GRID.H*100)+"%";
     });
+
     el.addEventListener("pointerup",()=>{on=false;});
     el.addEventListener("pointercancel",()=>{on=false;});
   }
 
   function attachResize(handle,el,f){
+    if(handle._resizeBound) return;
+    handle._resizeBound = true;
+
     let on=false,sx=0,sw=0;
+
     handle.addEventListener("pointerdown",e=>{
+      if(!editMode) return;
       e.stopPropagation();
       selectedId=f.id;
       updateSelectionUI();
+      renderPhotoSheet();
+
       on=true;
-      sx=e.clientX;sw=f.w;
+      sx=e.clientX;
+      sw=f.w;
       handle.setPointerCapture(e.pointerId);
     });
+
     handle.addEventListener("pointermove",e=>{
-      if(!on)return;
+      if(!on) return;
       const r=$("canvas").getBoundingClientRect();
       let nw=sw+(e.clientX-sx)/r.width*GRID.W;
-      if(nw<10)nw=10;
+      if(nw<10) nw=10;
       f.w=nw;
       const pct=gridToPercent(f);
       el.style.width=pct.width;
       el.style.height=pct.height;
     });
+
     handle.addEventListener("pointerup",()=>{on=false;});
     handle.addEventListener("pointercancel",()=>{on=false;});
   }
@@ -605,7 +850,7 @@ input[type="file"]{display:none;}
     currentLayout=layout;
     selectedId=null;
     const grid=LAYOUTS[layout]||LAYOUTS.story;
-    const pids=photos.filter(p=>p.name!=="placeholder").map(p=>p.id);
+
     frames=grid.map(g=>({
       id:uid(),
       kind:g[0],
@@ -613,13 +858,19 @@ input[type="file"]{display:none;}
       gy:g[2],
       w:g[3],
       bottomAlign:g[4],
-      photoIds:pids.length?[...pids]:[],
-      fixedPhotoId:null
+      photoIds:[],
+      fixedPhotoId:null,
+      currentPhotoId:null
     }));
+
+    autoAssignPhotos();
+
     document.querySelectorAll(".layoutCard").forEach(c=>{
       c.classList.toggle("active",c.dataset.layout===layout);
     });
+
     renderCanvas();
+    renderPhotoSheet();
   }
 
   /* ===== Sheets ===== */
@@ -638,55 +889,120 @@ input[type="file"]{display:none;}
 
   /* ===== Photo Sheet ===== */
   function renderPhotoSheet(){
-    const real=photos.filter(p=>p.name!=="placeholder");
+    const real=getRealPhotos();
     $("photoMeta").textContent=`写真 ${real.length} / ${MAX_PHOTOS}　残り ${MAX_PHOTOS-real.length} 枚`;
-    const grid=$("photoGrid"),empty=$("photoEmpty");
+
+    const grid=$("photoGrid");
+    const empty=$("photoEmpty");
+
     if(!real.length){
       grid.style.display="none";
       empty.style.display="block";
+      grid.innerHTML="";
       return;
     }
+
     grid.style.display="grid";
     empty.style.display="none";
     grid.innerHTML="";
-    real.forEach(p=>{
+
+    const selectedFrame = selectedId ? findFrame(selectedId) : null;
+
+    real.forEach(photo=>{
       const cell=document.createElement("div");
       cell.className="photoCell";
-      cell.innerHTML=`<img src="${p.dataUrl}"><button class="delBtn">✕</button>`;
-      cell.querySelector(".delBtn").onclick=e=>{
+
+      if(selectedFrame && selectedFrame.fixedPhotoId===photo.id){
+        cell.classList.add("fixed");
+      }
+
+      cell.innerHTML=`<img src="${photo.dataUrl}"><button class="delBtn">✕</button>`;
+
+      if(selectedFrame && selectedFrame.fixedPhotoId===photo.id){
+        const badge=document.createElement("div");
+        badge.className="fixedBadge";
+        badge.textContent="固定中";
+        cell.appendChild(badge);
+      }
+
+      cell.addEventListener("click",()=>{
+        if(!selectedFrame){
+          showToast("先にフレームを選択してください");
+          return;
+        }
+        selectedFrame.fixedPhotoId=photo.id;
+        selectedFrame.photoIds=[photo.id];
+        selectedFrame.currentPhotoId=photo.id;
+        renderCanvas();
+        renderPhotoSheet();
+        showToast("選択中フレームに固定しました");
+      });
+
+      cell.querySelector(".delBtn").addEventListener("click",e=>{
         e.stopPropagation();
-        photos=photos.filter(x=>x.id!==p.id);
-        frames.forEach(fr=>{
-          fr.photoIds=fr.photoIds.filter(x=>x!==p.id);
-          if(fr.fixedPhotoId===p.id)fr.fixedPhotoId=null;
+
+        photos=photos.filter(p=>p.id!==photo.id);
+
+        frames.forEach(frame=>{
+          frame.photoIds=(frame.photoIds||[]).filter(id=>id!==photo.id);
+          if(frame.fixedPhotoId===photo.id){
+            frame.fixedPhotoId=null;
+          }
+          if(frame.currentPhotoId===photo.id){
+            frame.currentPhotoId=null;
+          }
         });
+
+        autoAssignPhotos();
         renderPhotoSheet();
         renderCanvas();
         showToast("削除しました");
-      };
+      });
+
       grid.appendChild(cell);
     });
   }
 
   $("fileInput").onchange=async e=>{
     const files=[...(e.target.files||[])];
-    if(!files.length)return;
-    const remaining=MAX_PHOTOS-photos.filter(p=>p.name!=="placeholder").length;
+    if(!files.length) return;
+
+    const remaining=MAX_PHOTOS-getRealPhotos().length;
     if(remaining<=0){
       showToast("写真上限に達しています");
       return;
     }
+
     try{
       const arr=[];
-      for(const f of files.slice(0,remaining))arr.push(await readFile(f));
-      photos=[...arr,...photos.filter(p=>p.name!=="placeholder")];
-      frames.forEach(fr=>{fr.photoIds=photos.map(p=>p.id);});
+      for(const f of files.slice(0,remaining)){
+        arr.push(await readFile(f));
+      }
+
+      photos=[...getRealPhotos(), ...arr];
+
+      frames.forEach(frame=>{
+        if(!frame.fixedPhotoId){
+          frame.photoIds=[];
+          frame.currentPhotoId=null;
+        }else{
+          const fixed=findPhoto(frame.fixedPhotoId);
+          if(!fixed){
+            frame.fixedPhotoId=null;
+            frame.photoIds=[];
+            frame.currentPhotoId=null;
+          }
+        }
+      });
+
+      autoAssignPhotos();
       renderPhotoSheet();
       renderCanvas();
       showToast(arr.length+"枚追加しました");
     }catch{
       showToast("読み込み失敗");
     }
+
     e.target.value="";
   };
 
@@ -702,25 +1018,31 @@ input[type="file"]{display:none;}
   function setEditMode(on){
     editMode=on;
     $("editBar").classList.toggle("show",on);
-    selectedId=null;
+    if(!on) selectedId=null;
     renderCanvas();
+    renderPhotoSheet();
   }
 
   $("addFrameBtn").onclick=()=>{
     const kind=$("frameType").value;
     const w=[30,35,42][Math.floor(Math.random()*3)];
-    frames.push({
+    const frame={
       id:uid(),
       kind,
       gx:24+Math.random()*140,
       gy:15+Math.random()*90,
       w,
       bottomAlign:null,
-      photoIds:photos.map(p=>p.id),
-      fixedPhotoId:null
-    });
-    selectedId=frames[frames.length-1].id;
+      photoIds:[],
+      fixedPhotoId:null,
+      currentPhotoId:null
+    };
+
+    frames.push(frame);
+    autoAssignPhotos();
+    selectedId=frame.id;
     renderCanvas();
+    renderPhotoSheet();
     showToast("追加しました");
   };
 
@@ -732,10 +1054,23 @@ input[type="file"]{display:none;}
     frames=frames.filter(f=>f.id!==selectedId);
     selectedId=null;
     renderCanvas();
+    renderPhotoSheet();
     showToast("削除しました");
   };
 
   /* ===== Display Mode ===== */
+  function nextPhotoForFrame(frame){
+    const pool=getCompatiblePool(frame.kind);
+    if(pool.length<2) return null;
+
+    const current=getCurrentPhoto(frame);
+    if(!current) return pool[0];
+
+    const idx=pool.findIndex(p=>p.id===current.id);
+    if(idx===-1) return pool[0];
+    return pool[(idx+1)%pool.length];
+  }
+
   function enterDisplay(){
     displayMode=true;
     document.body.classList.add("displayMode");
@@ -756,28 +1091,21 @@ input[type="file"]{display:none;}
 
   function startCrossfade(){
     stopCrossfade();
-    const real=photos.filter(p=>p.name!=="placeholder");
-    if(real.length<2)return;
-    $("canvas").querySelectorAll(".frame").forEach(frameEl=>{
-      const pmask=frameEl.querySelector(".photoMask");
-      if(!pmask)return;
-      let lastIdx=0;
-      const cycle=()=>{
-        let nextIdx;
-        do{
-          nextIdx=Math.floor(Math.random()*real.length);
-        }while(nextIdx===lastIdx&&real.length>1);
-        lastIdx=nextIdx;
-        const newImg=document.createElement("img");
-        newImg.src=real[nextIdx].dataUrl;
-        newImg.style.cssText="opacity:0;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 1.2s ease;";
-        pmask.appendChild(newImg);
-        requestAnimationFrame(()=>{newImg.style.opacity="1";});
-        setTimeout(()=>{
-          while(pmask.children.length>2)pmask.removeChild(pmask.children[0]);
-        },1400);
-      };
-      displayTimers.push(setInterval(cycle,25000+Math.random()*10000));
+
+    if(getRealPhotos().length<2) return;
+
+    frames.forEach(frame=>{
+      if(frame.fixedPhotoId) return;
+
+      const timer=setInterval(()=>{
+        const next=nextPhotoForFrame(frame);
+        if(!next) return;
+        frame.currentPhotoId=next.id;
+        frame.photoIds=[next.id];
+        renderCanvas();
+      }, 25000 + Math.random()*10000);
+
+      displayTimers.push(timer);
     });
   }
 
@@ -787,18 +1115,31 @@ input[type="file"]{display:none;}
   }
 
   $("canvasArea").addEventListener("click",()=>{
-    if(displayMode)exitDisplay();
+    if(displayMode){
+      exitDisplay();
+      return;
+    }
+
+    if(editMode){
+      selectedId=null;
+      updateSelectionUI();
+      renderPhotoSheet();
+    }
   });
 
   /* ===== Navigation ===== */
   document.querySelectorAll(".navItem").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const action=btn.dataset.action;
+
       if(action==="display"){
         enterDisplay();
+        document.querySelectorAll(".navItem").forEach(n=>n.classList.remove("active"));
+        btn.classList.add("active");
         return;
       }
-      if(displayMode)exitDisplay();
+
+      if(displayMode) exitDisplay();
 
       if(action==="photo"){
         if(openSheet==="sheetPhoto"){
@@ -846,9 +1187,16 @@ input[type="file"]{display:none;}
 
   /* ===== Init ===== */
   await checkMasks();
-  console.log("Masks available:",masksAvailable);
   await hydrateAR();
-  photos=[{id:uid(),name:"placeholder",dataUrl:placeholderUrl,ratio:1,orient:"square"}];
+
+  photos=[{
+    id:uid(),
+    name:"placeholder",
+    dataUrl:placeholderUrl,
+    ratio:1,
+    orient:"square"
+  }];
+
   seedLayout(currentLayout);
   fitCanvas();
   window.addEventListener("resize",fitCanvas);
