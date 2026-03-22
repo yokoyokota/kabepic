@@ -359,7 +359,7 @@ input[type=“file”]{display:none;}
   /* ===== Hydrate AR from PNG ===== */
   async function hydrateAR(){
     await Promise.all(Object.values(FRAME_META).map(m=>new Promise(res=>{
-      const img=new Image();img.onload=()=>{m.ar=(img.naturalWidth||1)/(img.naturalHeight||1);res();};img.onerror=()=>res();img.src=m.src+"?t="+Date.now();
+      const img=new Image();img.onload=()=>{m.ar=(img.naturalWidth||1)/(img.naturalHeight||1);res();};img.onerror=()=>res();img.src=m.src;
     })));
   }
 
