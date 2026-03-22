@@ -148,12 +148,12 @@ input[type=“file”]{display:none;}
 <script>
 (async () => {
   const FRAME_META = {
-    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.6% 24.2% 15.8% 25.1%", ar:874/1044 },
-    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.6% 24.2% 15.8% 25.1%", ar:874/1044 },
-    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"20.1% 20.8% 20.7% 20.1%", ar:1033/1033 },
-    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"24.2% 15.8% 25.1% 16.6%", ar:1044/874 },
-    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"24.2% 15.8% 25.1% 16.6%", ar:1044/874 },
-    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"13.5% 24.8% 11.9% 26.9%", ar:675/963 }
+    portrait:        { src:"frame_vertical.png",         maskPng:"mask_vertical.png",   inset:"16.48% 24.17% 15.74% 25.09%", ar:874/1044 },
+    portrait_simple: { src:"frame_vertical_simple.png",  maskPng:"mask_vertical.png",   inset:"16.48% 24.17% 15.74% 25.09%", ar:874/1044 },
+    square:          { src:"frame_square.png",           maskPng:"mask_square.png",     inset:"19.63% 20.28% 20.28% 19.54%", ar:1033/1033 },
+    landscape:       { src:"frame_horizontal.png",       maskPng:"mask_horizontal.png", inset:"24.17% 15.74% 25.09% 16.48%", ar:1044/874 },
+    landscape_simple:{ src:"frame_horizontal_simple.png",maskPng:"mask_horizontal.png", inset:"24.17% 15.74% 25.09% 16.48%", ar:1044/874 },
+    oval:            { src:"frame_oval.png",             maskPng:"mask_oval.png",       inset:"12.69% 24.63% 11.11% 26.67%", ar:675/963 }
   };
 
   const LAYOUTS = {
@@ -261,7 +261,7 @@ input[type=“file”]{display:none;}
 
       const pmask=document.createElement("div");
       pmask.className="photoMask";
-      if(masksAvailable){pmask.style.inset="0";applyMaskImage(pmask,m.maskPng);}
+      if(f.kind==="oval"&&masksAvailable){pmask.style.inset="0";applyMaskImage(pmask,m.maskPng);}
       else{pmask.style.inset=m.inset;}
 
       const photo=getCurrentPhoto(f);
