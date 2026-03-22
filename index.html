@@ -190,8 +190,8 @@ input[type=“file”]{display:none;}
   /* ===== Canvas Rendering ===== */
   function applyMaskImage(el, maskPng){
     const url=`url("${maskPng}")`;
-    el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";
-    el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";
+    el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";el.style.webkitMaskMode="luminance";
+    el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";el.style.maskMode="luminance";
   }
 
   function renderCanvas(){
