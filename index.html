@@ -12,328 +12,122 @@
       --display-bg: #f7f7f7;
       --display-outside-bg: #d9d9d9;
       --stage-edit-fill: #f6f2e9;
+      --panel-bg: rgba(255,255,255,0.96);
+      --panel-line: rgba(0,0,0,0.08);
+      --text: #1d1d1d;
+      --muted: #6f685f;
+      --accent: #2f5bda;
+      --accent-strong: #2f6bff;
+      --accent-soft: rgba(47, 91, 218, 0.10);
+      --accent-ring: rgba(47, 107, 255, 0.28);
+      --danger: #c84a4a;
+      --shadow-lg: 0 18px 36px rgba(0,0,0,0.12);
+      --shadow-md: 0 10px 18px rgba(0,0,0,0.10);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --fade-ms: 1200ms;
+      --bottom-bar-h: 72px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif; background: var(--edit-bg); }
+    body.display-mode { background: var(--display-outside-bg); }
+    button, input { font: inherit; }
+    button { border: 0; background: none; color: inherit; cursor: pointer; }
+    img { display: block; max-width: 100%; -webkit-user-drag: none; user-select: none; }
+    .hidden { display: none !important; }
+    input[type="file"] { display: none; }
 
 ```
-  --panel-bg: rgba(255,255,255,0.96);
-  --panel-line: rgba(0,0,0,0.08);
-
-  --text: #1d1d1d;
-  --muted: #6f685f;
-  --accent: #2f5bda;
-  --accent-strong: #2f6bff;
-  --accent-soft: rgba(47, 91, 218, 0.10);
-  --accent-ring: rgba(47, 107, 255, 0.28);
-  --danger: #c84a4a;
-
-  --shadow-lg: 0 18px 36px rgba(0,0,0,0.12);
-  --shadow-md: 0 10px 18px rgba(0,0,0,0.10);
-
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-
-  --fade-ms: 1200ms;
-  --bottom-bar-h: 72px;
-}
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-html, body {
-  margin: 0; width: 100%; height: 100%; overflow: hidden;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
-  background: var(--edit-bg);
-}
-
-body.display-mode { background: var(--display-outside-bg); }
-button, input { font: inherit; }
-button { border: 0; background: none; color: inherit; cursor: pointer; }
-img { display: block; max-width: 100%; -webkit-user-drag: none; user-select: none; }
-.hidden { display: none !important; }
-input[type="file"] { display: none; }
-
-/* ===== App Container ===== */
 #app { position: fixed; inset: 0; overflow: hidden; background: var(--edit-bg); }
 body.display-mode #app { background: var(--display-outside-bg); }
 
-/* ===== Top Bar ===== */
-.topbar {
-  position: fixed;
-  top: calc(var(--safe-top) + 12px); left: 12px; right: 12px;
-  z-index: 3200;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  min-height: 56px; padding: 8px 12px;
-  border-radius: 20px;
-  background: var(--panel-bg); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-}
+.topbar { position: fixed; top: calc(var(--safe-top) + 12px); left: 12px; right: 12px; z-index: 3200; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 56px; padding: 8px 12px; border-radius: 20px; background: var(--panel-bg); border: 1px solid var(--panel-line); box-shadow: var(--shadow-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .brand { font-weight: 900; letter-spacing: 0.04em; }
 .topbar-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .status-mini { color: var(--muted); font-weight: 800; font-size: 0.86rem; white-space: nowrap; }
 
-/* ===== Chip Buttons ===== */
-.chip-btn {
-  min-height: 38px; padding: 0 12px; border-radius: 999px;
-  background: rgba(255,255,255,0.96); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-md); font-weight: 900; white-space: nowrap;
-  transition: transform 120ms ease, background 120ms ease, color 120ms ease;
-}
+.chip-btn { min-height: 38px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.96); border: 1px solid var(--panel-line); box-shadow: var(--shadow-md); font-weight: 900; white-space: nowrap; transition: transform 120ms ease, background 120ms ease, color 120ms ease; }
 .chip-btn:active { transform: scale(0.98); }
 .chip-btn.primary { background: var(--accent); color: #fff; border-color: transparent; box-shadow: none; }
 .chip-btn.soft { background: var(--accent-soft); color: var(--accent); border-color: rgba(47,91,218,0.12); box-shadow: none; }
 
-/* ===== Canvas Area (viewport) ===== */
-#canvasArea {
-  position: absolute; inset: 0;
-  padding-top: calc(var(--safe-top) + 80px);
-  padding-bottom: calc(var(--bottom-bar-h) + var(--safe-bottom) + 18px);
-  overflow: hidden;
-}
+#canvasArea { position: absolute; inset: 0; padding-top: calc(var(--safe-top) + 80px); padding-bottom: calc(var(--bottom-bar-h) + var(--safe-bottom) + 18px); overflow: hidden; }
 body.display-mode #canvasArea { padding-top: 0; padding-bottom: 0; }
+#canvasScaler { position: absolute; top: 0; left: 0; width: 2400px; height: 1500px; transform-origin: top left; }
+#canvas { position: relative; width: 2400px; height: 1500px; background: var(--stage-edit-fill); overflow: hidden; touch-action: none; border: 2px solid rgba(0,0,0,0.06); box-shadow: 0 0 0 1px rgba(0,0,0,0.02); }
+body.display-mode #canvas { background: var(--display-bg); border: 2px solid rgba(0,0,0,0.12); box-shadow: 0 0 0 9999px var(--display-outside-bg); }
+#canvas::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 14% 10%, rgba(255,255,255,0.14), transparent 26%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.015)); }
 
-#canvasScaler {
-  position: absolute; top: 0; left: 0;
-  width: 2400px; height: 1500px;
-  transform-origin: top left;
-}
-
-#canvas {
-  position: relative; width: 2400px; height: 1500px;
-  background: var(--stage-edit-fill);
-  overflow: hidden; touch-action: none;
-  border: 2px solid rgba(0,0,0,0.06);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
-}
-body.display-mode #canvas {
-  background: var(--display-bg);
-  border: 2px solid rgba(0,0,0,0.12);
-  box-shadow: 0 0 0 9999px var(--display-outside-bg);
-}
-#canvas::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(circle at 14% 10%, rgba(255,255,255,0.14), transparent 26%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.015));
-}
-
-/* ===== Frame (from code 2 layout + code 1 selection) ===== */
-.frame {
-  position: absolute; overflow: visible; touch-action: none; pointer-events: none;
-  z-index: 1; user-select: none;
-  transition: left 140ms ease, top 140ms ease, width 140ms ease, height 140ms ease, filter 140ms ease;
-}
+.frame { position: absolute; overflow: visible; touch-action: none; pointer-events: none; z-index: 1; user-select: none; transition: left 140ms ease, top 140ms ease, width 140ms ease, height 140ms ease, filter 140ms ease; }
 .frame.editable { pointer-events: auto; cursor: grab; }
 .frame.editable:active { cursor: grabbing; }
 .frame.dragging, .frame.resizing { transition: none; z-index: 80 !important; }
-
-/* Selection outline (code 1 style) */
-.frame-outline {
-  position: absolute; inset: -10px; border-radius: 22px;
-  border: 6px solid transparent; opacity: 0; pointer-events: none; z-index: 1;
-  transition: opacity 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
-}
-.frame.selected .frame-outline {
-  opacity: 1; border-color: var(--accent-strong);
-  box-shadow: 0 0 0 4px var(--accent-ring);
-}
-.frame.dragging .frame-outline, .frame.resizing .frame-outline {
-  opacity: 1; border-color: var(--accent-strong);
-  box-shadow: 0 0 0 7px rgba(47, 107, 255, 0.38);
-}
+.frame-outline { position: absolute; inset: -10px; border-radius: 22px; border: 6px solid transparent; opacity: 0; pointer-events: none; z-index: 1; transition: opacity 120ms ease, border-color 120ms ease, box-shadow 120ms ease; }
+.frame.selected .frame-outline { opacity: 1; border-color: var(--accent-strong); box-shadow: 0 0 0 4px var(--accent-ring); }
+.frame.dragging .frame-outline, .frame.resizing .frame-outline { opacity: 1; border-color: var(--accent-strong); box-shadow: 0 0 0 7px rgba(47, 107, 255, 0.38); }
 .frame.selected { z-index: 50 !important; filter: drop-shadow(0 16px 26px rgba(0,0,0,0.18)); }
 
-/* Photo rendering (code 2 mask approach) */
 .photoWrap { position: absolute; inset: 0; overflow: hidden; }
 .photoMask { position: absolute; overflow: visible; background: transparent; }
-.photoMask img {
-  width: 100%; height: 100%; object-fit: cover; object-position: center;
-  display: block; pointer-events: none; user-select: none; -webkit-user-drag: none;
-}
-.overlay {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  pointer-events: none; user-select: none; -webkit-user-drag: none; z-index: 3;
-}
+.photoMask img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none; z-index: 3; }
 
-/* Resize handle (code 1 style) */
-.resize-handle {
-  position: absolute; right: -16px; bottom: -16px;
-  width: 34px; height: 34px; border-radius: 999px;
-  background: rgba(255,255,255,0.99); border: 5px solid rgba(47,91,218,0.98);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.14);
-  z-index: 9; touch-action: none; display: none; pointer-events: auto;
-}
+.resize-handle { position: absolute; right: -16px; bottom: -16px; width: 34px; height: 34px; border-radius: 999px; background: rgba(255,255,255,0.99); border: 5px solid rgba(47,91,218,0.98); box-shadow: 0 8px 16px rgba(0,0,0,0.14); z-index: 9; touch-action: none; display: none; pointer-events: auto; }
 .frame.selected .resize-handle { display: block; }
 body:not(.edit-enabled) .frame.selected .resize-handle { display: none; }
 body.edit-enabled .frame.selected .resize-handle { display: block; }
 
-/* Frame badge */
-.frame-badge {
-  position: absolute; top: -16px; left: -16px;
-  width: 44px; height: 44px; border-radius: 999px;
-  display: none; align-items: center; justify-content: center;
-  background: rgba(16,24,44,0.96); color: #fff;
-  border: 2px solid rgba(255,255,255,0.16);
-  font-size: 0.94rem; font-weight: 900;
-  box-shadow: 0 10px 18px rgba(0,0,0,0.20);
-  z-index: 7; pointer-events: none;
-  transition: background 120ms ease, box-shadow 120ms ease;
-}
+.frame-badge { position: absolute; top: -16px; left: -16px; width: 44px; height: 44px; border-radius: 999px; display: none; align-items: center; justify-content: center; background: rgba(16,24,44,0.96); color: #fff; border: 2px solid rgba(255,255,255,0.16); font-size: 0.94rem; font-weight: 900; box-shadow: 0 10px 18px rgba(0,0,0,0.20); z-index: 7; pointer-events: none; transition: background 120ms ease, box-shadow 120ms ease; }
 .frame.selected .frame-badge { background: var(--accent-strong); box-shadow: 0 0 0 4px var(--accent-ring), 0 10px 18px rgba(0,0,0,0.20); }
 body.edit-enabled .frame.selected .frame-badge { display: flex; }
 
-/* Pin badge */
-.frame-pin {
-  position: absolute; top: -10px; right: -10px;
-  min-width: 40px; height: 24px; padding: 0 10px; border-radius: 999px;
-  background: rgba(255,255,255,0.96); border: 1px solid var(--panel-line);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-  color: var(--muted); font-size: 0.72rem; font-weight: 900;
-  display: none; align-items: center; justify-content: center; z-index: 7;
-}
+.frame-pin { position: absolute; top: -10px; right: -10px; min-width: 40px; height: 24px; padding: 0 10px; border-radius: 999px; background: rgba(255,255,255,0.96); border: 1px solid var(--panel-line); box-shadow: 0 6px 12px rgba(0,0,0,0.12); color: var(--muted); font-size: 0.72rem; font-weight: 900; display: none; align-items: center; justify-content: center; z-index: 7; }
 .frame.locked .frame-pin { display: inline-flex; }
 
-/* ===== Bottom Nav ===== */
-.bottom-nav {
-  position: fixed; left: 12px; right: 12px;
-  bottom: calc(var(--safe-bottom) + 12px);
-  z-index: 3300;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px;
-  border-radius: 22px;
-  background: var(--panel-bg); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-}
-.nav-btn {
-  min-height: 52px; border-radius: 16px; font-weight: 900;
-  background: transparent; border: 1px solid transparent;
-  transition: transform 120ms ease, background 120ms ease, color 120ms ease;
-}
+.bottom-nav { position: fixed; left: 12px; right: 12px; bottom: calc(var(--safe-bottom) + 12px); z-index: 3300; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; border-radius: 22px; background: var(--panel-bg); border: 1px solid var(--panel-line); box-shadow: var(--shadow-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.nav-btn { min-height: 52px; border-radius: 16px; font-weight: 900; background: transparent; border: 1px solid transparent; transition: transform 120ms ease, background 120ms ease, color 120ms ease; }
 .nav-btn:active { transform: scale(0.98); }
 .nav-btn.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(47,91,218,0.12); }
+body.display-mode .topbar, body.display-mode .bottom-nav, body.display-mode .sheet, body.display-mode .panel { opacity: 0; visibility: hidden; pointer-events: none; }
 
-body.display-mode .topbar,
-body.display-mode .bottom-nav,
-body.display-mode .sheet,
-body.display-mode .panel { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* ===== Sheets & Panels ===== */
-.sheet, .panel {
-  position: fixed; left: 12px; right: 12px;
-  z-index: 3250;
-  background: rgba(255,255,255,0.98); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-lg); border-radius: 24px;
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  overflow: hidden;
-  transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none;
-  transition: transform 220ms ease, opacity 220ms ease;
-  bottom: calc(var(--safe-bottom) + 90px);
-  max-height: 74vh;
-}
+.sheet, .panel { position: fixed; left: 12px; right: 12px; z-index: 3250; background: rgba(255,255,255,0.98); border: 1px solid var(--panel-line); box-shadow: var(--shadow-lg); border-radius: 24px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); overflow: hidden; transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none; transition: transform 220ms ease, opacity 220ms ease; bottom: calc(var(--safe-bottom) + 90px); max-height: 74vh; }
 .sheet.open, .panel.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
-
-.sheet-head, .panel-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 14px 16px; border-bottom: 1px solid var(--panel-line);
-}
+.sheet-head, .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--panel-line); }
 .sheet-title, .panel-title { font-size: 1.08rem; font-weight: 900; }
 .sheet-meta { color: var(--muted); font-weight: 800; margin-top: 3px; font-size: 0.92rem; line-height: 1.5; }
 .sheet-body, .panel-body { padding: 14px; }
 .sheet-actions { display: flex; align-items: center; gap: 8px; }
 
-/* ===== Photo Grid (code 2 style: 3 columns) ===== */
-.photo-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-  max-height: min(54vh, 520px); overflow: auto; -webkit-overflow-scrolling: touch;
-}
-.photo-cell {
-  position: relative; aspect-ratio: 1; overflow: hidden;
-  border-radius: 8px; cursor: pointer; background: #f7f4ee;
-}
+.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-height: min(54vh, 520px); overflow: auto; -webkit-overflow-scrolling: touch; }
+.photo-cell { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px; cursor: pointer; background: #f7f4ee; }
 .photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.photo-cell .del-btn {
-  position: absolute; top: 4px; right: 4px;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: rgba(255,255,255,0.9); border: none;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: #e33;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-}
+.photo-cell .del-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #e33; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
 .photo-cell.fixed { outline: 2px solid var(--accent); outline-offset: -2px; }
-.photo-cell .fixed-badge {
-  position: absolute; left: 4px; bottom: 4px;
-  background: rgba(34,34,34,0.82); color: #fff;
-  font-size: 11px; border-radius: 999px; padding: 4px 8px;
-}
+.photo-cell .fixed-badge { position: absolute; left: 4px; bottom: 4px; background: rgba(34,34,34,0.82); color: #fff; font-size: 11px; border-radius: 999px; padding: 4px 8px; }
 .photo-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 30px 0; }
 
-/* ===== Frames Panel ===== */
 .menu-list { display: grid; gap: 8px; }
-.menu-item {
-  min-height: 50px; padding: 0 14px; border-radius: 16px;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  font-weight: 900; border: 1px solid var(--panel-line); background: rgba(255,255,255,0.9);
-  transition: transform 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
-}
+.menu-item { min-height: 50px; padding: 0 14px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 900; border: 1px solid var(--panel-line); background: rgba(255,255,255,0.9); transition: transform 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease; }
 .menu-item:active { transform: scale(0.99); }
 .menu-item.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(47,91,218,0.18); }
 .menu-item.disabled { opacity: 0.5; pointer-events: none; }
-
 .section-label { font-size: 0.84rem; font-weight: 900; color: var(--muted); margin: 8px 0 10px; letter-spacing: 0.02em; }
 .subgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 
-/* ===== Viewer ===== */
-.viewer {
-  position: fixed; inset: 0; z-index: 4000;
-  background: rgba(0,0,0,0.82);
-  display: none; align-items: center; justify-content: center; padding: 20px;
-}
+.viewer { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.82); display: none; align-items: center; justify-content: center; padding: 20px; }
 .viewer.open { display: flex; }
 .viewer img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 16px; box-shadow: 0 18px 30px rgba(0,0,0,0.28); }
-.viewer-close {
-  position: absolute; top: calc(var(--safe-top) + 14px); right: 14px;
-  width: 46px; height: 46px; border-radius: 999px;
-  background: rgba(255,255,255,0.14); color: #fff;
-  border: 1px solid rgba(255,255,255,0.16);
-  font-size: 1.2rem; font-weight: 900;
-}
+.viewer-close { position: absolute; top: calc(var(--safe-top) + 14px); right: 14px; width: 46px; height: 46px; border-radius: 999px; background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.16); font-size: 1.2rem; font-weight: 900; }
 
-/* ===== Display Hint ===== */
-#displayHint {
-  position: fixed;
-  top: calc(var(--safe-top) + 14px); left: 50%; transform: translateX(-50%);
-  z-index: 4200; padding: 10px 14px; border-radius: 999px;
-  background: rgba(20, 28, 48, 0.80); color: #fff;
-  font-weight: 900; font-size: 0.88rem;
-  opacity: 0; transition: opacity 220ms ease; pointer-events: none;
-}
+#displayHint { position: fixed; top: calc(var(--safe-top) + 14px); left: 50%; transform: translateX(-50%); z-index: 4200; padding: 10px 14px; border-radius: 999px; background: rgba(20, 28, 48, 0.80); color: #fff; font-weight: 900; font-size: 0.88rem; opacity: 0; transition: opacity 220ms ease; pointer-events: none; }
 body.display-mode #displayHint.show { opacity: 1; }
 
-/* ===== Toast ===== */
-#toast {
-  position: fixed;
-  top: calc(var(--safe-top) + 82px); left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  z-index: 5000; max-width: min(92vw, 560px);
-  padding: 10px 14px; border-radius: 16px;
-  background: rgba(255,255,255,0.97); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-lg); text-align: center; font-weight: 900;
-  opacity: 0; pointer-events: none;
-  transition: opacity 140ms ease, transform 140ms ease;
-}
+#toast { position: fixed; top: calc(var(--safe-top) + 82px); left: 50%; transform: translateX(-50%) translateY(-8px); z-index: 5000; max-width: min(92vw, 560px); padding: 10px 14px; border-radius: 16px; background: rgba(255,255,255,0.97); border: 1px solid var(--panel-line); box-shadow: var(--shadow-lg); text-align: center; font-weight: 900; opacity: 0; pointer-events: none; transition: opacity 140ms ease, transform 140ms ease; }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ===== Progress ===== */
-#progressOverlay {
-  position: fixed; inset: 0; z-index: 5500;
-  background: rgba(0,0,0,0.28);
-  display: none; align-items: center; justify-content: center; padding: 20px;
-}
+#progressOverlay { position: fixed; inset: 0; z-index: 5500; background: rgba(0,0,0,0.28); display: none; align-items: center; justify-content: center; padding: 20px; }
 #progressOverlay.open { display: flex; }
-.progress-card {
-  width: min(92vw, 360px); padding: 18px 18px 16px; border-radius: 22px;
-  background: rgba(255,255,255,0.98); border: 1px solid var(--panel-line);
-  box-shadow: var(--shadow-lg);
-}
+.progress-card { width: min(92vw, 360px); padding: 18px 18px 16px; border-radius: 22px; background: rgba(255,255,255,0.98); border: 1px solid var(--panel-line); box-shadow: var(--shadow-lg); }
 .progress-title { font-size: 1.04rem; font-weight: 900; margin-bottom: 10px; }
 .progress-meta { color: var(--muted); font-weight: 800; margin-bottom: 10px; }
 .progress-bar { height: 10px; border-radius: 999px; background: rgba(0,0,0,0.08); overflow: hidden; }
@@ -347,855 +141,357 @@ body.display-mode #displayHint.show { opacity: 1; }
 <body>
   <div id="app">
     <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
-
-```
-<!-- Top Bar -->
-<div id="topbar" class="topbar">
-  <div class="brand">KABEPIC</div>
-  <div class="topbar-right">
-    <div id="modeText" class="status-mini">配置編集OFF</div>
-    <button id="fitBtn" class="chip-btn soft">全体</button>
-  </div>
-</div>
-
-<!-- Canvas Area -->
-<div id="canvasArea">
-  <div id="canvasScaler">
-    <div id="canvas"></div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<div id="bottomNav" class="bottom-nav">
-  <button id="navPhoto" class="nav-btn active">Photo</button>
-  <button id="navFrames" class="nav-btn">Frames</button>
-  <button id="navEdit" class="nav-btn">Edit</button>
-  <button id="navDisplay" class="nav-btn">Display</button>
-</div>
-
-<!-- Photo Sheet -->
-<div id="photoSheet" class="sheet">
-  <div class="sheet-head">
-    <div>
-      <div class="sheet-title">写真一覧</div>
-      <div id="sheetMeta" class="sheet-meta">写真 0 / 100<br>残り 100 枚</div>
+    <div id="topbar" class="topbar">
+      <div class="brand">KABEPIC</div>
+      <div class="topbar-right">
+        <div id="modeText" class="status-mini">配置編集OFF</div>
+        <button id="fitBtn" class="chip-btn soft">全体</button>
+      </div>
     </div>
-    <div class="sheet-actions">
-      <button id="addInSheetBtn" class="chip-btn primary">追加</button>
-      <button id="closePhotoSheetBtn" class="chip-btn">閉じる</button>
+    <div id="canvasArea"><div id="canvasScaler"><div id="canvas"></div></div></div>
+    <div id="bottomNav" class="bottom-nav">
+      <button id="navPhoto" class="nav-btn active">Photo</button>
+      <button id="navFrames" class="nav-btn">Frames</button>
+      <button id="navEdit" class="nav-btn">Edit</button>
+      <button id="navDisplay" class="nav-btn">Display</button>
     </div>
-  </div>
-  <div class="sheet-body">
-    <div id="photoGrid" class="photo-grid"></div>
-    <div id="photoEmpty" class="photo-empty">写真を追加して壁に飾りましょう</div>
-  </div>
-</div>
-
-<!-- Frames Panel -->
-<div id="framesPanel" class="panel">
-  <div class="panel-head">
-    <div class="panel-title">Frames</div>
-    <button id="closeFramesPanelBtn" class="chip-btn">閉じる</button>
-  </div>
-  <div class="panel-body">
-    <div id="framesList" class="menu-list"></div>
-  </div>
-</div>
-
-<!-- Edit Panel -->
-<div id="editPanel" class="panel">
-  <div class="panel-head">
-    <div class="panel-title">Edit</div>
-    <button id="closeEditPanelBtn" class="chip-btn">閉じる</button>
-  </div>
-  <div class="panel-body">
-    <div class="menu-list">
-      <button id="toggleEditBtn" class="menu-item">
-        <span>配置編集</span>
-        <span id="toggleEditLabel">OFF</span>
-      </button>
+    <div id="photoSheet" class="sheet">
+      <div class="sheet-head">
+        <div><div class="sheet-title">写真一覧</div><div id="sheetMeta" class="sheet-meta">写真 0 / 100<br>残り 100 枚</div></div>
+        <div class="sheet-actions"><button id="addInSheetBtn" class="chip-btn primary">追加</button><button id="closePhotoSheetBtn" class="chip-btn">閉じる</button></div>
+      </div>
+      <div class="sheet-body"><div id="photoGrid" class="photo-grid"></div><div id="photoEmpty" class="photo-empty">写真を追加して壁に飾りましょう</div></div>
     </div>
-
-    <div class="section-label">フレーム追加</div>
-    <div class="subgrid">
-      <button class="menu-item" data-add-kind="square"><span>正方形を追加</span></button>
-      <button class="menu-item" data-add-kind="landscape"><span>横長を追加</span></button>
-      <button class="menu-item" data-add-kind="portrait"><span>縦長を追加</span></button>
-      <button class="menu-item" data-add-kind="oval"><span>楕円を追加</span></button>
+    <div id="framesPanel" class="panel">
+      <div class="panel-head"><div class="panel-title">Frames</div><button id="closeFramesPanelBtn" class="chip-btn">閉じる</button></div>
+      <div class="panel-body"><div id="framesList" class="menu-list"></div></div>
     </div>
-
-    <div class="section-label">選択中フレーム</div>
-    <div class="menu-list">
-      <button id="pinPhotoBtn" class="menu-item disabled">
-        <span id="pinPhotoText">写真固定</span>
-        <span id="pinPhotoState">未選択</span>
-      </button>
-      <button id="deleteFrameBtn" class="menu-item disabled">
-        <span style="color:var(--danger);">フレーム削除</span>
-        <span>選択中</span>
-      </button>
+    <div id="editPanel" class="panel">
+      <div class="panel-head"><div class="panel-title">Edit</div><button id="closeEditPanelBtn" class="chip-btn">閉じる</button></div>
+      <div class="panel-body">
+        <div class="menu-list"><button id="toggleEditBtn" class="menu-item"><span>配置編集</span><span id="toggleEditLabel">OFF</span></button></div>
+        <div class="section-label">フレーム追加</div>
+        <div class="subgrid">
+          <button class="menu-item" data-add-kind="square"><span>正方形を追加</span></button>
+          <button class="menu-item" data-add-kind="landscape"><span>横長を追加</span></button>
+          <button class="menu-item" data-add-kind="portrait"><span>縦長を追加</span></button>
+          <button class="menu-item" data-add-kind="oval"><span>楕円を追加</span></button>
+        </div>
+        <div class="section-label">選択中フレーム</div>
+        <div class="menu-list">
+          <button id="pinPhotoBtn" class="menu-item disabled"><span id="pinPhotoText">写真固定</span><span id="pinPhotoState">未選択</span></button>
+          <button id="deleteFrameBtn" class="menu-item disabled"><span style="color:var(--danger);">フレーム削除</span><span>選択中</span></button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- Viewer -->
-<div id="viewer" class="viewer">
-  <button id="viewerClose" class="viewer-close">×</button>
-  <img id="viewerImage" alt="" />
-</div>
-
-<div id="displayHint">タップで編集に戻る</div>
-<div id="toast"></div>
-
-<div id="progressOverlay">
-  <div class="progress-card">
-    <div class="progress-title">写真を追加中</div>
-    <div id="progressMeta" class="progress-meta">0 / 0</div>
-    <div class="progress-bar">
-      <div id="progressFill" class="progress-fill"></div>
-    </div>
-  </div>
-</div>
-```
-
+    <div id="viewer" class="viewer"><button id="viewerClose" class="viewer-close">×</button><img id="viewerImage" alt="" /></div>
+    <div id="displayHint">タップで編集に戻る</div>
+    <div id="toast"></div>
+    <div id="progressOverlay"><div class="progress-card"><div class="progress-title">写真を追加中</div><div id="progressMeta" class="progress-meta">0 / 0</div><div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div></div></div>
   </div>
 
 <script>
 (() => {
   "use strict";
 
-  /* ===== Constants ===== */
   const GRID = { W: 240, H: 150 };
   const MAX_PHOTOS = 100;
   const SWITCH_MIN_MS = 25000;
   const SWITCH_MAX_MS = 35000;
-  const FADE_MS = 1200;
   const JPEG_QUALITY = 0.84;
   const MAX_LONG_EDGE = 1600;
-
   const $ = (id) => document.getElementById(id);
 
-  /* ===== Frame Meta (from code 2) ===== */
+  /* ===== FRAME_META [FIXED] ===== */
   const FRAME_META = {
-    portrait:         { src: "frame_vertical.png",          maskPng: null, inset: "16.0% 23.4% 15.3% 24.4%", ar: 874 / 1044 },
-    portrait_simple:  { src: "frame_vertical.png",          maskPng: null, inset: "16.0% 23.4% 15.3% 24.4%", ar: 874 / 1044 },
-    square:           { src: "frame_square.png",            maskPng: null, inset: "19.2% 19.5% 19.8% 18.9%", ar: 1033 / 1033 },
-    landscape:        { src: "frame_horizontal.png",        maskPng: null, inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
-    landscape_simple: { src: "frame_horizontal.png",        maskPng: null, inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
-    oval:             { src: "frame_oval.png",              maskPng: "mask_oval.png", inset: "12.0% 24.0% 10.5% 26.0%", ar: 675 / 963 }
+    portrait:         { src: "frame_vertical.png",          maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
+    portrait_simple:  { src: "frame_vertical_simple.png",   maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
+    square:           { src: "frame_square.png",            maskPng: "mask_square.png",     inset: "19.5% 19.8% 19.8% 18.9%", ar: 1033 / 1033 },
+    landscape:        { src: "frame_horizontal.png",        maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
+    landscape_simple: { src: "frame_horizontal_simple.png", maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
+    oval:             { src: "frame_oval.png",              maskPng: "mask_oval.png",       inset: "12.0% 24.0% 10.5% 26.0%", ar: 675 / 963 }
   };
 
-  /* ===== Layouts (from code 2 grid coordinates) ===== */
   const LAYOUTS = {
-    calm: [
-      ["portrait",  43.9,  0,     84.5],
-      ["square",    126,   27.6,  56.8],
-      ["landscape", 88,    82.6,  71]
-    ],
-    flow: [
-      ["portrait",        -0.6, 53.8, 59.5],
-      ["portrait",        52.7,  8.7, 72.0],
-      ["square",          123.3, 30.7, 49.9],
-      ["landscape_simple",177.2, 53.3, 60.8],
-      ["landscape",       79.2,  79.3, 68.6]
-    ],
-    story: [
-      ["portrait",        -0.2, 57.8, 38],
-      ["square",          42.9, 32.2, 41],
-      ["portrait",        87.4, 16.5, 56.25],
-      ["landscape_simple",144.7, 38.1, 38],
-      ["landscape",       187.5, 48.4, 51],
-      ["landscape",       39.5,  73.1, 47],
-      ["square",          91.7,  76.4, 47],
-      ["portrait",        142.7, 77.0, 41.5]
-    ],
-    scene: [
-      ["landscape_simple",1.5,   42.3, 39],
-      ["square",          42.75, 33.5, 45],
-      ["portrait_simple", 96.15,  3,   39],
-      ["portrait",        141,   38.7, 39],
-      ["landscape",       180,   47.4, 33],
-      ["square",          21.3,  81.5, 31.5],
-      ["portrait",        54.6,  81.5, 36.6],
-      ["portrait",        85.5,  43.55,60],
-      ["landscape",       142.5, 77.0, 53.4],
-      ["landscape_simple",198.75,78.5, 39],
-      ["square",          94.8,  106.2,42]
-    ]
+    calm: [["portrait",43.9,0,84.5],["square",126,27.6,56.8],["landscape",88,82.6,71]],
+    flow: [["portrait",-0.6,53.8,59.5],["portrait",52.7,8.7,72.0],["square",123.3,30.7,49.9],["landscape_simple",177.2,53.3,60.8],["landscape",79.2,79.3,68.6]],
+    story: [["portrait",-0.2,57.8,38],["square",42.9,32.2,41],["portrait",87.4,16.5,56.25],["landscape_simple",144.7,38.1,38],["landscape",187.5,48.4,51],["landscape",39.5,73.1,47],["square",91.7,76.4,47],["portrait",142.7,77.0,41.5]],
+    scene: [["landscape_simple",1.5,42.3,39],["square",42.75,33.5,45],["portrait_simple",96.15,3,39],["portrait",141,38.7,39],["landscape",180,47.4,33],["square",21.3,81.5,31.5],["portrait",54.6,81.5,36.6],["portrait",85.5,43.55,60],["landscape",142.5,77.0,53.4],["landscape_simple",198.75,78.5,39],["square",94.8,106.2,42]]
   };
 
-  /* ===== State ===== */
-  const state = {
-    mode: "edit",         // "edit" | "display"
-    activeTab: "photo",   // "photo" | "frames" | "edit" | null
-    layoutKey: "story",
-    editEnabled: false,
-    photos: [],
-    frames: [],
-    selectedFrameId: null,
-    displayTimers: [],
-    toastTimer: null,
-    isUploading: false,
-    masksAvailable: false
-  };
+  const state = { mode:"edit", activeTab:"photo", layoutKey:"story", editEnabled:false, photos:[], frames:[], selectedFrameId:null, displayTimers:[], toastTimer:null, isUploading:false, masksAvailable:false };
 
-  /* ===== Utilities ===== */
-  function uid() { return Math.random().toString(36).slice(2, 10) + "_" + Date.now().toString(36); }
-  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  function uid(){return Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36);}
+  function showToast(msg,ms=1400){clearTimeout(state.toastTimer);$("toast").textContent=msg;$("toast").classList.add("show");state.toastTimer=setTimeout(()=>$("toast").classList.remove("show"),ms);}
+  function setProgress(open,current=0,total=0){$("progressOverlay").classList.toggle("open",open);$("progressMeta").textContent=open?`${current} / ${total}`:"0 / 0";$("progressFill").style.width=open&&total?`${Math.round((current/total)*100)}%`:"0%";}
 
-  function showToast(msg, ms = 1400) {
-    clearTimeout(state.toastTimer);
-    $("toast").textContent = msg;
-    $("toast").classList.add("show");
-    state.toastTimer = setTimeout(() => $("toast").classList.remove("show"), ms);
-  }
+  function makePlaceholder(){const c=document.createElement("canvas");c.width=800;c.height=800;const g=c.getContext("2d");g.fillStyle="#f1efe8";g.fillRect(0,0,800,800);g.strokeStyle="rgba(0,0,0,0.08)";g.lineWidth=4;g.strokeRect(40,40,720,720);g.fillStyle="rgba(0,0,0,0.18)";g.textAlign="center";g.font="48px sans-serif";g.fillText("KABEPIC",400,380);g.font="22px sans-serif";g.fillText("placeholder",400,425);return c.toDataURL("image/png");}
+  const placeholderUrl=makePlaceholder();
 
-  function setProgress(open, current = 0, total = 0) {
-    $("progressOverlay").classList.toggle("open", open);
-    $("progressMeta").textContent = open ? `${current} / ${total}` : "0 / 0";
-    $("progressFill").style.width = open && total ? `${Math.round((current / total) * 100)}%` : "0%";
-  }
+  function findPhoto(id){return state.photos.find(p=>p.id===id)||null;}
+  function findFrame(id){return state.frames.find(f=>f.id===id)||null;}
+  function getSelectedFrame(){return state.frames.find(f=>f.id===state.selectedFrameId)||null;}
+  function detectOrient(r){return r>1.05?"landscape":r<0.95?"portrait":"square";}
+  function getRealPhotos(){return state.photos.filter(p=>p.name!=="placeholder");}
+  function getFrameBucket(kind){if(kind==="square")return"square";if(kind==="oval"||kind.includes("portrait"))return"portrait";if(kind.includes("landscape"))return"landscape";return"square";}
 
-  function makePlaceholder() {
-    const c = document.createElement("canvas"); c.width = 800; c.height = 800;
-    const g = c.getContext("2d");
-    g.fillStyle = "#f1efe8"; g.fillRect(0, 0, 800, 800);
-    g.strokeStyle = "rgba(0,0,0,0.08)"; g.lineWidth = 4; g.strokeRect(40, 40, 720, 720);
-    g.fillStyle = "rgba(0,0,0,0.18)"; g.textAlign = "center";
-    g.font = "48px sans-serif"; g.fillText("KABEPIC", 400, 380);
-    g.font = "22px sans-serif"; g.fillText("placeholder", 400, 425);
-    return c.toDataURL("image/png");
-  }
-  const placeholderUrl = makePlaceholder();
-
-  /* ===== Photo Helpers ===== */
-  function findPhoto(id) { return state.photos.find(p => p.id === id) || null; }
-  function findFrame(id) { return state.frames.find(f => f.id === id) || null; }
-  function getSelectedFrame() { return state.frames.find(f => f.id === state.selectedFrameId) || null; }
-  function detectOrient(r) { return r > 1.05 ? "landscape" : r < 0.95 ? "portrait" : "square"; }
-  function getRealPhotos() { return state.photos.filter(p => p.name !== "placeholder"); }
-
-  function getFrameBucket(kind) {
-    if (kind === "square") return "square";
-    if (kind === "oval" || kind.includes("portrait")) return "portrait";
-    if (kind.includes("landscape")) return "landscape";
-    return "square";
-  }
-
-  function getCompatiblePool(kind) {
-    const real = getRealPhotos();
-    const bucket = getFrameBucket(kind);
-    const portrait = real.filter(p => p.orient === "portrait");
-    const landscape = real.filter(p => p.orient === "landscape");
-    const square = real.filter(p => p.orient === "square");
-    if (bucket === "portrait") return portrait.length ? portrait : (square.length ? square : real);
-    if (bucket === "landscape") return landscape.length ? landscape : (square.length ? square : real);
-    if (bucket === "square") { if (square.length) return square; const m = [...portrait, ...landscape]; return m.length ? m : real; }
+  function getCompatiblePool(kind){
+    const real=getRealPhotos(),bucket=getFrameBucket(kind);
+    const portrait=real.filter(p=>p.orient==="portrait"),landscape=real.filter(p=>p.orient==="landscape"),square=real.filter(p=>p.orient==="square");
+    if(bucket==="portrait")return portrait.length?portrait:(square.length?square:real);
+    if(bucket==="landscape")return landscape.length?landscape:(square.length?square:real);
+    if(bucket==="square"){if(square.length)return square;const m=[...portrait,...landscape];return m.length?m:real;}
     return real;
   }
 
-  function gridToPercent(f) {
-    const m = FRAME_META[f.kind];
-    const h = f.w / m.ar;
-    return {
-      left: (f.gx / GRID.W * 100) + "%",
-      top: (f.gy / GRID.H * 100) + "%",
-      width: (f.w / GRID.W * 100) + "%",
-      height: (h / GRID.H * 100) + "%"
-    };
-  }
+  function gridToPercent(f){const m=FRAME_META[f.kind],h=f.w/m.ar;return{left:(f.gx/GRID.W*100)+"%",top:(f.gy/GRID.H*100)+"%",width:(f.w/GRID.W*100)+"%",height:(h/GRID.H*100)+"%"};}
 
-  /* ===== Photo Assignment ===== */
-  function autoAssignPhotos() {
-    const real = getRealPhotos();
-    if (!real.length) {
-      state.frames.forEach(f => { if (!f.fixedPhotoId) { f.photoIds = []; f.currentPhotoId = null; } });
-      return;
-    }
-    const indexMap = { portrait: 0, landscape: 0, square: 0 };
-    state.frames.forEach(frame => {
-      if (frame.fixedPhotoId) {
-        const fixed = findPhoto(frame.fixedPhotoId);
-        if (fixed) { frame.photoIds = [fixed.id]; frame.currentPhotoId = fixed.id; return; }
-        frame.fixedPhotoId = null;
-      }
-      const bucket = getFrameBucket(frame.kind);
-      const pool = getCompatiblePool(frame.kind);
-      if (!pool.length) { frame.photoIds = []; frame.currentPhotoId = null; return; }
-      const nextIndex = indexMap[bucket] % pool.length;
-      frame.photoIds = [pool[nextIndex].id];
-      frame.currentPhotoId = pool[nextIndex].id;
-      indexMap[bucket] += 1;
+  function autoAssignPhotos(){
+    const real=getRealPhotos();
+    if(!real.length){state.frames.forEach(f=>{if(!f.fixedPhotoId){f.photoIds=[];f.currentPhotoId=null;}});return;}
+    const indexMap={portrait:0,landscape:0,square:0};
+    state.frames.forEach(frame=>{
+      if(frame.fixedPhotoId){const fixed=findPhoto(frame.fixedPhotoId);if(fixed){frame.photoIds=[fixed.id];frame.currentPhotoId=fixed.id;return;}frame.fixedPhotoId=null;}
+      const bucket=getFrameBucket(frame.kind),pool=getCompatiblePool(frame.kind);
+      if(!pool.length){frame.photoIds=[];frame.currentPhotoId=null;return;}
+      const nextIndex=indexMap[bucket]%pool.length;
+      frame.photoIds=[pool[nextIndex].id];frame.currentPhotoId=pool[nextIndex].id;indexMap[bucket]+=1;
     });
   }
 
-  function getCurrentPhoto(frame) {
-    if (frame.fixedPhotoId) { const f = findPhoto(frame.fixedPhotoId); if (f) return f; }
-    if (frame.currentPhotoId) { const c = findPhoto(frame.currentPhotoId); if (c) return c; }
-    if (Array.isArray(frame.photoIds) && frame.photoIds.length) { const f = findPhoto(frame.photoIds[0]); if (f) return f; }
+  function getCurrentPhoto(frame){
+    if(frame.fixedPhotoId){const f=findPhoto(frame.fixedPhotoId);if(f)return f;}
+    if(frame.currentPhotoId){const c=findPhoto(frame.currentPhotoId);if(c)return c;}
+    if(Array.isArray(frame.photoIds)&&frame.photoIds.length){const f=findPhoto(frame.photoIds[0]);if(f)return f;}
     return null;
   }
 
-  /* ===== Image Compression ===== */
-  function fileToDataURL(file) {
-    return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+  function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
+  function loadImage(src){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=src;});}
+
+  async function compressImage(file){
+    const src=await fileToDataURL(file),img=await loadImage(src);
+    const longEdge=Math.max(img.width,img.height),scale=longEdge<=MAX_LONG_EDGE?1:MAX_LONG_EDGE/longEdge;
+    const w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+    const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+    canvas.getContext("2d").drawImage(img,0,0,w,h);
+    const ratio=w/h;
+    return{id:uid(),name:file.name,width:w,height:h,ratio,orient:detectOrient(ratio),dataUrl:canvas.toDataURL("image/jpeg",JPEG_QUALITY),createdAt:Date.now()};
   }
 
-  function loadImage(src) {
-    return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = src; });
-  }
-
-  async function compressImage(file) {
-    const src = await fileToDataURL(file);
-    const img = await loadImage(src);
-    const longEdge = Math.max(img.width, img.height);
-    const scale = longEdge <= MAX_LONG_EDGE ? 1 : MAX_LONG_EDGE / longEdge;
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-    const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-    const ratio = w / h;
-    return {
-      id: uid(), name: file.name,
-      width: w, height: h, ratio,
-      orient: detectOrient(ratio),
-      dataUrl: canvas.toDataURL("image/jpeg", JPEG_QUALITY),
-      createdAt: Date.now()
-    };
-  }
-
-  /* ===== Mask Check ===== */
-  async function checkMasks() {
-    return new Promise(res => {
-      const img = new Image();
-      img.onload = () => { state.masksAvailable = true; res(true); };
-      img.onerror = () => { state.masksAvailable = false; res(false); };
-      img.src = "mask_oval.png";
+  /* ===== Mask Check [FIXED: check mask_vertical.png] ===== */
+  async function checkMasks(){
+    return new Promise(res=>{
+      const img=new Image();
+      img.onload=()=>{state.masksAvailable=true;res(true);};
+      img.onerror=()=>{state.masksAvailable=false;res(false);};
+      img.src="mask_vertical.png";
     });
   }
 
-  function applyMaskImage(el, maskPng) {
-    if (!maskPng) return;
-    const url = `url("${maskPng}")`;
-    el.style.webkitMaskImage = url; el.style.webkitMaskSize = "100% 100%";
-    el.style.webkitMaskRepeat = "no-repeat"; el.style.webkitMaskPosition = "center";
-    el.style.maskImage = url; el.style.maskSize = "100% 100%";
-    el.style.maskRepeat = "no-repeat"; el.style.maskPosition = "center";
+  /* ===== Apply Mask [FIXED: added luminance mode] ===== */
+  function applyMaskImage(el,maskPng){
+    if(!maskPng)return;
+    const url=`url("${maskPng}")`;
+    el.style.webkitMaskImage=url;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";el.style.webkitMaskMode="luminance";
+    el.style.maskImage=url;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";el.style.maskMode="luminance";
   }
 
-  /* ===== Canvas Fit ===== */
-  function fitCanvas() {
-    const area = $("canvasArea");
-    const scaleX = area.clientWidth / 2400;
-    const scaleY = area.clientHeight / 1500;
-    const scale = Math.min(scaleX, scaleY);
-    const scaledW = 2400 * scale;
-    const scaledH = 1500 * scale;
-    const offsetX = (area.clientWidth - scaledW) / 2;
-    const offsetY = (area.clientHeight - scaledH) / 2;
-    $("canvasScaler").style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+  function fitCanvas(){
+    const area=$("canvasArea"),scaleX=area.clientWidth/2400,scaleY=area.clientHeight/1500,scale=Math.min(scaleX,scaleY);
+    const scaledW=2400*scale,scaledH=1500*scale,offsetX=(area.clientWidth-scaledW)/2,offsetY=(area.clientHeight-scaledH)/2;
+    $("canvasScaler").style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;
   }
 
-  /* ===== Rendering ===== */
-  function renderCanvas() {
-    const canvas = $("canvas");
-    canvas.innerHTML = "";
+  function renderCanvas(){
+    const canvas=$("canvas");canvas.innerHTML="";
+    state.frames.forEach(f=>{
+      const m=FRAME_META[f.kind],pct=gridToPercent(f);
+      const el=document.createElement("div");
+      el.className="frame"+(state.editEnabled&&state.mode==="edit"?" editable":"");
+      if(f.id===state.selectedFrameId&&state.mode==="edit")el.className+=" selected";
+      if(f.fixedPhotoId)el.className+=" locked";
+      el.dataset.id=f.id;
+      el.style.left=pct.left;el.style.top=pct.top;el.style.width=pct.width;el.style.height=pct.height;
 
-    state.frames.forEach(f => {
-      const m = FRAME_META[f.kind];
-      const pct = gridToPercent(f);
+      const outline=document.createElement("div");outline.className="frame-outline";el.appendChild(outline);
 
-      const el = document.createElement("div");
-      el.className = "frame" + (state.editEnabled && state.mode === "edit" ? " editable" : "");
-      if (f.id === state.selectedFrameId && state.mode === "edit") el.className += " selected";
-      if (f.fixedPhotoId) el.className += " locked";
-      el.dataset.id = f.id;
-      el.style.left = pct.left; el.style.top = pct.top;
-      el.style.width = pct.width; el.style.height = pct.height;
+      const pwrap=document.createElement("div");pwrap.className="photoWrap";
+      if(state.masksAvailable&&m.maskPng)applyMaskImage(pwrap,m.maskPng);
 
-      // Outline
-      const outline = document.createElement("div");
-      outline.className = "frame-outline";
-      el.appendChild(outline);
+      const pmask=document.createElement("div");pmask.className="photoMask";pmask.style.inset=m.inset;
+      const photo=getCurrentPhoto(f);
+      const img=document.createElement("img");img.src=photo?photo.dataUrl:placeholderUrl;
+      pmask.appendChild(img);pwrap.appendChild(pmask);el.appendChild(pwrap);
 
-      // Photo wrapper with mask
-      const pwrap = document.createElement("div");
-      pwrap.className = "photoWrap";
-      if (state.masksAvailable && m.maskPng) applyMaskImage(pwrap, m.maskPng);
+      const ov=document.createElement("img");ov.className="overlay";ov.src=m.src;ov.onerror=()=>{ov.style.display="none";};el.appendChild(ov);
 
-      const pmask = document.createElement("div");
-      pmask.className = "photoMask";
-      pmask.style.inset = m.inset;
+      const badge=document.createElement("div");badge.className="frame-badge";badge.textContent=(state.frames.indexOf(f)+1);el.appendChild(badge);
+      const pin=document.createElement("div");pin.className="frame-pin";pin.textContent="固定";el.appendChild(pin);
+      const handle=document.createElement("div");handle.className="resize-handle";el.appendChild(handle);
 
-      const photo = getCurrentPhoto(f);
-      const img = document.createElement("img");
-      img.src = photo ? photo.dataUrl : placeholderUrl;
-      pmask.appendChild(img);
-      pwrap.appendChild(pmask);
-      el.appendChild(pwrap);
-
-      // Frame overlay
-      const ov = document.createElement("img");
-      ov.className = "overlay";
-      ov.src = m.src;
-      ov.onerror = () => { ov.style.display = "none"; };
-      el.appendChild(ov);
-
-      // Badge
-      const badge = document.createElement("div");
-      badge.className = "frame-badge";
-      badge.textContent = (state.frames.indexOf(f) + 1);
-      el.appendChild(badge);
-
-      // Pin
-      const pin = document.createElement("div");
-      pin.className = "frame-pin";
-      pin.textContent = "固定";
-      el.appendChild(pin);
-
-      // Resize handle
-      const handle = document.createElement("div");
-      handle.className = "resize-handle";
-      el.appendChild(handle);
-
-      // Interactions
-      bindFrameClick(el, f);
-      if (state.editEnabled && state.mode === "edit") {
-        attachDrag(el, f);
-        attachResize(handle, el, f);
-      }
-
+      bindFrameClick(el,f);
+      if(state.editEnabled&&state.mode==="edit"){attachDrag(el,f);attachResize(handle,el,f);}
       canvas.appendChild(el);
     });
   }
 
-  function bindFrameClick(el, f) {
-    el.addEventListener("click", (e) => {
-      if (state.mode === "display") return;
-      if (e.target.classList.contains("resize-handle")) return;
-      state.selectedFrameId = f.id;
-      renderAll();
-    });
+  function bindFrameClick(el,f){el.addEventListener("click",(e)=>{if(state.mode==="display")return;if(e.target.classList.contains("resize-handle"))return;state.selectedFrameId=f.id;renderAll();});}
+
+  function attachDrag(el,f){
+    let on=false,sx=0,sy=0,ogx=0,ogy=0;
+    el.addEventListener("pointerdown",(e)=>{if(!state.editEnabled||e.target.classList.contains("resize-handle"))return;e.stopPropagation();state.selectedFrameId=f.id;renderAll();on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;el.setPointerCapture(e.pointerId);el.classList.add("dragging");});
+    el.addEventListener("pointermove",(e)=>{if(!on)return;const r=$("canvas").getBoundingClientRect();f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;el.style.left=(f.gx/GRID.W*100)+"%";el.style.top=(f.gy/GRID.H*100)+"%";});
+    el.addEventListener("pointerup",()=>{on=false;el.classList.remove("dragging");});
+    el.addEventListener("pointercancel",()=>{on=false;el.classList.remove("dragging");});
   }
 
-  /* ===== Drag & Resize (from code 2) ===== */
-  function attachDrag(el, f) {
-    let on = false, sx = 0, sy = 0, ogx = 0, ogy = 0;
-    el.addEventListener("pointerdown", (e) => {
-      if (!state.editEnabled || e.target.classList.contains("resize-handle")) return;
-      e.stopPropagation();
-      state.selectedFrameId = f.id;
-      renderAll();
-      on = true; sx = e.clientX; sy = e.clientY; ogx = f.gx; ogy = f.gy;
-      el.setPointerCapture(e.pointerId);
-      el.classList.add("dragging");
-    });
-    el.addEventListener("pointermove", (e) => {
-      if (!on) return;
-      const r = $("canvas").getBoundingClientRect();
-      f.gx = ogx + (e.clientX - sx) / r.width * GRID.W;
-      f.gy = ogy + (e.clientY - sy) / r.height * GRID.H;
-      el.style.left = (f.gx / GRID.W * 100) + "%";
-      el.style.top = (f.gy / GRID.H * 100) + "%";
-    });
-    el.addEventListener("pointerup", () => { on = false; el.classList.remove("dragging"); });
-    el.addEventListener("pointercancel", () => { on = false; el.classList.remove("dragging"); });
+  function attachResize(handle,el,f){
+    let on=false,sx=0,sw=0;
+    handle.addEventListener("pointerdown",(e)=>{if(!state.editEnabled)return;e.stopPropagation();state.selectedFrameId=f.id;on=true;sx=e.clientX;sw=f.w;handle.setPointerCapture(e.pointerId);el.classList.add("resizing");});
+    handle.addEventListener("pointermove",(e)=>{if(!on)return;const r=$("canvas").getBoundingClientRect();let nw=sw+(e.clientX-sx)/r.width*GRID.W;if(nw<10)nw=10;f.w=nw;const pct=gridToPercent(f);el.style.width=pct.width;el.style.height=pct.height;});
+    handle.addEventListener("pointerup",()=>{on=false;el.classList.remove("resizing");});
+    handle.addEventListener("pointercancel",()=>{on=false;el.classList.remove("resizing");});
   }
 
-  function attachResize(handle, el, f) {
-    let on = false, sx = 0, sw = 0;
-    handle.addEventListener("pointerdown", (e) => {
-      if (!state.editEnabled) return;
-      e.stopPropagation();
-      state.selectedFrameId = f.id;
-      on = true; sx = e.clientX; sw = f.w;
-      handle.setPointerCapture(e.pointerId);
-      el.classList.add("resizing");
-    });
-    handle.addEventListener("pointermove", (e) => {
-      if (!on) return;
-      const r = $("canvas").getBoundingClientRect();
-      let nw = sw + (e.clientX - sx) / r.width * GRID.W;
-      if (nw < 10) nw = 10;
-      f.w = nw;
-      const pct = gridToPercent(f);
-      el.style.width = pct.width; el.style.height = pct.height;
-    });
-    handle.addEventListener("pointerup", () => { on = false; el.classList.remove("resizing"); });
-    handle.addEventListener("pointercancel", () => { on = false; el.classList.remove("resizing"); });
+  function seedLayout(layoutKey){
+    state.layoutKey=layoutKey;state.selectedFrameId=null;
+    const grid=LAYOUTS[layoutKey]||LAYOUTS.story;
+    state.frames=grid.map(g=>({id:uid(),kind:g[0],gx:g[1],gy:g[2],w:g[3],photoIds:[],fixedPhotoId:null,currentPhotoId:null}));
+    autoAssignPhotos();renderAll();
   }
 
-  /* ===== Layout ===== */
-  function seedLayout(layoutKey) {
-    state.layoutKey = layoutKey;
-    state.selectedFrameId = null;
-    const grid = LAYOUTS[layoutKey] || LAYOUTS.story;
-    state.frames = grid.map(g => ({
-      id: uid(), kind: g[0], gx: g[1], gy: g[2], w: g[3],
-      photoIds: [], fixedPhotoId: null, currentPhotoId: null
-    }));
-    autoAssignPhotos();
-    renderAll();
-  }
-
-  /* ===== Photo Sheet ===== */
-  function renderPhotoSheet() {
-    const real = getRealPhotos();
-    $("sheetMeta").innerHTML = `写真 ${real.length} / ${MAX_PHOTOS}<br>残り ${MAX_PHOTOS - real.length} 枚`;
-    const grid = $("photoGrid");
-    const empty = $("photoEmpty");
-
-    if (!real.length) {
-      grid.style.display = "none"; empty.style.display = "block"; grid.innerHTML = "";
-      return;
-    }
-    grid.style.display = "grid"; empty.style.display = "none"; grid.innerHTML = "";
-
-    const selectedFrame = getSelectedFrame();
-
-    real.forEach(photo => {
-      const cell = document.createElement("div");
-      cell.className = "photo-cell";
-      if (selectedFrame && selectedFrame.fixedPhotoId === photo.id) cell.classList.add("fixed");
-
-      const img = document.createElement("img");
-      img.src = photo.dataUrl;
-      cell.appendChild(img);
-
-      const del = document.createElement("button");
-      del.className = "del-btn"; del.textContent = "✕";
-      del.addEventListener("click", (e) => {
-        e.stopPropagation();
-        removePhoto(photo.id);
-      });
-      cell.appendChild(del);
-
-      if (selectedFrame && selectedFrame.fixedPhotoId === photo.id) {
-        const badge = document.createElement("div");
-        badge.className = "fixed-badge"; badge.textContent = "固定中";
-        cell.appendChild(badge);
-      }
-
-      cell.addEventListener("click", () => {
-        if (!selectedFrame) {
-          openViewer(photo.dataUrl);
-          return;
-        }
-        selectedFrame.fixedPhotoId = photo.id;
-        selectedFrame.photoIds = [photo.id];
-        selectedFrame.currentPhotoId = photo.id;
-        renderAll();
-        showToast("写真固定", 700);
-      });
-
+  function renderPhotoSheet(){
+    const real=getRealPhotos();
+    $("sheetMeta").innerHTML=`写真 ${real.length} / ${MAX_PHOTOS}<br>残り ${MAX_PHOTOS-real.length} 枚`;
+    const grid=$("photoGrid"),empty=$("photoEmpty");
+    if(!real.length){grid.style.display="none";empty.style.display="block";grid.innerHTML="";return;}
+    grid.style.display="grid";empty.style.display="none";grid.innerHTML="";
+    const selectedFrame=getSelectedFrame();
+    real.forEach(photo=>{
+      const cell=document.createElement("div");cell.className="photo-cell";
+      if(selectedFrame&&selectedFrame.fixedPhotoId===photo.id)cell.classList.add("fixed");
+      const img=document.createElement("img");img.src=photo.dataUrl;cell.appendChild(img);
+      const del=document.createElement("button");del.className="del-btn";del.textContent="✕";
+      del.addEventListener("click",(e)=>{e.stopPropagation();removePhoto(photo.id);});cell.appendChild(del);
+      if(selectedFrame&&selectedFrame.fixedPhotoId===photo.id){const badge=document.createElement("div");badge.className="fixed-badge";badge.textContent="固定中";cell.appendChild(badge);}
+      cell.addEventListener("click",()=>{if(!selectedFrame){openViewer(photo.dataUrl);return;}selectedFrame.fixedPhotoId=photo.id;selectedFrame.photoIds=[photo.id];selectedFrame.currentPhotoId=photo.id;renderAll();showToast("写真固定",700);});
       grid.appendChild(cell);
     });
   }
 
-  function removePhoto(photoId) {
-    state.photos = state.photos.filter(p => p.id !== photoId);
-    state.frames.forEach(fr => {
-      fr.photoIds = (fr.photoIds || []).filter(id => id !== photoId);
-      if (fr.fixedPhotoId === photoId) fr.fixedPhotoId = null;
-      if (fr.currentPhotoId === photoId) fr.currentPhotoId = null;
-    });
-    autoAssignPhotos();
-    renderAll();
-    showToast("削除しました");
+  function removePhoto(photoId){
+    state.photos=state.photos.filter(p=>p.id!==photoId);
+    state.frames.forEach(fr=>{fr.photoIds=(fr.photoIds||[]).filter(id=>id!==photoId);if(fr.fixedPhotoId===photoId)fr.fixedPhotoId=null;if(fr.currentPhotoId===photoId)fr.currentPhotoId=null;});
+    autoAssignPhotos();renderAll();showToast("削除しました");
   }
 
-  /* ===== Frames Panel ===== */
-  function buildFramesPanel() {
-    const list = $("framesList");
-    list.innerHTML = "";
-    const labels = { calm: "Calm (3)", flow: "Flow (5)", story: "Story (8)", scene: "Scene (11)" };
-    const descs = {
-      calm: "余白重視。大きな写真を見せる構成。",
-      flow: "自然な流れを持つ軽い物語構成。",
-      story: "物語が広がるバランス型ギャラリー。",
-      scene: "壁として完成する物語構成。"
-    };
-    Object.entries(labels).forEach(([key, label]) => {
-      const btn = document.createElement("button");
-      btn.className = `menu-item${state.layoutKey === key ? " active" : ""}`;
-      btn.innerHTML = `<span>${label}<br><small style="font-weight:500;color:var(--muted);font-size:0.8rem;">${descs[key]}</small></span><span>${state.layoutKey === key ? "選択中" : ""}</span>`;
-      btn.addEventListener("click", () => {
-        seedLayout(key);
-        showToast(`${label} に切り替えました`);
-      });
+  function buildFramesPanel(){
+    const list=$("framesList");list.innerHTML="";
+    const labels={calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"};
+    const descs={calm:"余白重視。大きな写真を見せる構成。",flow:"自然な流れを持つ軽い物語構成。",story:"物語が広がるバランス型ギャラリー。",scene:"壁として完成する物語構成。"};
+    Object.entries(labels).forEach(([key,label])=>{
+      const btn=document.createElement("button");
+      btn.className=`menu-item${state.layoutKey===key?" active":""}`;
+      btn.innerHTML=`<span>${label}<br><small style="font-weight:500;color:var(--muted);font-size:0.8rem;">${descs[key]}</small></span><span>${state.layoutKey===key?"選択中":""}</span>`;
+      btn.addEventListener("click",()=>{seedLayout(key);showToast(`${label} に切り替えました`);});
       list.appendChild(btn);
     });
   }
 
-  /* ===== Edit Panel ===== */
-  function updateEditPanel() {
-    $("toggleEditLabel").textContent = state.editEnabled ? "ON" : "OFF";
-    $("toggleEditBtn").classList.toggle("active", state.editEnabled);
-    $("modeText").textContent = state.mode === "display" ? "表示" : (state.editEnabled ? "配置編集ON" : "配置編集OFF");
-
-    const frame = getSelectedFrame();
-    const noSel = !frame;
-
-    const pinned = frame && !!frame.fixedPhotoId;
-    $("pinPhotoText").textContent = pinned ? "写真固定解除" : "写真固定";
-    $("pinPhotoState").textContent = noSel ? "未選択" : (pinned ? "現在: 固定中" : "現在: 未固定");
-    $("pinPhotoBtn").classList.toggle("active", !!pinned);
-    $("pinPhotoBtn").classList.toggle("disabled", noSel);
-    $("deleteFrameBtn").classList.toggle("disabled", noSel);
+  function updateEditPanel(){
+    $("toggleEditLabel").textContent=state.editEnabled?"ON":"OFF";
+    $("toggleEditBtn").classList.toggle("active",state.editEnabled);
+    $("modeText").textContent=state.mode==="display"?"表示":(state.editEnabled?"配置編集ON":"配置編集OFF");
+    const frame=getSelectedFrame(),noSel=!frame,pinned=frame&&!!frame.fixedPhotoId;
+    $("pinPhotoText").textContent=pinned?"写真固定解除":"写真固定";
+    $("pinPhotoState").textContent=noSel?"未選択":(pinned?"現在: 固定中":"現在: 未固定");
+    $("pinPhotoBtn").classList.toggle("active",!!pinned);
+    $("pinPhotoBtn").classList.toggle("disabled",noSel);
+    $("deleteFrameBtn").classList.toggle("disabled",noSel);
   }
 
-  /* ===== Display Mode ===== */
-  function enterDisplay() {
-    state.mode = "display";
-    state.activeTab = null;
-    document.body.classList.add("display-mode");
-    document.body.classList.remove("edit-enabled");
-    state.editEnabled = false;
-    renderAll();
-    fitCanvas();
-    startCrossfade();
-    showDisplayHint();
-  }
+  function enterDisplay(){state.mode="display";state.activeTab=null;document.body.classList.add("display-mode");document.body.classList.remove("edit-enabled");state.editEnabled=false;renderAll();fitCanvas();startCrossfade();$("displayHint").classList.add("show");setTimeout(()=>$("displayHint").classList.remove("show"),1800);}
+  function exitDisplay(){state.mode="edit";document.body.classList.remove("display-mode");stopCrossfade();renderAll();fitCanvas();}
 
-  function exitDisplay() {
-    state.mode = "edit";
-    document.body.classList.remove("display-mode");
-    stopCrossfade();
-    renderAll();
-    fitCanvas();
-  }
+  function nextPhotoForFrame(frame){const pool=getCompatiblePool(frame.kind);if(pool.length<2)return null;const current=getCurrentPhoto(frame);if(!current)return pool[0];const idx=pool.findIndex(p=>p.id===current.id);if(idx===-1)return pool[0];return pool[(idx+1)%pool.length];}
 
-  function showDisplayHint() {
-    $("displayHint").classList.add("show");
-    setTimeout(() => $("displayHint").classList.remove("show"), 1800);
-  }
-
-  function nextPhotoForFrame(frame) {
-    const pool = getCompatiblePool(frame.kind);
-    if (pool.length < 2) return null;
-    const current = getCurrentPhoto(frame);
-    if (!current) return pool[0];
-    const idx = pool.findIndex(p => p.id === current.id);
-    if (idx === -1) return pool[0];
-    return pool[(idx + 1) % pool.length];
-  }
-
-  function startCrossfade() {
-    stopCrossfade();
-    if (getRealPhotos().length < 2) return;
-    state.frames.forEach(frame => {
-      if (frame.fixedPhotoId) return;
-      const timer = setInterval(() => {
-        const next = nextPhotoForFrame(frame);
-        if (!next) return;
-        frame.currentPhotoId = next.id;
-        frame.photoIds = [next.id];
-        // Update just this frame's photo
-        const el = $("canvas").querySelector(`.frame[data-id="${frame.id}"]`);
-        if (el) {
-          const img = el.querySelector(".photoMask img");
-          if (img) img.src = next.dataUrl;
-        }
-      }, SWITCH_MIN_MS + Math.random() * (SWITCH_MAX_MS - SWITCH_MIN_MS));
+  function startCrossfade(){
+    stopCrossfade();if(getRealPhotos().length<2)return;
+    state.frames.forEach(frame=>{
+      if(frame.fixedPhotoId)return;
+      const timer=setInterval(()=>{const next=nextPhotoForFrame(frame);if(!next)return;frame.currentPhotoId=next.id;frame.photoIds=[next.id];const el=$("canvas").querySelector(`.frame[data-id="${frame.id}"]`);if(el){const img=el.querySelector(".photoMask img");if(img)img.src=next.dataUrl;}},SWITCH_MIN_MS+Math.random()*(SWITCH_MAX_MS-SWITCH_MIN_MS));
       state.displayTimers.push(timer);
     });
   }
+  function stopCrossfade(){state.displayTimers.forEach(t=>clearInterval(t));state.displayTimers=[];}
 
-  function stopCrossfade() {
-    state.displayTimers.forEach(t => clearInterval(t));
-    state.displayTimers = [];
+  function openViewer(src){$("viewerImage").src=src;$("viewer").classList.add("open");}
+  function closeViewer(){$("viewer").classList.remove("open");$("viewerImage").src="";}
+
+  function renderPanels(){$("photoSheet").classList.toggle("open",state.mode==="edit"&&state.activeTab==="photo");$("framesPanel").classList.toggle("open",state.mode==="edit"&&state.activeTab==="frames");$("editPanel").classList.toggle("open",state.mode==="edit"&&state.activeTab==="edit");}
+  function renderBottomNav(){$("navPhoto").classList.toggle("active",state.activeTab==="photo"&&state.mode==="edit");$("navFrames").classList.toggle("active",state.activeTab==="frames"&&state.mode==="edit");$("navEdit").classList.toggle("active",state.activeTab==="edit"&&state.mode==="edit");$("navDisplay").classList.toggle("active",state.mode==="display");}
+  function renderTopBar(){document.body.classList.toggle("display-mode",state.mode==="display");document.body.classList.toggle("edit-enabled",state.mode==="edit"&&state.editEnabled);}
+  function renderAll(){renderTopBar();renderBottomNav();renderPanels();buildFramesPanel();renderPhotoSheet();updateEditPanel();renderCanvas();}
+
+  async function addPhotos(files){
+    if(!files.length||state.isUploading)return;
+    const remaining=MAX_PHOTOS-getRealPhotos().length;
+    if(remaining<=0){showToast("写真上限に達しています");return;}
+    state.isUploading=true;setProgress(true,0,files.length);
+    let added=0;
+    try{const toProcess=files.slice(0,remaining);for(let i=0;i<toProcess.length;i++){setProgress(true,i+1,toProcess.length);const photo=await compressImage(toProcess[i]);state.photos.push(photo);added++;}autoAssignPhotos();renderAll();if(added>0)showToast(`${added}枚追加しました`);}catch{showToast("読み込み失敗");}
+    state.isUploading=false;setProgress(false);
   }
 
-  /* ===== Viewer ===== */
-  function openViewer(src) {
-    $("viewerImage").src = src;
-    $("viewer").classList.add("open");
-  }
-  function closeViewer() {
-    $("viewer").classList.remove("open");
-    $("viewerImage").src = "";
+  function addFrame(kind){
+    const w=kind==="landscape"||kind==="landscape_simple"?50:kind==="portrait"||kind==="portrait_simple"?35:kind==="oval"?35:40;
+    const frame={id:uid(),kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w,photoIds:[],fixedPhotoId:null,currentPhotoId:null};
+    state.frames.push(frame);autoAssignPhotos();state.selectedFrameId=frame.id;renderAll();showToast("追加しました");
   }
 
-  /* ===== Panels State ===== */
-  function renderPanels() {
-    $("photoSheet").classList.toggle("open", state.mode === "edit" && state.activeTab === "photo");
-    $("framesPanel").classList.toggle("open", state.mode === "edit" && state.activeTab === "frames");
-    $("editPanel").classList.toggle("open", state.mode === "edit" && state.activeTab === "edit");
+  function deleteSelectedFrame(){const frame=getSelectedFrame();if(!frame){showToast("フレームを選択してください");return;}state.frames=state.frames.filter(f=>f.id!==frame.id);state.selectedFrameId=null;renderAll();showToast("削除しました");}
+
+  function togglePin(){
+    const frame=getSelectedFrame();if(!frame){showToast("フレームを選択してください");return;}
+    if(frame.fixedPhotoId){frame.fixedPhotoId=null;renderAll();showToast("写真固定解除",700);}
+    else{if(!frame.currentPhotoId){showToast("固定する写真がありません");return;}frame.fixedPhotoId=frame.currentPhotoId;renderAll();showToast("写真固定",700);}
   }
 
-  function renderBottomNav() {
-    $("navPhoto").classList.toggle("active", state.activeTab === "photo" && state.mode === "edit");
-    $("navFrames").classList.toggle("active", state.activeTab === "frames" && state.mode === "edit");
-    $("navEdit").classList.toggle("active", state.activeTab === "edit" && state.mode === "edit");
-    $("navDisplay").classList.toggle("active", state.mode === "display");
+  function bindUI(){
+    $("fitBtn").addEventListener("click",fitCanvas);
+    $("navPhoto").addEventListener("click",()=>{if(state.mode==="display")exitDisplay();state.activeTab=state.activeTab==="photo"?null:"photo";state.editEnabled=false;renderAll();});
+    $("navFrames").addEventListener("click",()=>{if(state.mode==="display")exitDisplay();state.activeTab=state.activeTab==="frames"?null:"frames";state.editEnabled=false;renderAll();});
+    $("navEdit").addEventListener("click",()=>{if(state.mode==="display")exitDisplay();state.activeTab=state.activeTab==="edit"?null:"edit";renderAll();});
+    $("navDisplay").addEventListener("click",()=>{enterDisplay();});
+    $("closePhotoSheetBtn").addEventListener("click",()=>{state.activeTab=null;renderAll();});
+    $("closeFramesPanelBtn").addEventListener("click",()=>{state.activeTab=null;renderAll();});
+    $("closeEditPanelBtn").addEventListener("click",()=>{state.activeTab=null;renderAll();});
+    $("addInSheetBtn").addEventListener("click",()=>$("photoInput").click());
+    $("photoInput").addEventListener("change",async(e)=>{const files=Array.from(e.target.files||[]);if(files.length)await addPhotos(files);e.target.value="";});
+    $("toggleEditBtn").addEventListener("click",()=>{state.editEnabled=!state.editEnabled;renderAll();showToast(state.editEnabled?"配置編集ON":"配置編集OFF",800);});
+    document.querySelectorAll("[data-add-kind]").forEach(btn=>{btn.addEventListener("click",()=>addFrame(btn.dataset.addKind));});
+    $("pinPhotoBtn").addEventListener("click",togglePin);
+    $("deleteFrameBtn").addEventListener("click",deleteSelectedFrame);
+    $("viewerClose").addEventListener("click",closeViewer);
+    $("viewer").addEventListener("click",(e)=>{if(e.target===$("viewer"))closeViewer();});
+    $("canvasArea").addEventListener("click",(e)=>{if(state.mode==="display"){exitDisplay();return;}if(!e.target.closest(".frame")){state.selectedFrameId=null;renderAll();}});
+    window.addEventListener("resize",fitCanvas);
   }
 
-  function renderTopBar() {
-    document.body.classList.toggle("display-mode", state.mode === "display");
-    document.body.classList.toggle("edit-enabled", state.mode === "edit" && state.editEnabled);
-  }
+  async function hydrateAspectRatios(){await Promise.all(Object.values(FRAME_META).map(m=>new Promise(res=>{const img=new Image();img.onload=()=>{m.ar=(img.naturalWidth||1)/(img.naturalHeight||1);res();};img.onerror=()=>res();img.src=m.src;})));}
 
-  /* ===== Master Render ===== */
-  function renderAll() {
-    renderTopBar();
-    renderBottomNav();
-    renderPanels();
-    buildFramesPanel();
-    renderPhotoSheet();
-    updateEditPanel();
-    renderCanvas();
-  }
-
-  /* ===== Add Photos ===== */
-  async function addPhotos(files) {
-    if (!files.length || state.isUploading) return;
-    const real = getRealPhotos();
-    const remaining = MAX_PHOTOS - real.length;
-    if (remaining <= 0) { showToast("写真上限に達しています"); return; }
-
-    state.isUploading = true;
-    setProgress(true, 0, files.length);
-
-    let added = 0;
-    try {
-      const toProcess = files.slice(0, remaining);
-      for (let i = 0; i < toProcess.length; i++) {
-        setProgress(true, i + 1, toProcess.length);
-        const photo = await compressImage(toProcess[i]);
-        state.photos.push(photo);
-        added++;
-      }
-      autoAssignPhotos();
-      renderAll();
-      if (added > 0) showToast(`${added}枚追加しました`);
-    } catch { showToast("読み込み失敗"); }
-    state.isUploading = false;
-    setProgress(false);
-  }
-
-  /* ===== Add Frame ===== */
-  function addFrame(kind) {
-    const w = kind === "landscape" || kind === "landscape_simple" ? 50 :
-              kind === "portrait" || kind === "portrait_simple" ? 35 :
-              kind === "oval" ? 35 : 40;
-    const frame = {
-      id: uid(), kind, gx: 24 + Math.random() * 140, gy: 15 + Math.random() * 90,
-      w, photoIds: [], fixedPhotoId: null, currentPhotoId: null
-    };
-    state.frames.push(frame);
-    autoAssignPhotos();
-    state.selectedFrameId = frame.id;
-    renderAll();
-    showToast("追加しました");
-  }
-
-  /* ===== Delete Frame ===== */
-  function deleteSelectedFrame() {
-    const frame = getSelectedFrame();
-    if (!frame) { showToast("フレームを選択してください"); return; }
-    state.frames = state.frames.filter(f => f.id !== frame.id);
-    state.selectedFrameId = null;
-    renderAll();
-    showToast("削除しました");
-  }
-
-  /* ===== Toggle Pin ===== */
-  function togglePin() {
-    const frame = getSelectedFrame();
-    if (!frame) { showToast("フレームを選択してください"); return; }
-    if (frame.fixedPhotoId) {
-      frame.fixedPhotoId = null;
-      renderAll();
-      showToast("写真固定解除", 700);
-    } else {
-      if (!frame.currentPhotoId) { showToast("固定する写真がありません"); return; }
-      frame.fixedPhotoId = frame.currentPhotoId;
-      renderAll();
-      showToast("写真固定", 700);
-    }
-  }
-
-  /* ===== Bind UI ===== */
-  function bindUI() {
-    $("fitBtn").addEventListener("click", fitCanvas);
-
-    // Nav
-    $("navPhoto").addEventListener("click", () => { if (state.mode === "display") exitDisplay(); state.activeTab = state.activeTab === "photo" ? null : "photo"; state.editEnabled = false; renderAll(); });
-    $("navFrames").addEventListener("click", () => { if (state.mode === "display") exitDisplay(); state.activeTab = state.activeTab === "frames" ? null : "frames"; state.editEnabled = false; renderAll(); });
-    $("navEdit").addEventListener("click", () => { if (state.mode === "display") exitDisplay(); state.activeTab = state.activeTab === "edit" ? null : "edit"; renderAll(); });
-    $("navDisplay").addEventListener("click", () => { enterDisplay(); });
-
-    // Close buttons
-    $("closePhotoSheetBtn").addEventListener("click", () => { state.activeTab = null; renderAll(); });
-    $("closeFramesPanelBtn").addEventListener("click", () => { state.activeTab = null; renderAll(); });
-    $("closeEditPanelBtn").addEventListener("click", () => { state.activeTab = null; renderAll(); });
-
-    // Photo upload
-    $("addInSheetBtn").addEventListener("click", () => $("photoInput").click());
-    $("photoInput").addEventListener("change", async (e) => {
-      const files = Array.from(e.target.files || []);
-      if (files.length) await addPhotos(files);
-      e.target.value = "";
-    });
-
-    // Edit
-    $("toggleEditBtn").addEventListener("click", () => {
-      state.editEnabled = !state.editEnabled;
-      renderAll();
-      showToast(state.editEnabled ? "配置編集ON" : "配置編集OFF", 800);
-    });
-
-    // Frame add buttons
-    document.querySelectorAll("[data-add-kind]").forEach(btn => {
-      btn.addEventListener("click", () => addFrame(btn.dataset.addKind));
-    });
-
-    $("pinPhotoBtn").addEventListener("click", togglePin);
-    $("deleteFrameBtn").addEventListener("click", deleteSelectedFrame);
-
-    // Viewer
-    $("viewerClose").addEventListener("click", closeViewer);
-    $("viewer").addEventListener("click", (e) => { if (e.target === $("viewer")) closeViewer(); });
-
-    // Canvas click for display exit & deselect
-    $("canvasArea").addEventListener("click", (e) => {
-      if (state.mode === "display") { exitDisplay(); return; }
-      if (!e.target.closest(".frame")) {
-        state.selectedFrameId = null;
-        renderAll();
-      }
-    });
-
-    // Resize
-    window.addEventListener("resize", fitCanvas);
-  }
-
-  /* ===== Hydrate Aspect Ratios ===== */
-  async function hydrateAspectRatios() {
-    await Promise.all(Object.values(FRAME_META).map(m => new Promise(res => {
-      const img = new Image();
-      img.onload = () => { m.ar = (img.naturalWidth || 1) / (img.naturalHeight || 1); res(); };
-      img.onerror = () => res();
-      img.src = m.src;
-    })));
-  }
-
-  /* ===== Init ===== */
-  async function init() {
+  async function init(){
     await checkMasks();
+    console.log("Masks available:",state.masksAvailable);
     await hydrateAspectRatios();
-
-    state.photos = [{ id: uid(), name: "placeholder", dataUrl: placeholderUrl, ratio: 1, orient: "square" }];
-
+    state.photos=[{id:uid(),name:"placeholder",dataUrl:placeholderUrl,ratio:1,orient:"square"}];
     seedLayout("story");
     bindUI();
     fitCanvas();
   }
 
-  init().catch(err => {
-    console.error(err);
-    showToast("初期化に失敗しました");
-  });
+  init().catch(err=>{console.error(err);showToast("初期化に失敗しました");});
 })();
 </script>
 
