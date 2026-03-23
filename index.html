@@ -206,7 +206,7 @@ body.display-mode #displayHint.show { opacity: 1; }
   const FRAME_META = {
     portrait:         { src: "frame_vertical.png",          maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
     portrait_simple:  { src: "frame_vertical_simple.png",   maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
-    square:           { src: "frame_square.png",            maskPng: "mask_square.png",     inset: "19.5% 19.8% 19.8% 18.9%", ar: 1033 / 1033 },
+    square:           { src: "frame_square.png",            maskPng: "mask_square.png",     inset: "19.55% 19.8% 19.8% 18.9%", ar: 1033 / 1033 },
     landscape:        { src: "frame_horizontal.png",        maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
     landscape_simple: { src: "frame_horizontal_simple.png", maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
     oval:             { src: "frame_oval.png",              maskPng: "mask_oval.png",       inset: "12.0% 24.0% 10.5% 26.0%", ar: 675 / 963 }
@@ -317,6 +317,7 @@ body.display-mode #displayHint.show { opacity: 1; }
       const outline=document.createElement("div");outline.className="frame-outline";el.appendChild(outline);
 
       const pwrap=document.createElement("div");pwrap.className="photoWrap";
+      if(f.kind==="oval")pwrap.style.borderRadius="50%";
       if(state.masksAvailable&&m.maskPng)applyMaskImage(pwrap,m.maskPng);
 
       const pmask=document.createElement("div");pmask.className="photoMask";pmask.style.inset=m.inset;
@@ -336,11 +337,25 @@ body.display-mode #displayHint.show { opacity: 1; }
     });
   }
 
-  function bindFrameClick(el,f){el.addEventListener("click",(e)=>{if(state.mode==="display")return;if(e.target.classList.contains("resize-handle"))return;state.selectedFrameId=f.id;renderAll();});}
+  function bindFrameClick(el,f){el.addEventListener("click",(e)=>{
+    if(state.mode==="display")return;if(e.target.classList.contains("resize-handle"))return;
+    state.selectedFrameId=f.id;
+    $("canvas").querySelectorAll(".frame").forEach(fr=>fr.classList.toggle("selected",fr.dataset.id===f.id));
+    updateEditPanel();renderPhotoSheet();renderPanels();
+  });}
 
   function attachDrag(el,f){
     let on=false,sx=0,sy=0,ogx=0,ogy=0;
-    el.addEventListener("pointerdown",(e)=>{if(!state.editEnabled||e.target.classList.contains("resize-handle"))return;e.stopPropagation();state.selectedFrameId=f.id;renderAll();on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;el.setPointerCapture(e.pointerId);el.classList.add("dragging");});
+    el.addEventListener("pointerdown",(e)=>{
+      if(!state.editEnabled||e.target.classList.contains("resize-handle"))return;
+      e.stopPropagation();
+      state.selectedFrameId=f.id;
+      // Update selection visually without rebuilding DOM
+      $("canvas").querySelectorAll(".frame").forEach(fr=>fr.classList.toggle("selected",fr.dataset.id===f.id));
+      updateEditPanel();
+      on=true;sx=e.clientX;sy=e.clientY;ogx=f.gx;ogy=f.gy;
+      el.setPointerCapture(e.pointerId);el.classList.add("dragging");
+    });
     el.addEventListener("pointermove",(e)=>{if(!on)return;const r=$("canvas").getBoundingClientRect();f.gx=ogx+(e.clientX-sx)/r.width*GRID.W;f.gy=ogy+(e.clientY-sy)/r.height*GRID.H;el.style.left=(f.gx/GRID.W*100)+"%";el.style.top=(f.gy/GRID.H*100)+"%";});
     el.addEventListener("pointerup",()=>{on=false;el.classList.remove("dragging");});
     el.addEventListener("pointercancel",()=>{on=false;el.classList.remove("dragging");});
@@ -348,7 +363,13 @@ body.display-mode #displayHint.show { opacity: 1; }
 
   function attachResize(handle,el,f){
     let on=false,sx=0,sw=0;
-    handle.addEventListener("pointerdown",(e)=>{if(!state.editEnabled)return;e.stopPropagation();state.selectedFrameId=f.id;on=true;sx=e.clientX;sw=f.w;handle.setPointerCapture(e.pointerId);el.classList.add("resizing");});
+    handle.addEventListener("pointerdown",(e)=>{
+      if(!state.editEnabled)return;
+      e.stopPropagation();
+      state.selectedFrameId=f.id;
+      on=true;sx=e.clientX;sw=f.w;
+      handle.setPointerCapture(e.pointerId);el.classList.add("resizing");
+    });
     handle.addEventListener("pointermove",(e)=>{if(!on)return;const r=$("canvas").getBoundingClientRect();let nw=sw+(e.clientX-sx)/r.width*GRID.W;if(nw<10)nw=10;f.w=nw;const pct=gridToPercent(f);el.style.width=pct.width;el.style.height=pct.height;});
     handle.addEventListener("pointerup",()=>{on=false;el.classList.remove("resizing");});
     handle.addEventListener("pointercancel",()=>{on=false;el.classList.remove("resizing");});
