@@ -79,9 +79,7 @@ body.edit-mode .sheet.open{bottom:122px;}
 .pcell{position:relative;aspect-ratio:1;overflow:hidden;border-radius:8px;cursor:pointer;background:var(--canvas-fill);}
 .pcell img{width:100%;height:100%;object-fit:cover;}.pcell .pdel{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--danger);box-shadow:0 1px 3px rgba(0,0,0,0.10);cursor:pointer;}
 .pcell.fixed-c{outline:2px solid var(--accent);outline-offset:-2px;}.pcell .ftag{position:absolute;left:3px;bottom:3px;background:rgba(42,37,32,0.75);color:#fff;font-size:9px;border-radius:var(--r-pill);padding:1px 7px;font-weight:500;}
-.pempty{text-align:center;color:var(--text-hint);font-size:12px;padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:12px;}
-.pempty-add{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;border-radius:var(--r-pill);background:var(--accent);color:#fff;font-size:12px;font-weight:600;letter-spacing:0.02em;border:none;cursor:pointer;transition:all 80ms ease;}
-.pempty-add:active{opacity:0.8;transform:scale(0.97);}
+.pempty{text-align:center;color:var(--text-hint);font-size:12px;padding:24px 0;}
 .mlist{display:grid;gap:5px;}.mitem{min-height:44px;padding:0 12px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:500;font-size:12px;border:1px solid var(--line);background:var(--surface-solid);transition:all 80ms ease;}
 .mitem:active{transform:scale(0.99);}.mitem.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(74,106,138,0.10);}.mitem.disabled{opacity:0.32;pointer-events:none;}
 .mitem-r{font-size:11px;color:var(--text-sub);font-weight:400;}.mitem.active .mitem-r{color:var(--accent);}
@@ -126,7 +124,7 @@ body.display-mode #displayHint.show{opacity:1;}
     </div>
     <div id="photoSheet" class="sheet">
       <div class="sh-head"><div><div class="sh-title">写真一覧</div><div id="sheetMeta" class="sh-sub">写真 0 / 100</div></div><div class="sh-actions"><button id="addPhotoBtn" class="pill accent">追加</button><button id="closePhoto" class="pill ghost">閉じる</button></div></div>
-      <div class="sh-body"><div id="photoGrid" class="pgrid"></div><div id="photoEmpty" class="pempty"><span>写真を追加して壁に飾りましょう</span><button id="addPhotoBtn2" class="pempty-add">写真を追加</button></div></div>
+      <div class="sh-body"><div id="photoGrid" class="pgrid"></div><div id="photoEmpty" class="pempty">写真を追加して壁に飾りましょう</div></div>
     </div>
     <div id="framesSheet" class="sheet">
       <div class="sh-head"><div class="sh-title">Frames</div><button id="closeFrames" class="pill ghost">閉じる</button></div>
@@ -143,10 +141,10 @@ body.display-mode #displayHint.show{opacity:1;}
         <div class="slabel">選択中フレーム</div>
         <div class="mlist">
           <button id="changeFrameBtn" class="mitem disabled"><span>フレーム変更</span><span id="changeFrameR" class="mitem-r">未選択</span></button>
+          <div id="changeArea" class="hidden"><div id="changeShapeStep"><div class="sgrid" id="changeShapeGrid"></div></div><div id="changeDesignStep" class="hidden"><button id="changeBack" class="step-back">← 形を選び直す</button><div id="changeDesignGrid" class="dgrid"></div></div></div>
           <button id="pinBtn" class="mitem disabled"><span id="pinText">写真固定</span><span id="pinState" class="mitem-r">未選択</span></button>
           <button id="delBtn" class="mitem disabled"><span style="color:var(--danger);">削除</span><span class="mitem-r"></span></button>
         </div>
-        <div id="changeArea" class="hidden"><div class="slabel">変更先を選択</div><div id="changeShapeStep"><div class="sgrid" id="changeShapeGrid"></div></div><div id="changeDesignStep" class="hidden"><button id="changeBack" class="step-back">← 形を選び直す</button><div id="changeDesignGrid" class="dgrid"></div></div></div>
       </div>
     </div>
     <div id="viewer" class="viewer"><button id="viewerClose" class="viewer-x">×</button><img id="viewerImg" alt="" /></div>
@@ -226,14 +224,13 @@ function adf(kind){pu();const w=kind.includes("landscape")?50:kind.includes("por
 function df(){const f=sf();if(!f){toast("フレームを選択");return}pu();S.fs=S.fs.filter(x=>x.id!==f.id);S.sel=null;ra();toast("削除しました")}
 function tp(){const f=sf();if(!f){toast("フレームを選択");return}if(f.fp){f.fp=null;ra();toast("固定解除",700)}else{if(!f.cp){toast("写真がありません");return}f.fp=f.cp;ra();toast("写真固定",700)}}
 function bind(){
-$("navPhoto").addEventListener("click",()=>{if(S.mode==="display")xd();if(S.mode==="edit")xe();S.tab=S.tab==="photo"?null:"photo";ra()});
-$("navFrames").addEventListener("click",()=>{if(S.mode==="display")xd();if(S.mode==="edit")xe();S.tab=S.tab==="frames"?null:"frames";ra()});
-$("navEdit").addEventListener("click",()=>{if(S.mode==="display")xd();if(S.mode==="edit"){S.tab=S.tab==="edit"?null:"edit";ra();return}ee()});
-$("navDisplay").addEventListener("click",()=>{if(S.mode==="edit")xe();ed()});
+$("navPhoto").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){xe()}S.tab=S.tab==="photo"?null:"photo";ra()});
+$("navFrames").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){xe()}S.tab=S.tab==="frames"?null:"frames";ra()});
+$("navEdit").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){S.tab=S.tab==="edit"?null:"edit";ra();return}ee()});
+$("navDisplay").addEventListener("click",()=>{if(S.mode==="edit"){xe()}ed()});
 $("ebUndo").addEventListener("click",undo);$("ebRedo").addEventListener("click",redo);$("ebDone").addEventListener("click",xe);
-$("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});$("closeEditSheet").addEventListener("click",()=>{S.tab=null;ra()});
+$("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});$("closeEditSheet").addEventListener("click",()=>{xe()});
 $("addPhotoBtn").addEventListener("click",()=>$("photoInput").click());
-$("addPhotoBtn2").addEventListener("click",()=>$("photoInput").click());
 $("photoInput").addEventListener("change",async e=>{const f=Array.from(e.target.files||[]);if(f.length)await aps(f);e.target.value=""});
 document.querySelectorAll("#addShapeStep .scard").forEach(c=>{c.addEventListener("click",()=>sad(c.dataset.shape))});
 $("addBack").addEventListener("click",raf);
