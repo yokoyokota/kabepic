@@ -142,6 +142,7 @@ body.dm #dHint.sh{opacity:1}
 
 </head>
 <body>
+<div id="dbg" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:red;color:white;padding:8px;font-size:14px;font-family:monospace">Loading...</div>
 <div id="editBar">
   <button id="ebU" class="ebb dis">↶ 戻す</button>
   <button id="ebR" class="ebb dis">↷ やり直す</button>
@@ -319,7 +320,7 @@ function clVw(){$(“vw”).classList.remove(“opn”);$(“vwI”).src=””}
 /* RENDER ALL */
 function rPa(){$(“shP”).classList.toggle(“opn”,mode!==“display”&&tab===“photo”);$(“shF”).classList.toggle(“opn”,mode!==“display”&&tab===“frames”);$(“shE”).classList.toggle(“opn”,mode===“edit”&&tab===“edit”)}
 function rNv(){$(“nP”).classList.toggle(“on”,tab===“photo”&&mode!==“edit”);$(“nF”).classList.toggle(“on”,tab===“frames”&&mode!==“edit”);$(“nE”).classList.toggle(“on”,mode===“edit”);$(“nD”).classList.toggle(“on”,mode===“display”)}
-function ra(){document.body.classList.toggle(“dm”,mode===“display”);document.body.classList.toggle(“em”,mode===“edit”);$(“editBar”).classList.toggle(“vis”,mode===“edit”);rNv();rPa();bFp();rPh();updE();updU();rc()}
+function ra(){var a=document.getElementById(“cvArea”);var d=document.getElementById(“dbg”);if(d&&a)d.textContent=“mode:”+mode+” fs:”+fs.length+” cvW:”+a.clientWidth+” cvH:”+a.clientHeight+” cv:”+document.getElementById(“cv”).clientWidth;document.body.classList.toggle(“dm”,mode===“display”);document.body.classList.toggle(“em”,mode===“edit”);$(“editBar”).classList.toggle(“vis”,mode===“edit”);rNv();rPa();bFp();rPh();updE();updU();rc()}
 
 /* ADD PHOTOS */
 function addPhotos(files){if(!files.length||uploading)return Promise.resolve();var rem=MAX_P-rp().length;if(rem<=0){toast(“写真上限です”);prog(false);return Promise.resolve()}uploading=true;var toP=Array.prototype.slice.call(files,0,rem);var n=0;function next(i){if(i>=toP.length){uploading=false;prog(false);autoA();ra();if(n)toast(n+“枚追加しました”);return Promise.resolve()}prog(true,i,toP.length);return new Promise(function(r){setTimeout(r,20)}).then(function(){return compress(toP[i])}).then(function(p){ps.push(p);n++;prog(true,i+1,toP.length);return next(i+1)})}return next(0)}
