@@ -162,6 +162,7 @@ const FM={portrait:{src:"frame_vertical.png",maskPng:"mask_vertical.png",inset:"
 const SD={square:[{kind:"square",label:"クラシック"}],landscape:[{kind:"landscape",label:"クラシック"},{kind:"landscape_simple",label:"シンプル"}],portrait:[{kind:"portrait",label:"クラシック"},{kind:"portrait_simple",label:"シンプル"}],oval:[{kind:"oval",label:"楕円"}]};
 const LO={calm:[["portrait",43.9,0,84.5],["square",126,27.6,56.8],["landscape",88,82.6,71]],flow:[["portrait",-0.6,53.8,59.5],["portrait",52.7,8.7,72],["square",123.3,30.7,49.9],["landscape_simple",177.2,53.3,60.8],["landscape",79.2,79.3,68.6]],story:[["portrait",-0.2,57.8,38],["square",42.9,32.2,41],["portrait",87.4,16.5,56.25],["landscape_simple",144.7,38.1,38],["landscape",187.5,48.4,51],["landscape",39.5,73.1,47],["square",91.7,76.4,47],["portrait",142.7,77,41.5]],scene:[["landscape_simple",1.5,42.3,39],["square",42.75,33.5,45],["portrait_simple",96.15,3,39],["portrait",141,38.7,39],["landscape",180,47.4,33],["square",21.3,81.5,31.5],["portrait",54.6,81.5,36.6],["portrait",85.5,43.55,60],["landscape",142.5,77,53.4],["landscape_simple",198.75,78.5,39],["square",94.8,106.2,42]]};
 const S={mode:"view",tab:null,lk:"story",ps:[],fs:[],sel:null,dt:[],tt:null,up:false,mk:false,us:[],rs:[],cs:null};
+let zoomScale=1,zoomOx=0,zoomOy=0;
 function uid(){return Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36)}
 function toast(m,ms=1200){clearTimeout(S.tt);$("toast").textContent=m;$("toast").classList.add("show");S.tt=setTimeout(()=>$("toast").classList.remove("show"),ms)}
 function prog(o,c=0,t=0){$("progressOverlay").classList.toggle("open",o);$("progressMeta").textContent=o?c+" / "+t:"";$("progressFill").style.width=o&&t?Math.round(c/t*100)+"%":"0%"}
@@ -235,8 +236,8 @@ $("navDisplay").addEventListener("click",()=>{if(S.mode==="edit"){xe()}ed()});
 $("ebUndo").addEventListener("click",undo);$("ebRedo").addEventListener("click",redo);$("ebDone").addEventListener("click",xe);
 $("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});
 $("closeEditSheet").addEventListener("click",()=>{S.tab=null;ra()});
-/* Pinch zoom state */
-let zoomScale=1,zoomOx=0,zoomOy=0,pinching=false,pinchDist0=0,pinchScale0=1;
+/* Pinch zoom */
+let pinching=false,pinchDist0=0,pinchScale0=1;
 function applyZoom(){const a=$("canvasArea"),baseS=Math.min(a.clientWidth/2400,a.clientHeight/1500),s=baseS*zoomScale,sw=2400*s,sh=1500*s,ox=(a.clientWidth-sw)/2+zoomOx,oy=(a.clientHeight-sh)/2+zoomOy;$("canvasScaler").style.transform=`translate(${ox}px,${oy}px) scale(${s})`}
 function fitZ(){zoomScale=1;zoomOx=0;zoomOy=0;fit()}
 function getDist(t){const a=t[0],b=t[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}
