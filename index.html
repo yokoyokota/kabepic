@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:#faf9f7;--canvas-fill:#f3eee6;--surface:rgba(255,253,249,0.97);--surface-solid:#fffdf9;
+      --bg:#f7f4ef;--canvas-fill:#f3eee6;--surface:rgba(255,253,249,0.97);--surface-solid:#fffdf9;
       --line:rgba(130,118,96,0.10);--line-strong:rgba(130,118,96,0.18);
       --text:#2a2520;--text-sub:#87796a;--text-hint:#b5a898;
       --accent:#4a6a8a;--accent-bg:rgba(74,106,138,0.07);--accent-ring:rgba(74,106,138,0.20);
@@ -96,6 +96,7 @@ body.edit-mode .sheet.open{bottom:122px;}
 .dlbl{font-size:10px;font-weight:500;color:var(--text-sub);}
 .step-back{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;color:var(--text-sub);cursor:pointer;padding:3px 0;margin-bottom:6px;}.step-back:active{color:var(--text);}
 #changeArea{margin-top:6px;}
+.change-active #addArea,.change-active #pinBtn,.change-active #delBtn{opacity:0.25;pointer-events:none;}
 
 .viewer{position:fixed;inset:0;z-index:4000;background:rgba(42,37,32,0.82);display:none;align-items:center;justify-content:center;padding:20px;}
 .viewer.open{display:flex;}.viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r-md);box-shadow:0 14px 36px rgba(0,0,0,0.28);}
@@ -113,9 +114,9 @@ body.display-mode #displayHint.show{opacity:1;}
   </style>
 </head>
 <body>
+  <div id="editBar"><button id="ebUndo" class="eb-btn disabled">↶ 戻す</button><button id="ebRedo" class="eb-btn disabled">↷ やり直す</button><button id="ebDone" class="eb-done">編集終了</button></div>
   <div id="app">
     <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
-    <div id="editBar"><button id="ebUndo" class="eb-btn disabled">↶ 戻す</button><button id="ebRedo" class="eb-btn disabled">↷ やり直す</button><button id="ebDone" class="eb-done">編集終了</button></div>
     <div id="canvasArea"><div id="canvasScaler"><div id="canvas"></div></div></div>
     <div class="bottom-nav">
       <button id="navPhoto" class="nav-btn"><span class="ni">◻</span>Photo</button>
@@ -162,7 +163,7 @@ const S={mode:"view",tab:null,lk:"story",ps:[],fs:[],sel:null,dt:[],tt:null,up:f
 function uid(){return Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36)}
 function toast(m,ms=1200){clearTimeout(S.tt);$("toast").textContent=m;$("toast").classList.add("show");S.tt=setTimeout(()=>$("toast").classList.remove("show"),ms)}
 function prog(o,c=0,t=0){$("progressOverlay").classList.toggle("open",o);$("progressMeta").textContent=o?c+" / "+t:"";$("progressFill").style.width=o&&t?Math.round(c/t*100)+"%":"0%"}
-function ph(){const c=document.createElement("canvas");c.width=800;c.height=800;const g=c.getContext("2d");g.fillStyle="#e8e2d6";g.fillRect(0,0,800,800);g.strokeStyle="rgba(130,118,96,0.12)";g.lineWidth=3;g.strokeRect(40,40,720,720);g.fillStyle="rgba(42,37,32,0.16)";g.textAlign="center";g.font="600 38px 'DM Sans',sans-serif";g.fillText("KABEPIC",400,380);g.font="300 17px 'DM Sans',sans-serif";g.fillText("placeholder",400,416);return c.toDataURL("image/png")}
+function ph(){const c=document.createElement("canvas");c.width=800;c.height=800;const g=c.getContext("2d");g.fillStyle="#f3eee6";g.fillRect(0,0,800,800);return c.toDataURL("image/png")}
 const PH=ph();
 function fp(id){return S.ps.find(p=>p.id===id)||null}function sf(){return S.fs.find(f=>f.id===S.sel)||null}function dor(r){return r>1.05?"landscape":r<0.95?"portrait":"square"}function rp(){return S.ps.filter(p=>p.name!=="placeholder")}
 function fb(k){if(k==="square")return"square";if(k==="oval"||k.includes("portrait"))return"portrait";if(k.includes("landscape"))return"landscape";return"square"}
@@ -202,7 +203,7 @@ function seed(k){pu();S.lk=k;S.sel=null;const g=LO[k]||LO.story;S.fs=g.map(x=>({
 function rps(){const r=rp();$("sheetMeta").textContent="写真 "+r.length+" / "+MAX_P;const g=$("photoGrid"),em=$("photoEmpty");if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";const s=sf();r.forEach(p=>{const c=document.createElement("div");c.className="pcell";if(s&&s.fp===p.id)c.classList.add("fixed-c");const im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);const d=document.createElement("button");d.className="pdel";d.textContent="✕";d.addEventListener("click",e=>{e.stopPropagation();rph(p.id)});c.appendChild(d);if(s&&s.fp===p.id){const t=document.createElement("div");t.className="ftag";t.textContent="固定中";c.appendChild(t)}c.addEventListener("click",()=>{if(!s){ov(p.dataUrl);return}s.fp=p.id;s.pi=[p.id];s.cp=p.id;ra();toast("写真固定",700)});g.appendChild(c)})}
 function rph(id){S.ps=S.ps.filter(p=>p.id!==id);S.fs.forEach(f=>{f.pi=(f.pi||[]).filter(x=>x!==id);if(f.fp===id)f.fp=null;if(f.cp===id)f.cp=null});aa();ra();toast("削除しました")}
 function bfp(){const l=$("framesList");l.innerHTML="";const lb={calm:"Calm (3)",flow:"Flow (5)",story:"Story (8)",scene:"Scene (11)"},ds={calm:"余白重視。大きな写真。",flow:"軽い物語構成。",story:"バランス型ギャラリー。",scene:"壁として完成する構成。"};Object.entries(lb).forEach(([k,v])=>{const b=document.createElement("button");b.className="mitem"+(S.lk===k?" active":"");b.innerHTML='<span>'+v+'<br><small style="font-size:10px;font-weight:400;color:var(--text-hint);">'+ds[k]+'</small></span><span class="mitem-r">'+(S.lk===k?"選択中":"")+"</span>";b.addEventListener("click",()=>{seed(k);toast(v+" に切り替えました")});l.appendChild(b)})}
-function ues(){const f=sf(),no=!f,pin=f&&!!f.fp;$("pinText").textContent=pin?"固定解除":"写真固定";$("pinState").textContent=no?"未選択":pin?"固定中":"未固定";$("pinBtn").classList.toggle("active",!!pin);$("pinBtn").classList.toggle("disabled",no);$("delBtn").classList.toggle("disabled",no);$("changeFrameBtn").classList.toggle("disabled",no);$("changeFrameR").textContent=no?"未選択":f.kind.includes("simple")?"シンプル":"クラシック";$("changeArea").classList.add("hidden");rcf()}
+function ues(){const f=sf(),no=!f,pin=f&&!!f.fp;$("pinText").textContent=pin?"固定解除":"写真固定";$("pinState").textContent=no?"未選択":pin?"固定中":"未固定";$("pinBtn").classList.toggle("active",!!pin);$("pinBtn").classList.toggle("disabled",no);$("delBtn").classList.toggle("disabled",no);$("changeFrameBtn").classList.toggle("disabled",no);$("changeFrameR").textContent=no?"未選択":f.kind.includes("simple")?"シンプル":"クラシック";$("changeArea").classList.add("hidden");var sb=$("editSheet").querySelector(".sh-body");if(sb)sb.classList.remove("change-active");rcf()}
 function raf(){$("addShapeStep").classList.remove("hidden");$("addDesignStep").classList.add("hidden");document.querySelectorAll("#addShapeStep .scard").forEach(c=>c.classList.remove("sel"))}
 function sad(shape){document.querySelectorAll("#addShapeStep .scard").forEach(c=>c.classList.toggle("sel",c.dataset.shape===shape));const d=SD[shape]||[];if(d.length<=1){adf(d[0].kind);raf();return}const g=$("addDesignGrid");g.innerHTML="";d.forEach(x=>{const c=document.createElement("button");c.className="dcard";const m=FM[x.kind];c.innerHTML='<div class="dprev"><img src="'+m.src+'" alt="'+x.label+'" onerror="this.parentElement.innerHTML=\'<div style=\\\'width:36px;height:36px;border:1.5px solid var(--text);border-radius:2px;\\\'></div>\'"></div><div class="dlbl">'+x.label+"</div>";c.addEventListener("click",()=>{adf(x.kind);raf()});g.appendChild(c)});$("addShapeStep").classList.add("hidden");$("addDesignStep").classList.remove("hidden")}
 function rcf(){S.cs=null;$("changeShapeStep").classList.remove("hidden");$("changeDesignStep").classList.add("hidden")}
@@ -232,11 +233,11 @@ $("navDisplay").addEventListener("click",()=>{if(S.mode==="edit"){xe()}ed()});
 $("ebUndo").addEventListener("click",undo);$("ebRedo").addEventListener("click",redo);$("ebDone").addEventListener("click",xe);
 $("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});
 $("closeEditSheet").addEventListener("click",()=>{S.tab=null;ra()});
-$("addPhotoBtn").addEventListener("click",()=>{$("addPhotoBtn").textContent="選択中...";$("addPhotoBtn").style.background="#6a8a6a";$("photoInput").click()});
-$("photoInput").addEventListener("change",async e=>{$("addPhotoBtn").textContent="追加";$("addPhotoBtn").style.background="";const f=Array.from(e.target.files||[]);if(f.length){prog(true,0,f.length);await new Promise(r=>setTimeout(r,50));await aps(f);S.tab=null;ra()}e.target.value=""});
+$("addPhotoBtn").addEventListener("click",()=>{$("photoInput").click()});
+$("photoInput").addEventListener("change",async e=>{const f=Array.from(e.target.files||[]);if(f.length){prog(true,0,f.length);await new Promise(r=>setTimeout(r,50));await aps(f);S.tab=null;ra()}e.target.value=""});
 document.querySelectorAll("#addShapeStep .scard").forEach(c=>{c.addEventListener("click",()=>sad(c.dataset.shape))});
 $("addBack").addEventListener("click",raf);
-$("changeFrameBtn").addEventListener("click",()=>{if(!sf())return;const sh=!$("changeArea").classList.contains("hidden");if(sh){$("changeArea").classList.add("hidden");rcf()}else{$("changeArea").classList.remove("hidden");bcsg()}});
+$("changeFrameBtn").addEventListener("click",()=>{if(!sf())return;const ca=$("changeArea"),sb=$("editSheet").querySelector(".sh-body"),sh=!ca.classList.contains("hidden");if(sh){ca.classList.add("hidden");sb.classList.remove("change-active");rcf()}else{ca.classList.remove("hidden");sb.classList.add("change-active");bcsg()}});
 $("changeBack").addEventListener("click",()=>{rcf();bcsg()});
 $("pinBtn").addEventListener("click",tp);$("delBtn").addEventListener("click",df);
 $("viewerClose").addEventListener("click",cv);$("viewer").addEventListener("click",e=>{if(e.target===$("viewer"))cv()});
