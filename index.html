@@ -30,16 +30,15 @@
     #app{position:fixed;inset:0;overflow:hidden;background:var(--bg);}body.display-mode #app{background:var(--display-out);}
 
 ```
-.edit-bar{position:fixed;top:calc(var(--safe-t)+8px);left:10px;right:10px;z-index:3200;display:flex;align-items:center;justify-content:flex-end;gap:6px;height:44px;padding:0 6px 0 14px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line);box-shadow:var(--sh-m);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;pointer-events:none;transition:opacity 180ms ease,transform 180ms ease;transform:translateY(-6px);}
+.edit-bar{position:fixed;top:12px;left:10px;right:10px;z-index:3200;display:flex;align-items:center;justify-content:flex-end;gap:6px;height:44px;padding:0 6px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line);box-shadow:var(--sh-m);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;pointer-events:none;transition:opacity 180ms ease,transform 180ms ease;transform:translateY(-6px);}
 body.edit-mode .edit-bar{opacity:1;pointer-events:auto;transform:translateY(0);}
-.eb-label{margin-right:auto;font-size:11px;font-weight:500;color:var(--text-sub);letter-spacing:0.04em;}
 .eb-icon{width:36px;height:36px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-sub);transition:all 80ms ease;}
 .eb-icon:active{background:rgba(0,0,0,0.04);transform:scale(0.94);}.eb-icon.disabled{opacity:0.25;pointer-events:none;}
 .eb-done{height:32px;padding:0 14px;border-radius:var(--r-pill);background:var(--accent);color:#fff;font-size:11px;font-weight:600;letter-spacing:0.03em;transition:all 80ms ease;}
 .eb-done:active{opacity:0.8;transform:scale(0.97);}
 
 #canvasArea{position:absolute;inset:0;padding-top:calc(var(--safe-t)+8px);padding-bottom:calc(var(--nav-h)+var(--safe-b)+14px);overflow:hidden;}
-body.edit-mode #canvasArea{padding-top:calc(var(--safe-t)+60px);}body.display-mode #canvasArea{padding:0;}
+body.edit-mode #canvasArea{padding-top:64px;}body.display-mode #canvasArea{padding:0;}
 #canvasScaler{position:absolute;top:0;left:0;width:2400px;height:1500px;transform-origin:top left;}
 #canvas{position:relative;width:2400px;height:1500px;background:var(--canvas-fill);overflow:hidden;touch-action:none;border-radius:3px;border:1px solid rgba(130,118,96,0.08);}
 body.display-mode #canvas{background:var(--display-bg);border-color:rgba(0,0,0,0.06);box-shadow:0 0 0 9999px var(--display-out);border-radius:0;}
@@ -79,7 +78,9 @@ body.display-mode .edit-bar,body.display-mode .bottom-nav,body.display-mode .she
 .pcell{position:relative;aspect-ratio:1;overflow:hidden;border-radius:8px;cursor:pointer;background:var(--canvas-fill);}
 .pcell img{width:100%;height:100%;object-fit:cover;}.pcell .pdel{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--danger);box-shadow:0 1px 3px rgba(0,0,0,0.10);cursor:pointer;}
 .pcell.fixed-c{outline:2px solid var(--accent);outline-offset:-2px;}.pcell .ftag{position:absolute;left:3px;bottom:3px;background:rgba(42,37,32,0.75);color:#fff;font-size:9px;border-radius:var(--r-pill);padding:1px 7px;font-weight:500;}
-.pempty{text-align:center;color:var(--text-hint);font-size:12px;padding:28px 0;}
+.pempty{text-align:center;color:var(--text-hint);font-size:12px;padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.pempty-add{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;border-radius:var(--r-pill);background:var(--accent);color:#fff;font-size:12px;font-weight:600;letter-spacing:0.02em;border:none;cursor:pointer;transition:all 80ms ease;}
+.pempty-add:active{opacity:0.8;transform:scale(0.97);}
 .mlist{display:grid;gap:5px;}.mitem{min-height:44px;padding:0 12px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:500;font-size:12px;border:1px solid var(--line);background:var(--surface-solid);transition:all 80ms ease;}
 .mitem:active{transform:scale(0.99);}.mitem.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(74,106,138,0.10);}.mitem.disabled{opacity:0.32;pointer-events:none;}
 .mitem-r{font-size:11px;color:var(--text-sub);font-weight:400;}.mitem.active .mitem-r{color:var(--accent);}
@@ -101,7 +102,7 @@ body.display-mode .edit-bar,body.display-mode .bottom-nav,body.display-mode .she
 .viewer-x{position:absolute;top:calc(var(--safe-t)+12px);right:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.10);font-size:15px;display:flex;align-items:center;justify-content:center;}
 #displayHint{position:fixed;top:calc(var(--safe-t)+12px);left:50%;transform:translateX(-50%);z-index:4200;padding:7px 14px;border-radius:var(--r-pill);background:rgba(42,37,32,0.72);color:#fff;font-size:11px;font-weight:500;letter-spacing:0.04em;opacity:0;transition:opacity 180ms;pointer-events:none;}
 body.display-mode #displayHint.show{opacity:1;}
-#toast{position:fixed;top:calc(var(--safe-t)+64px);left:50%;transform:translateX(-50%) translateY(-5px);z-index:5000;max-width:min(88vw,360px);padding:7px 14px;border-radius:var(--r-pill);background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--sh-m);text-align:center;font-size:11px;font-weight:500;opacity:0;pointer-events:none;transition:opacity 100ms,transform 100ms;}
+#toast{position:fixed;top:66px;left:50%;transform:translateX(-50%) translateY(-5px);z-index:5000;max-width:min(88vw,360px);padding:7px 14px;border-radius:var(--r-pill);background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--sh-m);text-align:center;font-size:11px;font-weight:500;opacity:0;pointer-events:none;transition:opacity 100ms,transform 100ms;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 #progressOverlay{position:fixed;inset:0;z-index:5500;background:rgba(42,37,32,0.22);display:none;align-items:center;justify-content:center;padding:20px;}
 #progressOverlay.open{display:flex;}.pcard{width:min(86vw,300px);padding:18px;border-radius:var(--r-lg);background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--sh-l);}
@@ -114,7 +115,7 @@ body.display-mode #displayHint.show{opacity:1;}
 <body>
   <div id="app">
     <input id="photoInput" class="hidden" type="file" accept="image/*" multiple />
-    <div class="edit-bar"><span class="eb-label">配置編集中</span><button id="ebUndo" class="eb-icon disabled" title="戻す">↶</button><button id="ebRedo" class="eb-icon disabled" title="やり直す">↷</button><button id="ebDone" class="eb-done">編集終了</button></div>
+    <div class="edit-bar"><button id="ebUndo" class="eb-icon disabled" title="戻す">↶</button><button id="ebRedo" class="eb-icon disabled" title="やり直す">↷</button><button id="ebDone" class="eb-done">編集終了</button></div>
     <div id="canvasArea"><div id="canvasScaler"><div id="canvas"></div></div></div>
     <div class="bottom-nav">
       <button id="navPhoto" class="nav-btn active"><span class="ni">◻</span>Photo</button>
@@ -124,7 +125,7 @@ body.display-mode #displayHint.show{opacity:1;}
     </div>
     <div id="photoSheet" class="sheet">
       <div class="sh-head"><div><div class="sh-title">写真一覧</div><div id="sheetMeta" class="sh-sub">写真 0 / 100</div></div><div class="sh-actions"><button id="addPhotoBtn" class="pill accent">追加</button><button id="closePhoto" class="pill ghost">閉じる</button></div></div>
-      <div class="sh-body"><div id="photoGrid" class="pgrid"></div><div id="photoEmpty" class="pempty">写真を追加して壁に飾りましょう</div></div>
+      <div class="sh-body"><div id="photoGrid" class="pgrid"></div><div id="photoEmpty" class="pempty"><span>写真を追加して壁に飾りましょう</span><button id="addPhotoBtn2" class="pempty-add">写真を追加</button></div></div>
     </div>
     <div id="framesSheet" class="sheet">
       <div class="sh-head"><div class="sh-title">Frames</div><button id="closeFrames" class="pill ghost">閉じる</button></div>
@@ -231,6 +232,7 @@ $("navDisplay").addEventListener("click",()=>{if(S.mode==="edit")xe();ed()});
 $("ebUndo").addEventListener("click",undo);$("ebRedo").addEventListener("click",redo);$("ebDone").addEventListener("click",xe);
 $("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});$("closeEditSheet").addEventListener("click",()=>{S.tab=null;ra()});
 $("addPhotoBtn").addEventListener("click",()=>$("photoInput").click());
+$("addPhotoBtn2").addEventListener("click",()=>$("photoInput").click());
 $("photoInput").addEventListener("change",async e=>{const f=Array.from(e.target.files||[]);if(f.length)await aps(f);e.target.value=""});
 document.querySelectorAll("#addShapeStep .scard").forEach(c=>{c.addEventListener("click",()=>sad(c.dataset.shape))});
 $("addBack").addEventListener("click",raf);
