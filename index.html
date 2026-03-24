@@ -385,7 +385,8 @@ window.addEventListener(“resize”,fit);
 /* HYDRATE ASPECT RATIOS */
 /* hydAR not needed for initial render */
 
-/* INIT - synchronous, no promises */
+/* INIT */
+try{
 ps=[{id:uid(),name:“placeholder”,dataUrl:PH,ratio:1,orient:“square”}];
 var gg=LO.story;
 fs=gg.map(function(x){return{id:uid(),kind:x[0],gx:x[1],gy:x[2],w:x[3],pi:[],fp:null,cp:null}});
@@ -394,6 +395,10 @@ bind();
 ra();
 fit();
 window.addEventListener(“resize”,fit);
+document.getElementById(“dbg”).textContent=“INIT OK fs:”+fs.length;
+}catch(e){
+document.getElementById(“dbg”).textContent=“ERROR: “+e.message+” at line “+e.lineNumber;
+}
 
 })();
 </script>
