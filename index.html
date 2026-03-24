@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:#ece7dd;--canvas-fill:#e8e2d6;--surface:rgba(255,253,249,0.97);--surface-solid:#fffdf9;
+      --bg:#faf9f7;--canvas-fill:#f3eee6;--surface:rgba(255,253,249,0.97);--surface-solid:#fffdf9;
       --line:rgba(130,118,96,0.10);--line-strong:rgba(130,118,96,0.18);
       --text:#2a2520;--text-sub:#87796a;--text-hint:#b5a898;
       --accent:#4a6a8a;--accent-bg:rgba(74,106,138,0.07);--accent-ring:rgba(74,106,138,0.20);
@@ -188,7 +188,7 @@ const nm=document.createElement("div");nm.className="frame-num";nm.textContent=S
 const pn=document.createElement("div");pn.className="frame-pin";pn.textContent="固定";el.appendChild(pn);
 const hd=document.createElement("div");hd.className="resize-handle";el.appendChild(hd);
 bfc(el,f);if(ie){ad(el,f);ar(hd,el,f)}cv.appendChild(el)})}
-function bfc(el,f){el.addEventListener("click",e=>{if(S.mode==="display")return;if(e.target.classList.contains("resize-handle"))return;S.sel=f.id;$("canvas").querySelectorAll(".frame").forEach(x=>x.classList.toggle("selected",x.dataset.id===f.id));ues();rps()})}
+function bfc(el,f){el.addEventListener("click",e=>{if(S.mode==="display")return;if(e.target.classList.contains("resize-handle"))return;S.sel=f.id;$("canvas").querySelectorAll(".frame").forEach(x=>x.classList.toggle("selected",x.dataset.id===f.id));ues();rps();if(S.mode==="edit"&&S.tab!=="edit"){S.tab="edit";rpa();rn()}})}
 function ad(el,f){let on=false,sx=0,sy=0,ox=0,oy=0,mv=false;
 el.addEventListener("pointerdown",e=>{if(e.target.classList.contains("resize-handle"))return;e.stopPropagation();S.sel=f.id;$("canvas").querySelectorAll(".frame").forEach(x=>x.classList.toggle("selected",x.dataset.id===f.id));ues();on=true;mv=false;sx=e.clientX;sy=e.clientY;ox=f.gx;oy=f.gy;el.setPointerCapture(e.pointerId);el.classList.add("dragging")});
 el.addEventListener("pointermove",e=>{if(!on)return;const r=$("canvas").getBoundingClientRect(),dx=(e.clientX-sx)/r.width*GRID.W,dy=(e.clientY-sy)/r.height*GRID.H;if(!mv&&(Math.abs(dx)>0.5||Math.abs(dy)>0.5)){pu();mv=true}f.gx=ox+dx;f.gy=oy+dy;el.style.left=f.gx/GRID.W*100+"%";el.style.top=f.gy/GRID.H*100+"%"});
@@ -216,20 +216,21 @@ function np(f){const pool=cp(f.kind);if(pool.length<2)return null;const c=gcp(f)
 function scf(){stcf();if(rp().length<2)return;S.fs.forEach(f=>{if(f.fp)return;const t=setInterval(()=>{const n=np(f);if(!n)return;f.cp=n.id;f.pi=[n.id];const el=$("canvas").querySelector('.frame[data-id="'+f.id+'"]');if(el){const im=el.querySelector(".photoMask img");if(im)im.src=n.dataUrl}},SW_MIN+Math.random()*(SW_MAX-SW_MIN));S.dt.push(t)})}
 function stcf(){S.dt.forEach(t=>clearInterval(t));S.dt=[]}
 function ov(src){$("viewerImg").src=src;$("viewer").classList.add("open")}function cv(){$("viewer").classList.remove("open");$("viewerImg").src=""}
-function rpa(){const v=S.mode==="view",e=S.mode==="edit";$("photoSheet").classList.toggle("open",(v||e)&&S.tab==="photo");$("framesSheet").classList.toggle("open",(v||e)&&S.tab==="frames");$("editSheet").classList.toggle("open",e&&S.tab==="edit")}
-function rn(){$("navPhoto").classList.toggle("active",S.tab==="photo");$("navFrames").classList.toggle("active",S.tab==="frames");$("navEdit").classList.toggle("active",S.mode==="edit"&&S.tab==="edit");$("navDisplay").classList.toggle("active",S.mode==="display")}
+function rpa(){$("photoSheet").classList.toggle("open",S.mode!=="display"&&S.tab==="photo");$("framesSheet").classList.toggle("open",S.mode!=="display"&&S.tab==="frames");$("editSheet").classList.toggle("open",S.mode==="edit"&&S.tab==="edit")}
+function rn(){$("navPhoto").classList.toggle("active",S.tab==="photo"&&S.mode!=="edit");$("navFrames").classList.toggle("active",S.tab==="frames"&&S.mode!=="edit");$("navEdit").classList.toggle("active",S.mode==="edit");$("navDisplay").classList.toggle("active",S.mode==="display")}
 function ra(){document.body.classList.toggle("display-mode",S.mode==="display");document.body.classList.toggle("edit-mode",S.mode==="edit");rn();rpa();bfp();rps();ues();uu();rc()}
 async function aps(files){if(!files.length||S.up)return;const rem=MAX_P-rp().length;if(rem<=0){toast("写真上限です");return}S.up=true;prog(true,0,files.length);let n=0;try{const f=files.slice(0,rem);for(let i=0;i<f.length;i++){prog(true,i+1,f.length);const p=await ci(f[i]);S.ps.push(p);n++}aa();ra();if(n)toast(n+"枚追加しました")}catch{toast("読み込み失敗")}S.up=false;prog(false)}
 function adf(kind){pu();const w=kind.includes("landscape")?50:kind.includes("portrait")?35:kind==="oval"?35:40;const f={id:uid(),kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w,pi:[],fp:null,cp:null};S.fs.push(f);aa();S.sel=f.id;ra();toast("追加しました")}
 function df(){const f=sf();if(!f){toast("フレームを選択");return}pu();S.fs=S.fs.filter(x=>x.id!==f.id);S.sel=null;ra();toast("削除しました")}
 function tp(){const f=sf();if(!f){toast("フレームを選択");return}if(f.fp){f.fp=null;ra();toast("固定解除",700)}else{if(!f.cp){toast("写真がありません");return}f.fp=f.cp;ra();toast("写真固定",700)}}
 function bind(){
-$("navPhoto").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){xe()}S.tab=S.tab==="photo"?null:"photo";ra()});
-$("navFrames").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){xe()}S.tab=S.tab==="frames"?null:"frames";ra()});
+$("navPhoto").addEventListener("click",()=>{if(S.mode==="display"){xd()}else if(S.mode==="edit"){xe()}S.tab=S.tab==="photo"?null:"photo";ra()});
+$("navFrames").addEventListener("click",()=>{if(S.mode==="display"){xd()}else if(S.mode==="edit"){xe()}S.tab=S.tab==="frames"?null:"frames";ra()});
 $("navEdit").addEventListener("click",()=>{if(S.mode==="display"){xd()}if(S.mode==="edit"){S.tab=S.tab==="edit"?null:"edit";ra();return}ee()});
 $("navDisplay").addEventListener("click",()=>{if(S.mode==="edit"){xe()}ed()});
 $("ebUndo").addEventListener("click",undo);$("ebRedo").addEventListener("click",redo);$("ebDone").addEventListener("click",xe);
-$("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});$("closeEditSheet").addEventListener("click",()=>{xe()});
+$("closePhoto").addEventListener("click",()=>{S.tab=null;ra()});$("closeFrames").addEventListener("click",()=>{S.tab=null;ra()});
+$("closeEditSheet").addEventListener("click",()=>{S.tab=null;ra()});
 $("addPhotoBtn").addEventListener("click",()=>$("photoInput").click());
 $("photoInput").addEventListener("change",async e=>{const f=Array.from(e.target.files||[]);if(f.length)await aps(f);e.target.value=""});
 document.querySelectorAll("#addShapeStep .scard").forEach(c=>{c.addEventListener("click",()=>sad(c.dataset.shape))});
