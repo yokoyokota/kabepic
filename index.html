@@ -206,7 +206,7 @@ body.display-mode #displayHint.show { opacity: 1; }
   const FRAME_META = {
     portrait:         { src: "frame_vertical.png",          maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
     portrait_simple:  { src: "frame_vertical_simple.png",   maskPng: "mask_vertical.png",   inset: "16.0% 23.6% 15.3% 24.4%", ar: 874 / 1044 },
-    square:           { src: "frame_square.png",            maskPng: "mask_square.png",     inset: "19.45% 19.8% 19.8% 18.9%", ar: 1033 / 1033 },
+    square:           { src: "frame_square.png",            maskPng: "mask_square.png",     inset: "19.35% 19.8% 19.8% 18.9%", ar: 1033 / 1033 },
     landscape:        { src: "frame_horizontal.png",        maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
     landscape_simple: { src: "frame_horizontal_simple.png", maskPng: "mask_horizontal.png", inset: "23.5% 15.1% 24.4% 16.0%", ar: 1044 / 874 },
     oval:             { src: "frame_oval.png",              maskPng: "mask_oval.png",       inset: "12.0% 24.0% 10.5% 26.0%", ar: 675 / 963 }
@@ -321,6 +321,7 @@ body.display-mode #displayHint.show { opacity: 1; }
       if(state.masksAvailable&&m.maskPng)applyMaskImage(pwrap,m.maskPng);
 
       const pmask=document.createElement("div");pmask.className="photoMask";pmask.style.inset=m.inset;
+      if(f.kind==="oval"){pmask.style.borderRadius="50%";pmask.style.overflow="hidden";}
       const photo=getCurrentPhoto(f);
       const img=document.createElement("img");img.src=photo?photo.dataUrl:placeholderUrl;
       pmask.appendChild(img);pwrap.appendChild(pmask);el.appendChild(pwrap);
