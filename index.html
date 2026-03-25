@@ -26,7 +26,7 @@ display:flex;align-items:center;justify-content:center;gap:10px;
 height:44px;padding:0 10px;border-radius:20px;
 background:rgba(255,253,249,.97);border:1px solid rgba(130,118,96,.10);box-shadow:0 6px 20px rgba(50,40,20,.07);
 transform:translateY(200px);pointer-events:none;opacity:0;
-transition:transform .15s ease,opacity .15s ease;
+transition:transform .25s cubic-bezier(.22,1,.36,1),opacity .2s ease;
 }
 #editBar.vis{transform:translateY(0);pointer-events:auto;opacity:1}
 .ebb{height:34px;padding:0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:500;color:#b5a898;background:#fffdf9;border:1px solid rgba(130,118,96,.10);white-space:nowrap;transition:transform 80ms,background 80ms}
@@ -55,8 +55,12 @@ body.dm #cv{background:#f4f2ee;border-color:rgba(0,0,0,.06);box-shadow:0 0 0 999
 .pw{position:absolute;inset:0;overflow:hidden}
 .pm{position:absolute;overflow:visible;background:transparent}
 .pm img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none}
+/* ── FIX 3: crossfade transition on photo images ── */
+.pm img.cf{position:absolute;inset:0;transition:opacity 1.4s ease-in-out}
 .ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
-.rh{position:absolute;right:-20px;bottom:-20px;width:42px;height:42px;border-radius:50%;background:#fff;border:3px solid #7a9ab4;box-shadow:0 4px 14px rgba(40,30,16,.16);z-index:200;touch-action:none;display:none;pointer-events:auto}
+
+/* ── FIX 1: bigger resize handle (42→56px) ── */
+.rh{position:absolute;right:-26px;bottom:-26px;width:56px;height:56px;border-radius:50%;background:#fff;border:3px solid #7a9ab4;box-shadow:0 4px 14px rgba(40,30,16,.16);z-index:200;touch-action:none;display:none;pointer-events:auto}
 .fr.sel .rh{display:block}
 body:not(.em) .fr.sel .rh{display:none}
 .fr-n{position:absolute;top:-10px;left:-10px;width:24px;height:24px;border-radius:50%;display:none;align-items:center;justify-content:center;background:#2a2520;color:#fff;font-size:10px;font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.14);z-index:7;pointer-events:none}
@@ -258,7 +262,14 @@ function rc(){var cv=$("cv");cv.innerHTML="";var isE=mode==="edit";fs.forEach(fu
 var ring=document.createElement("div");ring.className="fr-ring";el.appendChild(ring);
 var pw=document.createElement("div");pw.className="pw";if(f.kind==="oval")pw.style.borderRadius="50%";if(masksOk&&m.maskPng)apMask(pw,m.maskPng);
 var pm=document.createElement("div");pm.className="pm";pm.style.inset=m.inset;if(f.kind==="oval"){pm.style.borderRadius="50%";pm.style.overflow="hidden"}
-var ph=curP(f);var img=document.createElement("img");img.src=ph?ph.dataUrl:PH;pm.appendChild(img);pw.appendChild(pm);el.appendChild(pw);
+
+/* ── FIX 3: dual-image crossfade setup ── */
+var ph=curP(f);
+var imgA=document.createElement("img");imgA.className="cf";imgA.src=ph?ph.dataUrl:PH;imgA.style.opacity="1";
+var imgB=document.createElement("img");imgB.className="cf";imgB.src=ph?ph.dataUrl:PH;imgB.style.opacity="0";
+pm.appendChild(imgA);pm.appendChild(imgB);
+pw.appendChild(pm);el.appendChild(pw);
+
 var ov=document.createElement("img");ov.className="ov";ov.src=m.src;ov.onerror=function(){this.style.display="none"};el.appendChild(ov);
 var nm=document.createElement("div");nm.className="fr-n";nm.textContent=fs.indexOf(f)+1;el.appendChild(nm);
 var pn=document.createElement("div");pn.className="fr-p";pn.textContent="固定";el.appendChild(pn);
@@ -303,14 +314,47 @@ function scd(shape){var d=SD[shape]||[];if(d.length<=1){cfk(d[0].k);return}var g
 function cfk(nk){var f=gsf();if(!f)return;if(f.kind===nk){toast("同じフレームです",800);rcf();$("chgA").classList.add("hid");$("shEb").classList.remove("ca-on");return}pushU();f.kind=nk;autoA();ra();rcf();$("chgA").classList.add("hid");$("shEb").classList.remove("ca-on");toast("フレーム変更しました",800)}
 
 /* MODES */
-function enterEdit(){mode="edit";tab="edit";document.body.classList.add("em");document.body.classList.remove("dm");$("editBar").classList.add("vis");ra();fit()}
+/* ── FIX 4: edit bar visibility ── */
+function enterEdit(){mode="edit";tab="edit";document.body.classList.add("em");document.body.classList.remove("dm");closeAllSheets();ra();fit();/* force editBar visible after ra() */requestAnimationFrame(function(){$("editBar").classList.add("vis")})}
 function exitEdit(){mode="view";tab=null;document.body.classList.remove("em");$("editBar").classList.remove("vis");sel=null;ra();fit()}
 function enterDisp(){mode="display";tab=null;document.body.classList.add("dm");document.body.classList.remove("em");$("editBar").classList.remove("vis");sel=null;ra();fit();startCF();$("dHint").classList.add("sh");setTimeout(function(){$("dHint").classList.remove("sh")},1800)}
 function exitDisp(){mode="view";tab=null;document.body.classList.remove("dm");stopCF();ra();fit()}
+function closeAllSheets(){$("shP").classList.remove("opn");$("shF").classList.remove("opn");$("shE").classList.remove("opn")}
 
-/* CROSSFADE */
-function nextP(f){var pool=cpool(f.kind);if(pool.length<2)return null;var c=curP(f);if(!c)return pool[0];var i=-1;for(var j=0;j<pool.length;j++)if(pool[j].id===c.id){i=j;break}return pool[(i<0?0:i+1)%pool.length]}
-function startCF(){stopCF();if(rp().length<2)return;fs.forEach(function(f){if(f.fp)return;var t=setInterval(function(){var n=nextP(f);if(!n)return;f.cp=n.id;f.pi=[n.id];var el=$("cv").querySelector("[data-id="+String.fromCharCode(34)+f.id+String.fromCharCode(34)+"]");if(el){var im=el.querySelector(".pm img");if(im)im.src=n.dataUrl}},SW0+Math.random()*(SW1-SW0));dt.push(t)})}
+/* ── FIX 2 & 3: CROSSFADE with duplicate prevention + smooth transition ── */
+function nextP(f){
+var pool=cpool(f.kind);
+if(pool.length<2)return null;
+var c=curP(f);
+if(!c)return pool[0];
+/* filter out current photo to prevent duplicate */
+var avail=pool.filter(function(p){return p.id!==c.id});
+if(!avail.length)return null;
+/* pick random from remaining to feel natural */
+return avail[Math.floor(Math.random()*avail.length)];
+}
+
+function startCF(){stopCF();if(rp().length<2)return;fs.forEach(function(f){if(f.fp)return;
+/* track which img slot (A/B) is currently visible: 0=A, 1=B */
+var slot=0;
+var t=setInterval(function(){
+var n=nextP(f);if(!n)return;
+f.cp=n.id;f.pi=[n.id];
+var el=$("cv").querySelector(’[data-id="’+f.id+’"]’);
+if(!el)return;
+var imgs=el.querySelectorAll(".pm img.cf");
+if(imgs.length<2)return;
+/* load new photo into the hidden slot, then crossfade */
+var showIdx=slot;
+var hideIdx=1-slot;
+imgs[hideIdx].src=n.dataUrl;
+/* small delay to ensure image is decoded before fading */
+requestAnimationFrame(function(){requestAnimationFrame(function(){
+imgs[hideIdx].style.opacity="1";
+imgs[showIdx].style.opacity="0";
+})});
+slot=hideIdx;
+},SW0+Math.random()*(SW1-SW0));dt.push(t)})}
 function stopCF(){dt.forEach(function(t){clearInterval(t)});dt=[]}
 
 function opVw(s){$("vwI").src=s;$("vw").classList.add("opn")}
@@ -381,10 +425,7 @@ $("cvArea").addEventListener("touchend",function(e){if(e.touches.length===0&&!pi
 window.addEventListener("resize",fit);
 }
 
-/* HYDRATE ASPECT RATIOS */
-/* hydAR not needed for initial render */
-
-/* INIT - synchronous, no promises */
+/* INIT */
 ps=[{id:uid(),name:"placeholder",dataUrl:PH,ratio:1,orient:"square"}];
 var gg=LO.story;
 fs=gg.map(function(x){return{id:uid(),kind:x[0],gx:x[1],gy:x[2],w:x[3],pi:[],fp:null,cp:null}});
