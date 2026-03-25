@@ -223,6 +223,8 @@ scene:[["landscape_simple",1.5,42.3,39],["square",42.75,33.5,45],["portrait_simp
 
 var mode="view",tab=null,lk="story",ps=[],fs=[],sel=null,dt=[],tt=null,uploading=false,masksOk=false;
 var undoS=[],redoS=[],zScale=1,zOx=0,zOy=0;
+/* Track which img layer (0 or 1) is currently visible per frame, for crossfade */
+var cfSlots={};
 
 function uid(){return Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36)}
 function toast(m,ms){ms=ms||1200;clearTimeout(tt);$("tst").textContent=m;$("tst").classList.add("sh");tt=setTimeout(function(){$("tst").classList.remove("sh")},ms)}
@@ -290,7 +292,10 @@ function hydrateAR(){var keys=Object.keys(FM);var proms=keys.map(function(k){ret
 function fit(){var a=$("cvArea"),sx=a.clientWidth/2400,sy=a.clientHeight/1500,s=Math.min(sx,sy)*zScale;var sw=2400*s,sh=1500*s,ox=(a.clientWidth-sw)/2+zOx,oy=(a.clientHeight-sh)/2+zOy;$("cvScale").style.transform="translate("+ox+"px,"+oy+"px) scale("+s+")"}
 
 /* ===== renderCanvas [frame drawing from working code] ===== */
-function rc(){var cv=$("cv");cv.innerHTML="";var isE=mode==="edit";fs.forEach(function(f){var m=FM[f.kind],p=gpc(f);var el=document.createElement("div");el.className="fr"+(isE?" ed":"");if(f.id===sel&&mode!=="display")el.className+=" sel";if(f.fp)el.className+=" lk";el.setAttribute("data-id",f.id);el.style.left=p.left;el.style.top=p.top;el.style.width=p.width;el.style.height=p.height;
+function rc(){var cv=$("cv");cv.innerHTML="";var isE=mode==="edit";
+/* Reset crossfade slot tracking when rebuilding DOM */
+cfSlots={};
+fs.forEach(function(f){var m=FM[f.kind],p=gpc(f);var el=document.createElement("div");el.className="fr"+(isE?" ed":"");if(f.id===sel&&mode!=="display")el.className+=" sel";if(f.fp)el.className+=" lk";el.setAttribute("data-id",f.id);el.style.left=p.left;el.style.top=p.top;el.style.width=p.width;el.style.height=p.height;
 var ring=document.createElement("div");ring.className="fr-ring";el.appendChild(ring);
 var pw=document.createElement("div");pw.className="pw";
 if(f.kind==="oval")pw.style.borderRadius="50%";
@@ -298,6 +303,7 @@ if(masksOk&&m.maskPng)apMask(pw,m.maskPng);
 var pm=document.createElement("div");pm.className="pm";pm.style.inset=m.inset;
 if(f.kind==="oval"){pm.style.borderRadius="50%";pm.style.overflow="hidden"}
 var ph=curP(f);
+/* Layer 0 = bottom, Layer 1 = top. Initially layer 0 is visible (opacity 1), layer 1 hidden (opacity 0). */
 var imgA=document.createElement("img");imgA.className="cf";imgA.src=ph?ph.dataUrl:PH;imgA.style.opacity="1";
 var imgB=document.createElement("img");imgB.className="cf";imgB.src=ph?ph.dataUrl:PH;imgB.style.opacity="0";
 pm.appendChild(imgA);pm.appendChild(imgB);
@@ -308,7 +314,10 @@ var pn=document.createElement("div");pn.className="fr-p";pn.textContent=T("pinne
 var hd=document.createElement("div");hd.className="rh";el.appendChild(hd);
 el.addEventListener("click",function(e){if(mode==="display")return;if(e.target.classList.contains("rh"))return;sel=f.id;cv.querySelectorAll(".fr").forEach(function(x){x.classList.toggle("sel",x.getAttribute("data-id")===f.id)});updE();rPh()});
 if(isE){attachDrag(el,f);attachResize(hd,el,f)}
-cv.appendChild(el)})}
+cv.appendChild(el);
+/* Initialize slot tracker: layer 0 is currently showing */
+cfSlots[f.id]=0;
+})}
 
 function attachDrag(el,f){var on=false,sx=0,sy=0,ox=0,oy=0,mv=false;el.addEventListener("pointerdown",function(e){if(e.target.classList.contains("rh"))return;e.stopPropagation();sel=f.id;$("cv").querySelectorAll(".fr").forEach(function(x){x.classList.toggle("sel",x.getAttribute("data-id")===f.id)});updE();on=true;mv=false;sx=e.clientX;sy=e.clientY;ox=f.gx;oy=f.gy;el.setPointerCapture(e.pointerId);el.classList.add("dg")});el.addEventListener("pointermove",function(e){if(!on)return;var r=$("cv").getBoundingClientRect();var dx=(e.clientX-sx)/r.width*GRID.W,dy=(e.clientY-sy)/r.height*GRID.H;if(!mv&&(Math.abs(dx)>.5||Math.abs(dy)>.5)){pushU();mv=true}f.gx=ox+dx;f.gy=oy+dy;el.style.left=f.gx/GRID.W*100+"%";el.style.top=f.gy/GRID.H*100+"%"});el.addEventListener("pointerup",function(){on=false;el.classList.remove("dg")});el.addEventListener("pointercancel",function(){on=false;el.classList.remove("dg")})}
 function attachResize(hd,el,f){var on=false,sx=0,sw=0,mv=false;hd.addEventListener("pointerdown",function(e){e.stopPropagation();sel=f.id;on=true;mv=false;sx=e.clientX;sw=f.w;hd.setPointerCapture(e.pointerId);el.classList.add("rz")});hd.addEventListener("pointermove",function(e){if(!on)return;var r=$("cv").getBoundingClientRect();var dw=(e.clientX-sx)/r.width*GRID.W;if(!mv&&Math.abs(dw)>.3){pushU();mv=true}var nw=sw+dw;if(nw<10)nw=10;f.w=nw;var p=gpc(f);el.style.width=p.width;el.style.height=p.height});hd.addEventListener("pointerup",function(){on=false;el.classList.remove("rz")});hd.addEventListener("pointercancel",function(){on=false;el.classList.remove("rz")})}
@@ -330,10 +339,10 @@ function cfk(nk){var f=gsf();if(!f)return;if(f.kind===nk){toast(T("sameFrame"),8
 
 function enterEdit(){mode="edit";tab="edit";document.body.classList.add("em");document.body.classList.remove("dm");ra();fit();requestAnimationFrame(function(){$("editBar").classList.add("vis")})}
 function exitEdit(){mode="view";tab=null;document.body.classList.remove("em");$("editBar").classList.remove("vis");sel=null;ra();fit()}
-function enterDisp(){mode="display";tab=null;document.body.classList.add("dm");document.body.classList.remove("em");$("editBar").classList.remove("vis");sel=null;ra();fit();startCF();$("dHint").classList.add("sh");setTimeout(function(){$("dHint").classList.remove("sh")},1800)}
+function enterDisp(){mode="display";tab=null;document.body.classList.add("dm");document.body.classList.remove("em");$("editBar").classList.remove("vis");sel=null;rc();fit();startCF();$("dHint").classList.add("sh");setTimeout(function(){$("dHint").classList.remove("sh")},1800)}
 function exitDisp(){mode="view";tab=null;document.body.classList.remove("dm");stopCF();ra();fit()}
 
-/* ===== Crossfade per PDF spec: priority pool, exclude current, avoid other-frame photos ===== */
+/* ===== Crossfade — operates directly on existing DOM, never calls rc()/ra() ===== */
 function nextP(f){
 var pool=getPriorityPool(f.kind);
 if(pool.length<2)return null;
@@ -349,8 +358,54 @@ var preferred=avail.filter(function(p){return!othersShowing[p.id]});
 var pick=preferred.length?preferred:avail;
 return pick[Math.floor(Math.random()*pick.length)];
 }
-function startCF(){stopCF();if(rp().length<2)return;fs.forEach(function(f){if(f.fp)return;var slot=0;var t=setInterval(function(){var n=nextP(f);if(!n)return;var el=$("cv").querySelector('[data-id="'+f.id+'"]');if(!el)return;var imgs=el.querySelectorAll(".pm img.cf");if(imgs.length<2)return;var hideIdx=1-slot;/* Preload image, then fade */var preload=new Image();preload.onload=function(){imgs[hideIdx].src=n.dataUrl;requestAnimationFrame(function(){requestAnimationFrame(function(){imgs[hideIdx].style.opacity="1";imgs[slot].style.opacity="0"})});f.cp=n.id;slot=hideIdx};preload.src=n.dataUrl},SW0+Math.random()*(SW1-SW0));dt.push(t)})}
-function stopCF(){dt.forEach(function(t){clearInterval(t)});dt=[]}
+function startCF(){
+stopCF();
+if(rp().length<2)return;
+fs.forEach(function(f){
+if(f.fp)return;
+/* Each frame gets its own interval with staggered timing */
+var interval=SW0+Math.random()*(SW1-SW0);
+/* Add initial random delay so frames don't all switch at once */
+var initialDelay=Math.random()*interval;
+var timerId=setTimeout(function(){
+doFade(f);
+var repeater=setInterval(function(){
+doFade(f);
+},interval);
+dt.push(repeater);
+},initialDelay);
+dt.push(timerId);
+});
+}
+function doFade(f){
+var n=nextP(f);
+if(!n)return;
+var el=$("cv").querySelector('[data-id="'+f.id+'"]');
+if(!el)return;
+var imgs=el.querySelectorAll(".pm img.cf");
+if(imgs.length<2)return;
+/* Determine which layer is currently visible */
+var currentSlot=cfSlots[f.id]||0;
+var nextSlot=1-currentSlot;
+/* Preload new image first */
+var preload=new Image();
+preload.onload=function(){
+/* Set the hidden layer's src to the new photo (it's still invisible) */
+imgs[nextSlot].src=n.dataUrl;
+/* Force layout so the browser registers the new src before animating */
+void imgs[nextSlot].offsetWidth;
+/* Now crossfade: show new layer, hide old layer */
+requestAnimationFrame(function(){
+imgs[nextSlot].style.opacity="1";
+imgs[currentSlot].style.opacity="0";
+});
+/* Update tracking */
+cfSlots[f.id]=nextSlot;
+f.cp=n.id;
+};
+preload.src=n.dataUrl;
+}
+function stopCF(){dt.forEach(function(t){clearInterval(t);clearTimeout(t)});dt=[]}
 
 function opVw(s){$("vwI").src=s;$("vw").classList.add("opn")}
 function clVw(){$("vw").classList.remove("opn");$("vwI").src=""}
