@@ -40,7 +40,7 @@ body.dm #cv{background:#f4f2ee;border-color:rgba(0,0,0,.06);box-shadow:0 0 0 999
 .pm{position:absolute;overflow:visible;background:transparent}
 .pm img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none}
 .pm img.cf{position:absolute;inset:0;transition:opacity 1.4s ease-in-out}
-.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.fov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
 .rh{position:absolute;right:-26px;bottom:-26px;width:56px;height:56px;border-radius:50%;background:#fff;border:3px solid #7a9ab4;box-shadow:0 4px 14px rgba(40,30,16,.16);z-index:200;touch-action:none;display:none;pointer-events:auto}
 .fr.sel .rh{display:block}
 body:not(.em) .fr.sel .rh{display:none}
@@ -219,7 +219,7 @@ var imgA=document.createElement("img");imgA.className="cf";imgA.src=ph?ph.dataUr
 var imgB=document.createElement("img");imgB.className="cf";imgB.src=ph?ph.dataUrl:PH;imgB.style.opacity="0";
 pm.appendChild(imgA);pm.appendChild(imgB);
 pw.appendChild(pm);el.appendChild(pw);
-var ov=document.createElement("img");ov.className="ov";ov.src=m.src;ov.onerror=function(){this.style.display="none"};el.appendChild(ov);
+var ov=document.createElement("img");ov.className="fov";ov.src=m.src;ov.onerror=function(){this.style.display="none"};el.appendChild(ov);
 var nm=document.createElement("div");nm.className="fr-n";nm.textContent=fs.indexOf(f)+1;el.appendChild(nm);
 var pn=document.createElement("div");pn.className="fr-p";pn.textContent="固定";el.appendChild(pn);
 var hd=document.createElement("div");hd.className="rh";el.appendChild(hd);
