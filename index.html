@@ -38,7 +38,7 @@ body.dm #cv{border-color:rgba(0,0,0,.06);border-radius:0}
 .fr.sel{z-index:150!important;filter:drop-shadow(0 10px 18px rgba(40,30,16,.12))}
 .pw{position:absolute;inset:0;overflow:hidden}
 .pm{position:absolute;overflow:visible;background:transparent}
-.pm img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;pointer-events:none}
+.pm img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .pm img.cf{position:absolute;inset:0;transition:opacity 1.4s ease-in-out}
 .fov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
 .rh{position:absolute;right:-26px;bottom:-26px;width:56px;height:56px;border-radius:50%;background:#fff;border:3px solid #7a9ab4;box-shadow:0 4px 14px rgba(40,30,16,.16);z-index:200;touch-action:none;display:none;pointer-events:auto}
@@ -349,6 +349,7 @@ var pm=document.createElement("div");pm.className="pm";pm.style.inset=m.inset;
 if(f.kind==="oval"){pm.style.borderRadius="50%";pm.style.overflow="hidden"}
 var ph=curP(f);
 var cropPos=getCropPos(ph,f.kind);
+if(ph&&ph.crop&&ph.crop[fbu(f.kind)]&&fs.indexOf(f)===0){toast("RC cropPos="+cropPos+" kind="+f.kind,4000)}
 /* Layer 0 = bottom, Layer 1 = top. Initially layer 0 is visible (opacity 1), layer 1 hidden (opacity 0). */
 var imgA=document.createElement("img");imgA.className="cf";imgA.src=ph?ph.dataUrl:PH;imgA.style.opacity="1";imgA.style.objectPosition=cropPos;
 var imgB=document.createElement("img");imgB.className="cf";imgB.src=ph?ph.dataUrl:PH;imgB.style.opacity="0";imgB.style.objectPosition=cropPos;
@@ -523,7 +524,6 @@ if(fhN>=1){opy=50}else{opy=(c.y-fhN/2)/(1-fhN)*100}
 opx=Math.max(0,Math.min(100,opx));
 opy=Math.max(0,Math.min(100,opy));
 var result=opx.toFixed(1)+"% "+opy.toFixed(1)+"%";
-console.log("getCropPos orient=",orient,"c=",JSON.stringify(c),"fwN=",fwN,"fhN=",fhN,"result=",result);
 return result;
 }
 
