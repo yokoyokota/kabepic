@@ -372,7 +372,8 @@ function seed(k){pushU();lk=k;sel=null;var g=LO[k]||LO.story;fs=g.map(function(x
 
 function rPh(){var r=rp();$("shPm").textContent=Tf("photoCount",r.length,MAX_P);var g=$("pGr"),em=$("pEm");if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
 /* Add adjust button */
-var adj=document.createElement("button");adj.className="dx";adj.style.cssText="top:auto;bottom:3px;right:3px;width:auto;padding:0 6px;font-size:8px;color:#4a6a8a;background:rgba(255,255,255,.9)";adj.textContent=T("adjust");
+var hasCrop=p.crop&&(p.crop.portrait||p.crop.landscape||p.crop.square);
+var adj=document.createElement("button");adj.className="dx";adj.style.cssText="top:auto;bottom:3px;right:3px;width:auto;padding:0 6px;font-size:8px;background:"+(hasCrop?"#4a6a8a":"rgba(255,255,255,.9)")+";color:"+(hasCrop?"#fff":"#aaa");adj.textContent=T("adjust");
 adj.addEventListener("click",function(e){e.stopPropagation();openCrop(p.id)});c.appendChild(adj);
 g.appendChild(c)})}
 function rmPh(id){ps=ps.filter(function(p){return p.id!==id});fs.forEach(function(f){f.pi=(f.pi||[]).filter(function(x){return x!==id});if(f.fp===id)f.fp=null;if(f.cp===id)f.cp=null});autoA();ra();toast(T("deleted"))}
@@ -551,32 +552,30 @@ b.classList.toggle("on",b.getAttribute("data-ct")===cropOrient);
 var prev=$("cropPreview");
 var pw=prev.clientWidth,ph=prev.clientHeight;
 if(!pw||!ph){requestAnimationFrame(renderCrop);return}
-var pad=30;
-var frameAR=CROP_AR[cropOrient]; /* w/h */
+var pad=20;
 var imgAR=cropPhoto.width/cropPhoto.height;
-/* Step 1: Size the frame to fit in preview area with padding */
-var maxFW=pw-pad*2, maxFH=ph-pad*2;
-var fw,fh;
-if(frameAR>=maxFW/maxFH){fw=maxFW;fh=fw/frameAR}
-else{fh=maxFH;fw=fh*frameAR}
-/* Step 2: Size the image so it fully covers the frame (object-fit:cover logic) */
+var frameAR=CROP_AR[cropOrient];
+/* Step 1: Size image to fill preview area (contain-style, showing full photo) */
 var iw,ih;
-if(imgAR>frameAR){
-/* Image is wider than frame proportionally: match heights, image overflows horizontally */
-ih=fh;iw=ih*imgAR;
+if(imgAR>pw/ph){iw=pw;ih=pw/imgAR}else{ih=ph;iw=ih*imgAR}
+/* Step 2: Size the dotted frame — must fit within the image bounds */
+var fw,fh;
+if(frameAR>imgAR){
+/* Frame is wider proportionally: match widths */
+fw=iw;fh=fw/frameAR;
 }else{
-/* Image is taller than frame proportionally: match widths, image overflows vertically */
-iw=fw;ih=iw/imgAR;
+/* Frame is taller proportionally: match heights */
+fh=ih;fw=fh*frameAR;
 }
-/* Position frame centered in preview */
+/* Frame is always centered in preview */
 var fl=(pw-fw)/2,ft=(ph-fh)/2;
 var frame=$("cropFrame");
 frame.style.left=fl+"px";frame.style.top=ft+"px";
 frame.style.width=fw+"px";frame.style.height=fh+"px";
+/* Image positioning: based on cropTempX/Y */
 var img=$("cropImg");
 img.src=cropPhoto.dataUrl;
 img.style.width=iw+"px";img.style.height=ih+"px";
-/* Position image based on crop values */
 positionCropImg(fl,ft,fw,fh,iw,ih);
 /* Render dimming overlay */
 var dim=$("cropDim");
@@ -608,15 +607,12 @@ prev.setPointerCapture(e.pointerId);
 prev.addEventListener("pointermove",function(e){
 if(!cropDragging||!cropPhoto)return;
 var pw=prev.clientWidth,ph=prev.clientHeight;
-var pad=30;var frameAR=CROP_AR[cropOrient];
 var imgAR=cropPhoto.width/cropPhoto.height;
-var maxFW=pw-pad*2,maxFH=ph-pad*2;
-var fw,fh;
-if(frameAR>=maxFW/maxFH){fw=maxFW;fh=fw/frameAR}
-else{fh=maxFH;fw=fh*frameAR}
+var frameAR=CROP_AR[cropOrient];
 var iw,ih;
-if(imgAR>frameAR){ih=fh;iw=ih*imgAR}
-else{iw=fw;ih=iw/imgAR}
+if(imgAR>pw/ph){iw=pw;ih=pw/imgAR}else{ih=ph;iw=ih*imgAR}
+var fw,fh;
+if(frameAR>imgAR){fw=iw;fh=fw/frameAR}else{fh=ih;fw=fh*frameAR}
 var maxOx=iw-fw,maxOy=ih-fh;
 if(maxOx<1&&maxOy<1)return;
 var dx=e.clientX-cropSX,dy=e.clientY-cropSY;
@@ -670,9 +666,11 @@ $("cropCancel").addEventListener("click",function(){closeCrop()});
 $("cropSave").addEventListener("click",function(){saveCrop();closeCrop()});
 document.querySelectorAll("#cropTabs .ct-btn").forEach(function(b){
 b.addEventListener("click",function(){
+/* Save current orient's crop before switching */
 if(cropDirty){saveCrop()}
 cropOrient=b.getAttribute("data-ct");
-loadCropValues();cropDirty=false;renderCrop();
+/* Don't reset cropTempX/Y — keep photo position fixed, only frame changes */
+cropDirty=false;renderCrop();
 });
 });
 bindCropDrag();
