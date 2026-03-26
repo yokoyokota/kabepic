@@ -371,10 +371,9 @@ function attachResize(hd,el,f){var on=false,sx=0,sw=0,mv=false;hd.addEventListen
 function seed(k){pushU();lk=k;sel=null;var g=LO[k]||LO.story;fs=g.map(function(x){return{id:uid(),kind:x[0],gx:x[1],gy:x[2],w:x[3],pi:[],fp:null,cp:null}});autoA();ra()}
 
 function rPh(){var r=rp();$("shPm").textContent=Tf("photoCount",r.length,MAX_P);var g=$("pGr"),em=$("pEm");if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
-/* Add adjust button */
+/* Crop indicator: small blue circle if any crop is set */
 var hasCrop=p.crop&&(p.crop.portrait||p.crop.landscape||p.crop.square);
-var adj=document.createElement("button");adj.className="dx";adj.style.cssText="top:auto;bottom:3px;right:3px;width:auto;padding:0 6px;font-size:8px;background:"+(hasCrop?"#4a6a8a":"rgba(255,255,255,.9)")+";color:"+(hasCrop?"#fff":"#4a6a8a");adj.textContent=T("adjust");
-adj.addEventListener("click",function(e){e.stopPropagation();openCrop(p.id)});c.appendChild(adj);
+if(hasCrop){var dot=document.createElement("div");dot.style.cssText="position:absolute;bottom:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#4a6a8a;box-shadow:0 1px 3px rgba(0,0,0,.2)";c.appendChild(dot)}
 g.appendChild(c)})}
 function rmPh(id){ps=ps.filter(function(p){return p.id!==id});fs.forEach(function(f){f.pi=(f.pi||[]).filter(function(x){return x!==id});if(f.fp===id)f.fp=null;if(f.cp===id)f.cp=null});autoA();ra();toast(T("deleted"))}
 
@@ -513,34 +512,54 @@ return(c.x*100).toFixed(1)+"% "+(c.y*100).toFixed(1)+"%";
 var cropPhoto=null,cropOrient="portrait",cropDirty=false;
 var cropTempX=0.5,cropTempY=0.5;
 var cropDragging=false,cropSX=0,cropSY=0,cropOX=0,cropOY=0;
-/* Aspect ratios for the dotted frame: matches real frame inset ratios */
+/* Temp storage for all 3 orients during a crop session */
+var cropTemp={portrait:null,landscape:null,square:null};
+/* Aspect ratios for the dotted frame */
 var CROP_AR={portrait:3/4,landscape:4/3,square:1};
 
 function openCrop(photoId){
 var p=fp(photoId);if(!p||p.name==="placeholder")return;
 cropPhoto=p;cropDirty=false;
-/* Default orient: choose the one that most benefits from adjustment */
+/* Initialize temp from existing crop data */
+if(p.crop){
+cropTemp.portrait=p.crop.portrait?{x:p.crop.portrait.x,y:p.crop.portrait.y}:null;
+cropTemp.landscape=p.crop.landscape?{x:p.crop.landscape.x,y:p.crop.landscape.y}:null;
+cropTemp.square=p.crop.square?{x:p.crop.square.x,y:p.crop.square.y}:null;
+}else{cropTemp={portrait:null,landscape:null,square:null}}
+/* Default orient */
 cropOrient=p.orient==="landscape"?"landscape":p.orient==="portrait"?"portrait":"square";
-loadCropValues();
+loadCropFromTemp();
 $("cropScr").classList.add("opn");
 document.body.classList.add("crop-on");
 applyI18n();
 renderCrop();
 }
-function closeCrop(){$("cropScr").classList.remove("opn");document.body.classList.remove("crop-on");cropPhoto=null}
-function loadCropValues(){
-if(!cropPhoto)return;
-var c=cropPhoto.crop?cropPhoto.crop[cropOrient]:null;
+function closeCrop(){
+$("cropScr").classList.remove("opn");document.body.classList.remove("crop-on");cropPhoto=null;
+/* Refresh photo list to show updated indicators */
+rPh();
+}
+function loadCropFromTemp(){
+var c=cropTemp[cropOrient];
 cropTempX=c?c.x:0.5;
 cropTempY=c?c.y:0.5;
 }
-function saveCrop(){
+function storeCropToTemp(){
+/* Save current position to temp for current orient */
+cropTemp[cropOrient]={x:cropTempX,y:cropTempY};
+}
+function saveAllCrops(){
 if(!cropPhoto)return;
 if(!cropPhoto.crop)cropPhoto.crop={portrait:null,landscape:null,square:null};
-cropPhoto.crop[cropOrient]={x:cropTempX,y:cropTempY};
+/* Store current orient first */
+storeCropToTemp();
+/* Save all 3 orients from temp */
+cropPhoto.crop.portrait=cropTemp.portrait;
+cropPhoto.crop.landscape=cropTemp.landscape;
+cropPhoto.crop.square=cropTemp.square;
 cropDirty=false;
 toast(T("cropSaved"),800);
-/* Re-render main canvas so position updates */
+/* Re-render main canvas */
 autoA();rc();
 }
 function renderCrop(){
@@ -663,14 +682,14 @@ $("bgSlider").addEventListener("input",function(e){e.stopPropagation();bgBri=par
 $("bgPk").addEventListener("click",function(e){e.stopPropagation()});
 /* Crop screen bindings */
 $("cropCancel").addEventListener("click",function(){closeCrop()});
-$("cropSave").addEventListener("click",function(){saveCrop();closeCrop()});
+$("cropSave").addEventListener("click",function(){saveAllCrops();closeCrop()});
 document.querySelectorAll("#cropTabs .ct-btn").forEach(function(b){
 b.addEventListener("click",function(){
-/* Save current orient's crop before switching */
-if(cropDirty){saveCrop()}
+/* Store current orient's position to temp before switching */
+storeCropToTemp();
 cropOrient=b.getAttribute("data-ct");
 /* Don't reset cropTempX/Y — keep photo position fixed, only frame changes */
-cropDirty=false;renderCrop();
+cropDirty=true;renderCrop();
 });
 });
 bindCropDrag();
