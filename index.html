@@ -128,7 +128,7 @@ body.dm #bgBack{display:none}
 .ch-save:active{background:#3a5a7a}
 #cropPreview{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:none}
 #cropImg{position:absolute;touch-action:none;user-select:none;-webkit-user-drag:none;max-width:none!important}
-#cropFrame{position:absolute;border:2px dashed rgba(255,255,255,.6);pointer-events:none;z-index:2}
+#cropFrame{position:absolute;border:none;pointer-events:none;z-index:2}
 #cropDim{position:absolute;inset:0;z-index:1;pointer-events:none}
 #cropTabs{display:flex;justify-content:center;gap:6px;padding:10px 14px 16px;flex-shrink:0}
 .ct-btn{height:34px;padding:0 16px;border-radius:999px;font-size:11px;font-weight:500;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);background:transparent;transition:background .1s,color .1s}
@@ -571,45 +571,39 @@ b.classList.toggle("on",b.getAttribute("data-ct")===cropOrient);
 var prev=$("cropPreview");
 var pw=prev.clientWidth,ph=prev.clientHeight;
 if(!pw||!ph){requestAnimationFrame(renderCrop);return}
-var pad=20;
 var imgAR=cropPhoto.width/cropPhoto.height;
 var frameAR=CROP_AR[cropOrient];
-/* Step 1: Size image to fill preview area (contain-style, showing full photo) */
+/* Image: contain-fit in preview, always centered */
 var iw,ih;
 if(imgAR>pw/ph){iw=pw;ih=pw/imgAR}else{ih=ph;iw=ih*imgAR}
-/* Step 2: Size the dotted frame — must fit within the image bounds */
-var fw,fh;
-if(frameAR>imgAR){
-/* Frame is wider proportionally: match widths */
-fw=iw;fh=fw/frameAR;
-}else{
-/* Frame is taller proportionally: match heights */
-fh=ih;fw=fh*frameAR;
-}
-/* Frame is always centered in preview */
-var fl=(pw-fw)/2,ft=(ph-fh)/2;
-var frame=$("cropFrame");
-frame.style.left=fl+"px";frame.style.top=ft+"px";
-frame.style.width=fw+"px";frame.style.height=fh+"px";
-/* Image positioning: based on cropTempX/Y */
+var il=(pw-iw)/2,it=(ph-ih)/2;
 var img=$("cropImg");
 img.src=cropPhoto.dataUrl;
 img.style.width=iw+"px";img.style.height=ih+"px";
-positionCropImg(fl,ft,fw,fh,iw,ih);
-/* Render dimming overlay */
+img.style.left=il+"px";img.style.top=it+"px";
+/* Frame: sized to fit within image, positioned by cropTempX/Y */
+var fw,fh;
+if(frameAR>imgAR){fw=iw;fh=fw/frameAR}else{fh=ih;fw=fh*frameAR}
+/* cropTempX/Y = frame center position within image, 0-1 */
+/* Clamp so frame stays within image bounds */
+var halfFW=fw/2,halfFH=fh/2;
+var cx=il+cropTempX*iw;
+var cy=it+cropTempY*ih;
+/* Clamp frame center so edges don't exceed image */
+var minCx=il+halfFW,maxCx=il+iw-halfFW;
+var minCy=it+halfFH,maxCy=it+ih-halfFH;
+cx=Math.max(minCx,Math.min(maxCx,cx));
+cy=Math.max(minCy,Math.min(maxCy,cy));
+var fl=cx-halfFW,ft=cy-halfFH;
+var frame=$("cropFrame");
+frame.style.left=fl+"px";frame.style.top=ft+"px";
+frame.style.width=fw+"px";frame.style.height=fh+"px";
+/* Dimming overlay with cutout for frame */
 var dim=$("cropDim");
 dim.style.cssText="position:absolute;inset:0;z-index:1;pointer-events:none;"+
-"background:rgba(0,0,0,.55);"+
+"background:rgba(0,0,0,.65);"+
 "clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 0,"+
 fl+"px "+ft+"px,"+fl+"px "+(ft+fh)+"px,"+(fl+fw)+"px "+(ft+fh)+"px,"+(fl+fw)+"px "+ft+"px,"+fl+"px "+ft+"px)";
-}
-function positionCropImg(fl,ft,fw,fh,iw,ih){
-/* Max travel: how far image can move so frame stays covered */
-var maxOx=iw-fw,maxOy=ih-fh;
-var ix=fl-cropTempX*maxOx;
-var iy=ft-cropTempY*maxOy;
-var img=$("cropImg");
-img.style.left=ix+"px";img.style.top=iy+"px";
 }
 function clampCrop(){
 cropTempX=Math.max(0,Math.min(1,cropTempX));
@@ -627,20 +621,16 @@ prev.addEventListener("pointermove",function(e){
 if(!cropDragging||!cropPhoto)return;
 var pw=prev.clientWidth,ph=prev.clientHeight;
 var imgAR=cropPhoto.width/cropPhoto.height;
-var frameAR=CROP_AR[cropOrient];
 var iw,ih;
 if(imgAR>pw/ph){iw=pw;ih=pw/imgAR}else{ih=ph;iw=ih*imgAR}
-var fw,fh;
-if(frameAR>imgAR){fw=iw;fh=fw/frameAR}else{fh=ih;fw=fh*frameAR}
-var maxOx=iw-fw,maxOy=ih-fh;
-if(maxOx<1&&maxOy<1)return;
-var dx=e.clientX-cropSX,dy=e.clientY-cropSY;
-/* Invert: dragging right means showing more left = decrease x */
-cropTempX=cropOX-dx/(maxOx||1);
-cropTempY=cropOY-dy/(maxOy||1);
-clampCrop();cropDirty=true;
-var fl=(pw-fw)/2,ft=(ph-fh)/2;
-positionCropImg(fl,ft,fw,fh,iw,ih);
+/* Convert pixel drag to normalized image coordinates */
+var dx=e.clientX-cropSX;
+var dy=e.clientY-cropSY;
+cropTempX=cropOX+dx/iw;
+cropTempY=cropOY+dy/ih;
+clampCrop();
+cropDirty=true;
+renderCrop();
 });
 prev.addEventListener("pointerup",function(){cropDragging=false});
 prev.addEventListener("pointercancel",function(){cropDragging=false});
@@ -688,8 +678,7 @@ b.addEventListener("click",function(){
 /* Store current orient's position to temp before switching */
 storeCropToTemp();
 cropOrient=b.getAttribute("data-ct");
-/* Load saved/temp values for this orient */
-loadCropFromTemp();
+/* Keep cropTempX/Y unchanged — photo stays fixed, only frame changes */
 cropDirty=true;renderCrop();
 });
 });
