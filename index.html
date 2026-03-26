@@ -373,7 +373,7 @@ function seed(k){pushU();lk=k;sel=null;var g=LO[k]||LO.story;fs=g.map(function(x
 function rPh(){var r=rp();$("shPm").textContent=Tf("photoCount",r.length,MAX_P);var g=$("pGr"),em=$("pEm");if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
 /* Crop indicator: small blue circle if any crop is set */
 var hasCrop=p.crop&&(p.crop.portrait||p.crop.landscape||p.crop.square);
-if(hasCrop){var dot=document.createElement("div");dot.style.cssText="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#4a6a8a;border:1px solid #fff";c.appendChild(dot)}
+if(hasCrop){var dot=document.createElement("div");dot.style.cssText="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:50%;background:rgba(74,106,138,.88);border:.75px solid rgba(255,255,255,.95)";c.appendChild(dot)}
 g.appendChild(c)})}
 function rmPh(id){ps=ps.filter(function(p){return p.id!==id});fs.forEach(function(f){f.pi=(f.pi||[]).filter(function(x){return x!==id});if(f.fp===id)f.fp=null;if(f.cp===id)f.cp=null});autoA();ra();toast(T("deleted"))}
 
@@ -688,7 +688,8 @@ b.addEventListener("click",function(){
 /* Store current orient's position to temp before switching */
 storeCropToTemp();
 cropOrient=b.getAttribute("data-ct");
-/* Don't reset cropTempX/Y — keep photo position fixed, only frame changes */
+/* Load saved/temp values for this orient */
+loadCropFromTemp();
 cropDirty=true;renderCrop();
 });
 });
