@@ -551,29 +551,34 @@ b.classList.toggle("on",b.getAttribute("data-ct")===cropOrient);
 var prev=$("cropPreview");
 var pw=prev.clientWidth,ph=prev.clientHeight;
 if(!pw||!ph){requestAnimationFrame(renderCrop);return}
-/* Calculate frame dimensions to fit within preview with padding */
-var pad=40;
-var ar=CROP_AR[cropOrient];
+var pad=30;
+var frameAR=CROP_AR[cropOrient]; /* w/h */
+var imgAR=cropPhoto.width/cropPhoto.height;
+/* Step 1: Size the frame to fit in preview area with padding */
+var maxFW=pw-pad*2, maxFH=ph-pad*2;
 var fw,fh;
-if(ar>=1){fw=Math.min(pw-pad*2,320);fh=fw/ar}
-else{fh=Math.min(ph-pad*2,400);fw=fh*ar}
-if(fw>pw-pad*2){fw=pw-pad*2;fh=fw/ar}
-if(fh>ph-pad*2){fh=ph-pad*2;fw=fh*ar}
-/* Position frame centered */
+if(frameAR>=maxFW/maxFH){fw=maxFW;fh=fw/frameAR}
+else{fh=maxFH;fw=fh*frameAR}
+/* Step 2: Size the image so it fully covers the frame (object-fit:cover logic) */
+var iw,ih;
+if(imgAR>frameAR){
+/* Image is wider than frame proportionally: match heights, image overflows horizontally */
+ih=fh;iw=ih*imgAR;
+}else{
+/* Image is taller than frame proportionally: match widths, image overflows vertically */
+iw=fw;ih=iw/imgAR;
+}
+/* Position frame centered in preview */
 var fl=(pw-fw)/2,ft=(ph-fh)/2;
 var frame=$("cropFrame");
 frame.style.left=fl+"px";frame.style.top=ft+"px";
 frame.style.width=fw+"px";frame.style.height=fh+"px";
-/* Calculate image dimensions: cover the frame */
-var imgR=cropPhoto.width/cropPhoto.height;
-var iw,ih;
-if(imgR>ar){ih=fh;iw=ih*imgR}else{iw=fw;ih=iw/imgR}
 var img=$("cropImg");
 img.src=cropPhoto.dataUrl;
 img.style.width=iw+"px";img.style.height=ih+"px";
 /* Position image based on crop values */
 positionCropImg(fl,ft,fw,fh,iw,ih);
-/* Render dimming overlay using box-shadow trick */
+/* Render dimming overlay */
 var dim=$("cropDim");
 dim.style.cssText="position:absolute;inset:0;z-index:1;pointer-events:none;"+
 "background:rgba(0,0,0,.55);"+
@@ -603,15 +608,15 @@ prev.setPointerCapture(e.pointerId);
 prev.addEventListener("pointermove",function(e){
 if(!cropDragging||!cropPhoto)return;
 var pw=prev.clientWidth,ph=prev.clientHeight;
-var pad=40;var ar=CROP_AR[cropOrient];
+var pad=30;var frameAR=CROP_AR[cropOrient];
+var imgAR=cropPhoto.width/cropPhoto.height;
+var maxFW=pw-pad*2,maxFH=ph-pad*2;
 var fw,fh;
-if(ar>=1){fw=Math.min(pw-pad*2,320);fh=fw/ar}
-else{fh=Math.min(ph-pad*2,400);fw=fh*ar}
-if(fw>pw-pad*2){fw=pw-pad*2;fh=fw/ar}
-if(fh>ph-pad*2){fh=ph-pad*2;fw=fh*ar}
-var imgR=cropPhoto.width/cropPhoto.height;
+if(frameAR>=maxFW/maxFH){fw=maxFW;fh=fw/frameAR}
+else{fh=maxFH;fw=fh*frameAR}
 var iw,ih;
-if(imgR>ar){ih=fh;iw=ih*imgR}else{iw=fw;ih=iw/imgR}
+if(imgAR>frameAR){ih=fh;iw=ih*imgAR}
+else{iw=fw;ih=iw/imgAR}
 var maxOx=iw-fw,maxOy=ih-fh;
 if(maxOx<1&&maxOy<1)return;
 var dx=e.clientX-cropSX,dy=e.clientY-cropSY;
