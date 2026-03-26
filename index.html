@@ -114,7 +114,7 @@ body.dm #bgPk.vis{display:flex;transform:translateY(0);opacity:1}
 #bgSlider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.15);box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer}
 .bp-lbl{font-size:10px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.05em}
 #bgBack{position:fixed;top:14px;left:14px;z-index:4100;display:none;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.1);font-size:15px;align-items:center;justify-content:center;cursor:pointer;transition:opacity .18s}
-body.dm #bgBack{display:flex}
+body.dm #bgBack{display:none}
 #tst{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-5px);z-index:10000;max-width:min(88vw,360px);padding:7px 14px;border-radius:999px;background:#fffdf9;border:1px solid rgba(130,118,96,.10);box-shadow:0 6px 20px rgba(50,40,20,.07);text-align:center;font-size:11px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .1s,transform .1s}
 #tst.sh{opacity:1;transform:translateX(-50%) translateY(0)}
 #pgO{position:fixed;inset:0;z-index:5500;background:rgba(42,37,32,.22);display:none;align-items:center;justify-content:center;padding:20px}
@@ -169,7 +169,7 @@ addFrame:"\u30D5\u30EC\u30FC\u30E0\u8FFD\u52A0",square:"\u6B63\u65B9\u5F62",land
 backShape:"\u2190 \u5F62\u3092\u9078\u3073\u76F4\u3059",selectedFrame:"\u9078\u629E\u4E2D\u30D5\u30EC\u30FC\u30E0",
 changeFrame:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4",notSelected:"\u672A\u9078\u629E",
 pinPhoto:"\u5199\u771F\u56FA\u5B9A",unpinPhoto:"\u56FA\u5B9A\u89E3\u9664",delete:"\u524A\u9664",
-tapToEdit:"\u30BF\u30C3\u30D7\u3067\u7DE8\u96C6\u306B\u623B\u308B",addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",
+tapToEdit:"\u30C0\u30D6\u30EB\u30BF\u30C3\u30D7\u3067\u7DE8\u96C6\u306B\u623B\u308B",addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",
 pinned:"\u56FA\u5B9A",fixing:"\u56FA\u5B9A\u4E2D",fixed:"\u56FA\u5B9A\u4E2D",unfixed:"\u672A\u56FA\u5B9A",
 classic:"\u30AF\u30E9\u30B7\u30C3\u30AF",simple:"\u30B7\u30F3\u30D7\u30EB",
 photoCount:"\u5199\u771F {0}/{1}",loading:"\u8AAD\u307F\u8FBC\u307F\u4E2D",
@@ -193,7 +193,7 @@ addFrame:"Add Frame",square:"Square",landscape:"Landscape",portrait:"Portrait",o
 backShape:"\u2190 Back",selectedFrame:"Selected Frame",
 changeFrame:"Change Frame",notSelected:"None",
 pinPhoto:"Pin Photo",unpinPhoto:"Unpin",delete:"Delete",
-tapToEdit:"Tap to return to edit",addingPhotos:"Adding photos",
+tapToEdit:"Double-tap to return to edit",addingPhotos:"Adding photos",
 pinned:"Pinned",fixing:"Pinned",fixed:"Pinned",unfixed:"Unpinned",
 classic:"Classic",simple:"Simple",
 photoCount:"Photos {0}/{1}",loading:"Loading",
@@ -503,7 +503,7 @@ $("cvArea").addEventListener("click",function(e){if(mode==="display"){if(e.targe
 $("cvArea").addEventListener("touchstart",function(e){if(e.touches.length===2){pinching=true;pDist0=gDist(e.touches);pScale0=zScale}},{passive:true});
 $("cvArea").addEventListener("touchmove",function(e){if(pinching&&e.touches.length===2){var d=gDist(e.touches);var ns=pScale0*(d/pDist0);if(ns<.5)ns=.5;if(ns>4)ns=4;zScale=ns;fit()}},{passive:true});
 $("cvArea").addEventListener("touchend",function(e){if(e.touches.length<2)pinching=false},{passive:true});
-var lastTap=0;$("cvArea").addEventListener("touchend",function(e){if(e.touches.length===0&&!pinching){var now=Date.now();if(now-lastTap<300&&zScale!==1){zScale=1;zOx=0;zOy=0;fit()}lastTap=now}},{passive:true});
+var lastTap=0;$("cvArea").addEventListener("touchend",function(e){if(e.touches.length===0&&!pinching){var now=Date.now();if(now-lastTap<300){if(mode==="display"){exitDisp()}else if(zScale!==1){zScale=1;zOx=0;zOy=0;fit()}}lastTap=now}},{passive:true});
 window.addEventListener("resize",fit);
 }
 
