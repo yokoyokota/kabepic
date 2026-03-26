@@ -55,6 +55,7 @@ body.em .fr-n{display:flex}
 .nb .ni{font-size:17px;line-height:1}
 .nb.on{background:rgba(74,106,138,.07);color:#4a6a8a;border-color:rgba(74,106,138,.06)}
 body.dm .bnav,body.dm .sht,body.dm #editBar{display:none!important}
+body.crop-on .bnav,body.crop-on .sht,body.crop-on #editBar{display:none!important}
 .sht{position:fixed;left:8px;right:8px;bottom:72px;z-index:3250;background:rgba(255,253,249,.97);border:1px solid rgba(130,118,96,.10);box-shadow:0 -6px 32px rgba(50,40,20,.08);border-radius:20px;max-height:50vh;overflow:hidden;display:none}
 body.em .sht.opn{bottom:122px}
 .sht.opn{display:block}
@@ -521,10 +522,11 @@ cropPhoto=p;cropDirty=false;
 cropOrient=p.orient==="landscape"?"landscape":p.orient==="portrait"?"portrait":"square";
 loadCropValues();
 $("cropScr").classList.add("opn");
+document.body.classList.add("crop-on");
 applyI18n();
 renderCrop();
 }
-function closeCrop(){$("cropScr").classList.remove("opn");cropPhoto=null}
+function closeCrop(){$("cropScr").classList.remove("opn");document.body.classList.remove("crop-on");cropPhoto=null}
 function loadCropValues(){
 if(!cropPhoto)return;
 var c=cropPhoto.crop?cropPhoto.crop[cropOrient]:null;
