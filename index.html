@@ -115,6 +115,10 @@ body.dm #bgPk.vis{display:flex;transform:translateY(0);opacity:1}
 .bp-lbl{font-size:10px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.05em}
 #bgBack{position:fixed;top:14px;left:14px;z-index:4100;width:42px;height:42px;border-radius:50%;background:rgba(42,37,32,.55);color:#fff;border:1px solid rgba(255,255,255,.18);font-size:18px;font-weight:700;display:none;align-items:center;justify-content:center;cursor:pointer;transition:opacity .18s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 body.dm #bgBack.vis{display:flex}
+/* Photo shortage hint */
+#pShort{display:none;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;border-radius:12px;background:rgba(74,106,138,.06);border:1px solid rgba(74,106,138,.10);font-size:11px;color:#4a6a8a;font-weight:500}
+#pShort.vis{display:flex}
+#pShort .ps-icon{font-size:14px;flex-shrink:0}
 /* Crop Adjustment Screen */
 #cropScr{position:fixed;inset:0;z-index:6000;background:#1a1917;display:none;flex-direction:column}
 #cropScr.opn{display:flex}
@@ -145,7 +149,6 @@ body.dm #bgBack.vis{display:flex}
 </style>
 </head>
 <body>
-<!-- HTML uses data-t attributes for i18n, populated by JS -->
 <div id="editBar">
   <button id="ebU" class="ebb dis" data-t="undo"></button>
   <button id="ebR" class="ebb dis" data-t="redo"></button>
@@ -155,20 +158,20 @@ body.dm #bgBack.vis{display:flex}
   <input id="fIn" type="file" accept="image/*" multiple>
   <div id="cvArea"><div id="cvScale"><div id="cv"></div></div></div>
   <div class="bnav">
-    <button id="nP" class="nb"><span class="ni">◻</span>Photo</button>
-    <button id="nF" class="nb"><span class="ni">▦</span>Frames</button>
-    <button id="nE" class="nb"><span class="ni">✎</span>Edit</button>
-    <button id="nD" class="nb"><span class="ni">▶</span>Display</button>
+    <button id="nP" class="nb"><span class="ni">◻</span><span data-t="navPhoto"></span></button>
+    <button id="nF" class="nb"><span class="ni">▦</span><span data-t="navFrames"></span></button>
+    <button id="nE" class="nb"><span class="ni">✎</span><span data-t="navEdit"></span></button>
+    <button id="nD" class="nb"><span class="ni">▶</span><span data-t="navDisplay"></span></button>
   </div>
-  <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
-  <div id="shF" class="sht"><div class="shd"><div class="sht-t">Frames</div><button id="clF" class="pl gh" data-t="close"></button></div><div class="shb"><div id="fLst" class="ml"></div></div></div>
-  <div id="shE" class="sht"><div class="shd"><div class="sht-t">Edit</div><button id="clE" class="pl gh" data-t="close"></button></div><div class="shb" id="shEb"><div class="sl" data-t="addFrame"></div><div id="addA"><div id="aS1"><div class="sg"><button class="sc" data-s="square"><div class="si sq"></div><div class="sll" data-t="square"></div></button><button class="sc" data-s="landscape"><div class="si ls"></div><div class="sll" data-t="landscape"></div></button><button class="sc" data-s="portrait"><div class="si pt"></div><div class="sll" data-t="portrait"></div></button><button class="sc" data-s="oval"><div class="si ov"></div><div class="sll" data-t="oval"></div></button></div></div><div id="aS2" class="hid"><button id="aBk" class="sb" data-t="backShape"></button><div id="aDg" class="dg"></div></div></div><div class="sl" data-t="selectedFrame"></div><div class="ml"><button id="chgB" class="mi dis"><span data-t="changeFrame"></span><span id="chgR" class="mir" data-t="notSelected"></span></button><div id="chgA" class="hid"><div id="cS1"><div class="sg" id="cSg"></div></div><div id="cS2" class="hid"><button id="cBk" class="sb" data-t="backShape"></button><div id="cDg" class="dg"></div></div></div><button id="pinB" class="mi dis"><span id="pinT" data-t="pinPhoto"></span><span id="pinS" class="mir" data-t="notSelected"></span></button><button id="delB" class="mi dis"><span style="color:#b04e46" data-t="delete"></span><span class="mir"></span></button></div></div></div>
-  <div id="vw" class="vw"><button id="vwC" class="vwx">×</button><img id="vwI" alt=""></div>
+  <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pShort"><span class="ps-icon">💡</span><span id="pShortMsg"></span></div><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
+  <div id="shF" class="sht"><div class="shd"><div class="sht-t" data-t="navFrames"></div><button id="clF" class="pl gh" data-t="close"></button></div><div class="shb"><div id="fLst" class="ml"></div></div></div>
+  <div id="shE" class="sht"><div class="shd"><div class="sht-t" data-t="navEdit"></div><button id="clE" class="pl gh" data-t="close"></button></div><div class="shb" id="shEb"><div class="sl" data-t="addFrame"></div><div id="addA"><div id="aS1"><div class="sg"><button class="sc" data-s="square"><div class="si sq"></div><div class="sll" data-t="square"></div></button><button class="sc" data-s="landscape"><div class="si ls"></div><div class="sll" data-t="landscape"></div></button><button class="sc" data-s="portrait"><div class="si pt"></div><div class="sll" data-t="portrait"></div></button><button class="sc" data-s="oval"><div class="si ov"></div><div class="sll" data-t="oval"></div></button></div></div><div id="aS2" class="hid"><button id="aBk" class="sb" data-t="backShape"></button><div id="aDg" class="dg"></div></div></div><div class="sl" data-t="selectedFrame"></div><div class="ml"><button id="chgB" class="mi dis"><span data-t="changeFrame"></span><span id="chgR" class="mir" data-t="notSelected"></span></button><div id="chgA" class="hid"><div id="cS1"><div class="sg" id="cSg"></div></div><div id="cS2" class="hid"><button id="cBk" class="sb" data-t="backShape"></button><div id="cDg" class="dg"></div></div></div><button id="pinB" class="mi dis"><span id="pinT" data-t="pinPhoto"></span><span id="pinS" class="mir" data-t="notSelected"></span></button><button id="delB" class="mi dis"><span style="color:#b04e46" data-t="delete"></span><span class="mir"></span></button></div></div></div>
+  <div id="vw" class="vw"><button id="vwC" class="vwx">&times;</button><img id="vwI" alt=""></div>
   <div id="dHint"></div>
-  <div id="bgBack">←</div>
+  <div id="bgBack">&larr;</div>
   <div id="bgPk">
     <div class="bp-row" id="bgSwatches"></div>
-    <div class="bp-row"><span class="bp-lbl" data-t="brightness">明るさ</span><input type="range" id="bgSlider" min="-10" max="10" value="0" step="1"><span class="bp-lbl" id="bgSlVal">0%</span></div>
+    <div class="bp-row"><span class="bp-lbl" data-t="brightness"></span><input type="range" id="bgSlider" min="-10" max="10" value="0" step="1"><span class="bp-lbl" id="bgSlVal">0%</span></div>
   </div>
   <div id="cropScr">
     <div id="cropHead"><button id="cropCancel" class="ch-btn ch-cancel" data-t="cropCancel"></button><div class="ch-t" data-t="cropTitle"></div><button id="cropSave" class="ch-btn ch-save" data-t="cropSave"></button></div>
@@ -192,7 +195,7 @@ addFrame:"\u30D5\u30EC\u30FC\u30E0\u8FFD\u52A0",square:"\u6B63\u65B9\u5F62",land
 backShape:"\u2190 \u5F62\u3092\u9078\u3073\u76F4\u3059",selectedFrame:"\u9078\u629E\u4E2D\u30D5\u30EC\u30FC\u30E0",
 changeFrame:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4",notSelected:"\u672A\u9078\u629E",
 pinPhoto:"\u5199\u771F\u56FA\u5B9A",unpinPhoto:"\u56FA\u5B9A\u89E3\u9664",delete:"\u524A\u9664",
-tapToEdit:"\u30C0\u30D6\u30EB\u30BF\u30C3\u30D7\u3067\u7DE8\u96C6\u306B\u623B\u308B",addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",
+addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",
 pinned:"\u56FA\u5B9A",fixing:"\u56FA\u5B9A\u4E2D",fixed:"\u56FA\u5B9A\u4E2D",unfixed:"\u672A\u56FA\u5B9A",
 classic:"\u30AF\u30E9\u30B7\u30C3\u30AF",simple:"\u30B7\u30F3\u30D7\u30EB",
 photoCount:"\u5199\u771F {0}/{1}",loading:"\u8AAD\u307F\u8FBC\u307F\u4E2D",
@@ -207,7 +210,10 @@ selected:"\u9078\u629E\u4E2D",
 calmDesc:"\u4F59\u767D\u91CD\u8996\u3002\u5927\u304D\u306A\u5199\u771F\u3002",flowDesc:"\u8EFD\u3044\u7269\u8A9E\u69CB\u6210\u3002",
 storyDesc:"\u30D0\u30E9\u30F3\u30B9\u578B\u30AE\u30E3\u30E9\u30EA\u30FC\u3002",sceneDesc:"\u58C1\u3068\u3057\u3066\u5B8C\u6210\u3059\u308B\u69CB\u6210\u3002",
 brightness:"\u660E\u308B\u3055",
-cropTitle:"\u8868\u793A\u8ABF\u6574",cropCancel:"\u30AD\u30E3\u30F3\u30BB\u30EB",cropSave:"\u4FDD\u5B58",cropSaved:"\u4FDD\u5B58\u3057\u307E\u3057\u305F",cropHint:"\u5199\u771F\u3092\u30C9\u30E9\u30C3\u30B0\u3057\u3066\u8ABF\u6574",adjust:"\u8ABF\u6574"
+cropTitle:"\u8868\u793A\u8ABF\u6574",cropCancel:"\u30AD\u30E3\u30F3\u30BB\u30EB",cropSave:"\u4FDD\u5B58",cropSaved:"\u4FDD\u5B58\u3057\u307E\u3057\u305F",cropHint:"\u5199\u771F\u3092\u30C9\u30E9\u30C3\u30B0\u3057\u3066\u8ABF\u6574",adjust:"\u8ABF\u6574",
+navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",
+photoShort:"\u5199\u771F\u3092\u8FFD\u52A0\u3059\u308B\u3068\u3001\u3059\u3079\u3066\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8868\u793A\u3055\u308C\u307E\u3059",
+photoShortCount:"\u3042\u3068{0}\u679A\u3067\u5168\u30D5\u30EC\u30FC\u30E0\u306B\u8868\u793A"
 },
 en:{
 undo:"\u21B6 Undo",redo:"\u21B7 Redo",editDone:"Done",
@@ -217,7 +223,7 @@ addFrame:"Add Frame",square:"Square",landscape:"Landscape",portrait:"Portrait",o
 backShape:"\u2190 Back",selectedFrame:"Selected Frame",
 changeFrame:"Change Frame",notSelected:"None",
 pinPhoto:"Pin Photo",unpinPhoto:"Unpin",delete:"Delete",
-tapToEdit:"Double-tap to return to edit",addingPhotos:"Adding photos",
+addingPhotos:"Adding photos",
 pinned:"Pinned",fixing:"Pinned",fixed:"Pinned",unfixed:"Unpinned",
 classic:"Classic",simple:"Simple",
 photoCount:"Photos {0}/{1}",loading:"Loading",
@@ -232,7 +238,10 @@ selected:"Selected",
 calmDesc:"Spacious. Big photos.",flowDesc:"Light narrative flow.",
 storyDesc:"Balanced gallery.",sceneDesc:"Complete wall composition.",
 brightness:"Brightness",
-cropTitle:"Adjust View",cropCancel:"Cancel",cropSave:"Save",cropSaved:"Saved",cropHint:"Drag photo to adjust",adjust:"Adjust"
+cropTitle:"Adjust View",cropCancel:"Cancel",cropSave:"Save",cropSaved:"Saved",cropHint:"Drag photo to adjust",adjust:"Adjust",
+navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",
+photoShort:"Add more photos to fill all frames",
+photoShortCount:"{0} more to fill all frames"
 }
 };
 var LANG=(navigator.language||"ja").startsWith("ja")?"ja":"en";
@@ -267,7 +276,6 @@ scene:[["landscape_simple",1.5,42.3,39],["square",42.75,33.5,45],["portrait_simp
 
 var mode="view",tab=null,lk="story",ps=[],fs=[],sel=null,dt=[],tt=null,uploading=false,masksOk=false;
 var undoS=[],redoS=[],zScale=1,zOx=0,zOy=0;
-/* Track which img layer (0 or 1) is currently visible per frame, for crossfade */
 var cfSlots={};
 
 function uid(){return Math.random().toString(36).slice(2,10)+"_"+Date.now().toString(36)}
@@ -300,12 +308,10 @@ function autoA(){
 var real=rp();
 if(!real.length){fs.forEach(function(f){if(!f.fp){f.pi=[];f.cp=null}});return}
 var used={};
-/* Pass 1: handle fixed photos */
 fs.forEach(function(f){
 if(f.fp){var x=fp(f.fp);if(x){f.pi=[x.id];f.cp=x.id;used[x.id]=true;return}f.fp=null}
 f.pi=[];f.cp=null;
 });
-/* Pass 2: assign non-fixed frames, no duplicates */
 fs.forEach(function(f){
 if(f.fp)return;
 var pool=getPriorityPool(f.kind);
@@ -317,6 +323,9 @@ if(pick){f.pi=[pick.id];f.cp=pick.id;used[pick.id]=true}
 });
 }
 function curP(f){if(f.fp){var x=fp(f.fp);if(x)return x}if(f.cp){var x2=fp(f.cp);if(x2)return x2}if(f.pi&&f.pi.length){var x3=fp(f.pi[0]);if(x3)return x3}return null}
+
+/* Count how many frames have no photo assigned */
+function shortageCount(){var n=0;fs.forEach(function(f){if(!curP(f))n++});return n}
 
 function snap(){return JSON.parse(JSON.stringify(fs))}
 function pushU(){undoS.push(snap());if(undoS.length>UL)undoS.shift();redoS=[];updU()}
@@ -335,9 +344,6 @@ function hydrateAR(){var keys=Object.keys(FM);var proms=keys.map(function(k){ret
 function fit(){var a=$("cvArea"),sx=a.clientWidth/2400,sy=a.clientHeight/1500,s=Math.min(sx,sy)*zScale;var sw=2400*s,sh=1500*s,ox=(a.clientWidth-sw)/2+zOx,oy=(a.clientHeight-sh)/2+zOy;$("cvScale").style.transform="translate("+ox+"px,"+oy+"px) scale("+s+")"}
 
 /* ===== CROP POSITION HELPER ===== */
-/* Compute actual photo display area AR from frame insets.
-The photo is rendered inside .pm which has CSS inset applied,
-so visible area AR = (1-right-left) * outerAR / (1-top-bottom). */
 function getDisplayAR(frameKind){
 var m=FM[frameKind];
 if(!m)return 1;
@@ -348,24 +354,16 @@ var hFrac=1-top-bottom;
 return wFrac*m.ar/hFrac;
 }
 
-/* Convert saved crop center (0-1) to CSS object-position for object-fit:cover.
-c.x/c.y = frame center position within image (normalized 0-1).
-object-position X% means X% of horizontal overflow is clipped from left. */
 function getCropPos(photo,frameKind){
 if(!photo||!photo.crop)return"center";
 var orient=fbu(frameKind);
 var c=photo.crop[orient];
 if(!c)return"center";
-/* Use actual display area AR for correct conversion */
 var displayAR=getDisplayAR(frameKind);
 var imgAR=photo.width/photo.height;
-/* For object-fit:cover, compute visible fraction of image in each axis */
 var visX,visY;
 if(imgAR>displayAR){visX=displayAR/imgAR;visY=1}
 else{visX=1;visY=imgAR/displayAR}
-/* Convert frame center to object-position percentage.
-Visible center = opx/100 * (1-visX) + visX/2
-Solving for opx: opx = (c.x - visX/2) / (1-visX) * 100 */
 var opx,opy;
 if(visX>=1){opx=50}else{opx=(c.x-visX/2)/(1-visX)*100}
 if(visY>=1){opy=50}else{opy=(c.y-visY/2)/(1-visY)*100}
@@ -375,16 +373,19 @@ return opx.toFixed(1)+"% "+opy.toFixed(1)+"%";
 }
 
 /* ===== renderCanvas [frame drawing from working code] ===== */
-function rc(){var cv=$("cv");cv.innerHTML="";var isE=mode==="edit";
+function rc(){var cv=$("cv");cv.innerHTML="";var isE=mode==="edit";var isD=mode==="display";
 cfSlots={};
-fs.forEach(function(f){var m=FM[f.kind],p=gpc(f);var el=document.createElement("div");el.className="fr"+(isE?" ed":"");if(f.id===sel&&mode!=="display")el.className+=" sel";if(f.fp)el.className+=" lk";el.setAttribute("data-id",f.id);el.style.left=p.left;el.style.top=p.top;el.style.width=p.width;el.style.height=p.height;
+fs.forEach(function(f){var m=FM[f.kind],p=gpc(f);
+var ph=curP(f);
+/* Display mode: skip frames with no photo assigned */
+if(isD&&!ph)return;
+var el=document.createElement("div");el.className="fr"+(isE?" ed":"");if(f.id===sel&&!isD)el.className+=" sel";if(f.fp)el.className+=" lk";el.setAttribute("data-id",f.id);el.style.left=p.left;el.style.top=p.top;el.style.width=p.width;el.style.height=p.height;
 var ring=document.createElement("div");ring.className="fr-ring";el.appendChild(ring);
 var pw=document.createElement("div");pw.className="pw";
 if(f.kind==="oval")pw.style.borderRadius="50%";
 if(masksOk&&m.maskPng)apMask(pw,m.maskPng);
 var pm=document.createElement("div");pm.className="pm";pm.style.inset=m.inset;
 if(f.kind==="oval"){pm.style.borderRadius="50%";pm.style.overflow="hidden"}
-var ph=curP(f);
 var cropPos=getCropPos(ph,f.kind);
 var imgA=document.createElement("img");imgA.className="cf";imgA.src=ph?ph.dataUrl:PH;imgA.style.opacity="1";imgA.style.objectPosition=cropPos;
 var imgB=document.createElement("img");imgB.className="cf";imgB.src=ph?ph.dataUrl:PH;imgB.style.opacity="0";imgB.style.objectPosition=cropPos;
@@ -394,7 +395,7 @@ var ov=document.createElement("img");ov.className="fov";ov.src=m.src;ov.onerror=
 var nm=document.createElement("div");nm.className="fr-n";nm.textContent=fs.indexOf(f)+1;el.appendChild(nm);
 var pn=document.createElement("div");pn.className="fr-p";pn.textContent=T("pinned");el.appendChild(pn);
 var hd=document.createElement("div");hd.className="rh";el.appendChild(hd);
-el.addEventListener("click",function(e){if(mode==="display")return;if(e.target.classList.contains("rh"))return;sel=f.id;cv.querySelectorAll(".fr").forEach(function(x){x.classList.toggle("sel",x.getAttribute("data-id")===f.id)});updE();rPh()});
+el.addEventListener("click",function(e){if(isD)return;if(e.target.classList.contains("rh"))return;sel=f.id;cv.querySelectorAll(".fr").forEach(function(x){x.classList.toggle("sel",x.getAttribute("data-id")===f.id)});updE();rPh()});
 if(isE){attachDrag(el,f);attachResize(hd,el,f)}
 cv.appendChild(el);
 cfSlots[f.id]=0;
@@ -405,7 +406,13 @@ function attachResize(hd,el,f){var on=false,sx=0,sw=0,mv=false;hd.addEventListen
 
 function seed(k){pushU();lk=k;sel=null;var g=LO[k]||LO.story;fs=g.map(function(x){return{id:uid(),kind:x[0],gx:x[1],gy:x[2],w:x[3],pi:[],fp:null,cp:null}});autoA();ra()}
 
-function rPh(){var r=rp();$("shPm").textContent=Tf("photoCount",r.length,MAX_P);var g=$("pGr"),em=$("pEm");if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
+function rPh(){var r=rp();$("shPm").textContent=Tf("photoCount",r.length,MAX_P);var g=$("pGr"),em=$("pEm");
+/* Photo shortage hint */
+var sc=shortageCount();
+var ps_el=$("pShort");
+if(sc>0&&r.length>0){ps_el.classList.add("vis");$("pShortMsg").textContent=Tf("photoShortCount",sc)}
+else{ps_el.classList.remove("vis")}
+if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
 var hasCrop=p.crop&&(p.crop.portrait||p.crop.landscape||p.crop.square);
 if(hasCrop){var dot=document.createElement("div");dot.style.cssText="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:50%;background:rgba(74,106,138,.88);border:.75px solid rgba(255,255,255,.95)";c.appendChild(dot)}
 g.appendChild(c)})}
@@ -427,17 +434,17 @@ function enterDisp(){mode="display";tab=null;document.body.classList.add("dm");d
 function exitDisp(){mode="view";tab=null;document.body.classList.remove("dm");stopCF();hideDispUI();$("cv").style.background="";$("cv").style.boxShadow="";ra();fit()}
 
 /* ===== Crossfade ===== */
+/* Strict no-duplicate: only pick photos not shown in ANY other frame */
 function nextP(f){
 var pool=getPriorityPool(f.kind);
 if(pool.length<2)return null;
 var c=curP(f);
 var othersShowing={};
 fs.forEach(function(of){if(of.id!==f.id&&of.cp)othersShowing[of.cp]=true});
-var avail=pool.filter(function(p){return!c||p.id!==c.id});
-if(!avail.length)return null;
-var preferred=avail.filter(function(p){return!othersShowing[p.id]});
-var pick=preferred.length?preferred:avail;
-return pick[Math.floor(Math.random()*pick.length)];
+/* Exclude current photo AND photos shown in other frames — no fallback */
+var candidates=pool.filter(function(p){return(!c||p.id!==c.id)&&!othersShowing[p.id]});
+if(!candidates.length)return null;
+return candidates[Math.floor(Math.random()*candidates.length)];
 }
 function startCF(){
 stopCF();
@@ -520,7 +527,7 @@ c.appendChild(s);
 function showBgPicker(){bgPickerVis=true;$("bgPk").classList.add("vis")}
 function hideBgPicker(){bgPickerVis=false;$("bgPk").classList.remove("vis")}
 
-/* ===== Display UI show/hide (back button + bg picker together) ===== */
+/* ===== Display UI show/hide ===== */
 function showDispUI(){dispUIVis=true;$("bgBack").classList.add("vis");showBgPicker()}
 function hideDispUI(){dispUIVis=false;$("bgBack").classList.remove("vis");hideBgPicker();clearTimeout(dispUITimer)}
 function toggleDispUI(){if(dispUIVis){hideDispUI()}else{showDispUI();scheduleDispUIHide()}}
@@ -531,8 +538,6 @@ var cropPhoto=null,cropOrient="portrait",cropDirty=false;
 var cropTempX=0.5,cropTempY=0.5;
 var cropDragging=false,cropSX=0,cropSY=0,cropOX=0,cropOY=0;
 var cropTemp={portrait:null,landscape:null,square:null};
-/* Crop preview frame AR — computed from actual frame insets for accuracy.
-Initial values use FM defaults; recomputed after hydrateAR loads real image dimensions. */
 var CROP_AR={portrait:getDisplayAR("portrait"),landscape:getDisplayAR("landscape"),square:getDisplayAR("square")};
 
 function openCrop(photoId){
@@ -687,18 +692,15 @@ document.querySelectorAll("#cropTabs .ct-btn").forEach(function(b){
 b.addEventListener("click",function(){
 storeCropToTemp();
 cropOrient=b.getAttribute("data-ct");
-/* FIX: Load stored position for the new orient tab */
 loadCropFromTemp();
 cropDirty=true;renderCrop();
 });
 });
 bindCropDrag();
-/* Display mode: single tap toggles Display UI; non-display: deselect frame */
 $("cvArea").addEventListener("click",function(e){if(mode==="display"){if(e.target.closest("#bgPk")||e.target.closest("#bgBack"))return;toggleDispUI();return}if(!e.target.closest(".fr")){sel=null;ra()}});
 $("cvArea").addEventListener("touchstart",function(e){if(e.touches.length===2){pinching=true;pDist0=gDist(e.touches);pScale0=zScale}},{passive:true});
 $("cvArea").addEventListener("touchmove",function(e){if(pinching&&e.touches.length===2){var d=gDist(e.touches);var ns=pScale0*(d/pDist0);if(ns<.5)ns=.5;if(ns>4)ns=4;zScale=ns;fit()}},{passive:true});
 $("cvArea").addEventListener("touchend",function(e){if(e.touches.length<2)pinching=false},{passive:true});
-/* Double-tap: only used for zoom reset in non-display modes */
 var lastTap=0;$("cvArea").addEventListener("touchend",function(e){if(e.touches.length===0&&!pinching){var now=Date.now();if(now-lastTap<300){if(mode!=="display"&&zScale!==1){zScale=1;zOx=0;zOy=0;fit()}}lastTap=now}},{passive:true});
 window.addEventListener("resize",fit);
 }
@@ -707,7 +709,6 @@ window.addEventListener("resize",fit);
 chkMask().then(function(){
 return hydrateAR();
 }).then(function(){
-/* Recompute CROP_AR after frame images loaded with real AR values */
 CROP_AR.portrait=getDisplayAR("portrait");
 CROP_AR.landscape=getDisplayAR("landscape");
 CROP_AR.square=getDisplayAR("square");
