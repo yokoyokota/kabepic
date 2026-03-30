@@ -118,6 +118,8 @@ body.dm #bgBack.vis{display:flex}
 /* Photo shortage hint */
 #pShort{display:none;margin:8px 0 4px;padding:0 2px;font-size:10px;color:#9a8f80;font-weight:400}
 #pShort.vis{display:block}
+#pPinHint{display:none;margin:0 0 8px;padding:7px 10px;border-radius:10px;background:rgba(74,106,138,.08);font-size:11px;color:#4a6a8a;font-weight:500}
+#pPinHint.vis{display:block}
 /* Crop Adjustment Screen */
 #cropScr{position:fixed;inset:0;z-index:6000;background:#1a1917;display:none;flex-direction:column}
 #cropScr.opn{display:flex}
@@ -162,7 +164,7 @@ body.dm #bgBack.vis{display:flex}
     <button id="nE" class="nb"><span class="ni">✎</span><span data-t="navEdit"></span></button>
     <button id="nD" class="nb"><span class="ni">▶</span><span data-t="navDisplay"></span></button>
   </div>
-  <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pShort"><span id="pShortMsg"></span></div><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
+  <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pPinHint"></div><div id="pShort"><span id="pShortMsg"></span></div><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
   <div id="shF" class="sht"><div class="shd"><div class="sht-t" data-t="navFrames"></div><button id="clF" class="pl gh" data-t="close"></button></div><div class="shb"><div id="fLst" class="ml"></div></div></div>
   <div id="shE" class="sht"><div class="shd"><div class="sht-t" data-t="navEdit"></div><button id="clE" class="pl gh" data-t="close"></button></div><div class="shb" id="shEb"><div class="sl" data-t="addFrame"></div><div id="addA"><div id="aS1"><div class="sg"><button class="sc" data-s="square"><div class="si sq"></div><div class="sll" data-t="square"></div></button><button class="sc" data-s="landscape"><div class="si ls"></div><div class="sll" data-t="landscape"></div></button><button class="sc" data-s="portrait"><div class="si pt"></div><div class="sll" data-t="portrait"></div></button><button class="sc" data-s="oval"><div class="si ov"></div><div class="sll" data-t="oval"></div></button></div></div><div id="aS2" class="hid"><button id="aBk" class="sb" data-t="backShape"></button><div id="aDg" class="dg"></div></div></div><div class="sl" data-t="selectedFrame"></div><div class="ml"><button id="chgB" class="mi dis"><span data-t="changeFrame"></span><span id="chgR" class="mir" data-t="notSelected"></span></button><div id="chgA" class="hid"><div id="cS1"><div class="sg" id="cSg"></div></div><div id="cS2" class="hid"><button id="cBk" class="sb" data-t="backShape"></button><div id="cDg" class="dg"></div></div></div><button id="pinB" class="mi dis"><span id="pinT" data-t="pinPhoto"></span><span id="pinS" class="mir" data-t="notSelected"></span></button><button id="delB" class="mi dis"><span style="color:#b04e46" data-t="delete"></span><span class="mir"></span></button></div></div></div>
   <div id="vw" class="vw"><button id="vwC" class="vwx">&times;</button><img id="vwI" alt=""></div>
@@ -187,7 +189,7 @@ body.dm #bgBack.vis{display:flex}
 /* ===== i18n DICTIONARY ===== */
 var TEXT={
 ja:{
-undo:"\u21B6 \u623B\u3059",redo:"\u21B7 \u3084\u308A\u76F4\u3059",editDone:"\u7DE8\u96C6\u7D42\u4E86",
+undo:"\u21B6 \u623B\u3059",redo:"\u21B7 \u3084\u308A\u76F4\u3059",editDone:"\u5B8C\u4E86",
 photoList:"\u5199\u771F\u4E00\u89A7",add:"\u8FFD\u52A0",close:"\u9589\u3058\u308B",
 photoEmpty:"\u5199\u771F\u3092\u8FFD\u52A0\u3057\u3066\u58C1\u306B\u98FE\u308A\u307E\u3057\u3087\u3046",
 addFrame:"\u30D5\u30EC\u30FC\u30E0\u8FFD\u52A0",square:"\u6B63\u65B9\u5F62",landscape:"\u6A2A",portrait:"\u7E26",oval:"\u6955\u5186",
@@ -212,7 +214,8 @@ brightness:"\u660E\u308B\u3055",
 cropTitle:"\u8868\u793A\u8ABF\u6574",cropCancel:"\u30AD\u30E3\u30F3\u30BB\u30EB",cropSave:"\u4FDD\u5B58",cropSaved:"\u4FDD\u5B58\u3057\u307E\u3057\u305F",cropHint:"\u5199\u771F\u3092\u30C9\u30E9\u30C3\u30B0\u3057\u3066\u8ABF\u6574",adjust:"\u8ABF\u6574",
 navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",
 photoShort:"\u5199\u771F\u3092\u8FFD\u52A0\u3059\u308B\u3068\u3001\u3059\u3079\u3066\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8868\u793A\u3055\u308C\u307E\u3059",
-photoShortCount:"\u3042\u3068{0}\u679A\u3067\u5168\u30D5\u30EC\u30FC\u30E0\u8868\u793A"
+photoShortCount:"\u3042\u3068{0}\u679A\u3067\u5168\u30D5\u30EC\u30FC\u30E0\u8868\u793A",
+pinHint:"\u30D5\u30EC\u30FC\u30E0{0}\u306B\u56FA\u5B9A\u3059\u308B\u5199\u771F\u3092\u9078\u629E"
 },
 en:{
 undo:"\u21B6 Undo",redo:"\u21B7 Redo",editDone:"Done",
@@ -240,7 +243,8 @@ brightness:"Brightness",
 cropTitle:"Adjust View",cropCancel:"Cancel",cropSave:"Save",cropSaved:"Saved",cropHint:"Drag photo to adjust",adjust:"Adjust",
 navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",
 photoShort:"Add more photos to fill all frames",
-photoShortCount:"{0} more to fill all frames"
+photoShortCount:"{0} more to fill all frames",
+pinHint:"Select photo for Frame {0}"
 }
 };
 var LANG=(navigator.language||"ja").startsWith("ja")?"ja":"en";
@@ -333,8 +337,77 @@ function redo(){if(!redoS.length)return;undoS.push(snap());fs=redoS.pop();sel=nu
 function updU(){var u=$("ebU"),r=$("ebR");u.classList.toggle("dis",!undoS.length);u.classList.toggle("enb",!!undoS.length);r.classList.toggle("dis",!redoS.length);r.classList.toggle("enb",!!redoS.length)}
 
 function f2u(f){return new Promise(function(res,rej){var r=new FileReader;r.onload=function(){res(r.result)};r.onerror=rej;r.readAsDataURL(f)})}
+function f2ab(f){return new Promise(function(res,rej){var r=new FileReader;r.onload=function(){res(r.result)};r.onerror=rej;r.readAsArrayBuffer(f)})}
 function limg(s){return new Promise(function(res,rej){var i=new Image;i.onload=function(){res(i)};i.onerror=rej;i.src=s})}
-function compress(file){return f2u(file).then(function(src){return limg(src)}).then(function(img){var le=Math.max(img.width,img.height),sc=le<=MXE?1:MXE/le;var w=Math.round(img.width*sc),h=Math.round(img.height*sc);var cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);var ratio=w/h;return{id:uid(),name:file.name,width:w,height:h,ratio:ratio,orient:dor(ratio),dataUrl:cv.toDataURL("image/jpeg",JQ),createdAt:Date.now(),crop:{portrait:null,landscape:null,square:null}}})}
+
+/* ===== Minimal EXIF date parser (no external lib) ===== */
+function parseExifDate(file){
+return f2ab(file).then(function(buf){
+var dv=new DataView(buf);
+if(dv.getUint16(0)!==0xFFD8)return null;
+var off=2;
+while(off<dv.byteLength-1){
+if(dv.getUint8(off)!==0xFF)return null;
+var marker=dv.getUint8(off+1);
+if(marker===0xE1){
+var len=dv.getUint16(off+2);
+var exifStart=off+4;
+/* Check "Exif\0\0" */
+if(dv.getUint32(exifStart)!==0x45786966||dv.getUint16(exifStart+4)!==0x0000)return null;
+var tiffOff=exifStart+6;
+var le=dv.getUint16(tiffOff)===0x4949;
+var ifdOff=tiffOff+dv.getUint32(tiffOff+4,le);
+var cnt=dv.getUint16(ifdOff,le);
+for(var i=0;i<cnt;i++){
+var entOff=ifdOff+2+i*12;
+var tag=dv.getUint16(entOff,le);
+/* 0x9003 = DateTimeOriginal, 0x0132 = DateTime */
+if(tag===0x9003||tag===0x0132){
+var valOff=tiffOff+dv.getUint32(entOff+8,le);
+var s="";for(var j=0;j<19;j++)s+=String.fromCharCode(dv.getUint8(valOff+j));
+/* Format: "YYYY:MM:DD HH:MM:SS" */
+var parts=s.split(/[: ]/);
+if(parts.length>=3){
+var mm=parts[1],dd=parts[2];
+return mm+"-"+dd;
+}
+}
+}
+/* Check sub-IFD (Exif IFD pointer, tag 0x8769) */
+for(var i2=0;i2<cnt;i2++){
+var eo2=ifdOff+2+i2*12;
+if(dv.getUint16(eo2,le)===0x8769){
+var subOff=tiffOff+dv.getUint32(eo2+8,le);
+var subCnt=dv.getUint16(subOff,le);
+for(var j2=0;j2<subCnt;j2++){
+var se=subOff+2+j2*12;
+var st=dv.getUint16(se,le);
+if(st===0x9003||st===0x9004){
+var vo=tiffOff+dv.getUint32(se+8,le);
+var ss="";for(var k=0;k<19;k++)ss+=String.fromCharCode(dv.getUint8(vo+k));
+var pp=ss.split(/[: ]/);
+if(pp.length>=3)return pp[1]+"-"+pp[2];
+}
+}
+}
+}
+return null;
+}
+off+=2+dv.getUint16(off+2);
+}
+return null;
+}).catch(function(){return null});
+}
+
+function compress(file){
+var exifP=parseExifDate(file);
+return Promise.all([f2u(file).then(function(src){return limg(src)}),exifP]).then(function(res){
+var img=res[0],takenMMDD=res[1];
+var le=Math.max(img.width,img.height),sc=le<=MXE?1:MXE/le;var w=Math.round(img.width*sc),h=Math.round(img.height*sc);var cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);var ratio=w/h;return{id:uid(),name:file.name,width:w,height:h,ratio:ratio,orient:dor(ratio),dataUrl:cv.toDataURL("image/jpeg",JQ),createdAt:Date.now(),takenMMDD:takenMMDD,crop:{portrait:null,landscape:null,square:null}}});
+}
+
+/* ===== Memory photo (On This Day) tracking ===== */
+var memoryCount=0,memoryDateKey="",lastMemoryId=null,MEMORY_MAX=3;
 
 function chkMask(){return new Promise(function(res){var i=new Image;i.onload=function(){masksOk=true;res()};i.onerror=function(){masksOk=false;res()};i.src="mask_vertical.png"})}
 function apMask(el,mp){if(!mp)return;var u='url("'+mp+'")';el.style.webkitMaskImage=u;el.style.webkitMaskSize="100% 100%";el.style.webkitMaskRepeat="no-repeat";el.style.webkitMaskPosition="center";el.style.webkitMaskMode="luminance";el.style.maskImage=u;el.style.maskSize="100% 100%";el.style.maskRepeat="no-repeat";el.style.maskPosition="center";el.style.maskMode="luminance"}
@@ -411,7 +484,12 @@ var sc=shortageCount();
 var ps_el=$("pShort");
 if(sc>0&&r.length>0){ps_el.classList.add("vis");$("pShortMsg").textContent=Tf("photoShortCount",sc)}
 else{ps_el.classList.remove("vis")}
-if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";var sf2=gsf();r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
+/* Pin hint: show when frame is selected in edit mode */
+var sf2=gsf();
+var pinHEl=$("pPinHint");
+if(sf2&&mode==="edit"){var fIdx=fs.indexOf(sf2)+1;pinHEl.textContent=Tf("pinHint",fIdx);pinHEl.classList.add("vis")}
+else{pinHEl.classList.remove("vis")}
+if(!r.length){g.style.display="none";em.style.display="block";g.innerHTML="";return}g.style.display="grid";em.style.display="none";g.innerHTML="";r.forEach(function(p){var c=document.createElement("div");c.className="pc";if(sf2&&sf2.fp===p.id)c.classList.add("fx");var im=document.createElement("img");im.src=p.dataUrl;c.appendChild(im);var d=document.createElement("button");d.className="dx";d.textContent="\u2715";d.addEventListener("click",function(e){e.stopPropagation();rmPh(p.id)});c.appendChild(d);if(sf2&&sf2.fp===p.id){var t=document.createElement("div");t.className="ft";t.textContent=T("fixing");c.appendChild(t)}c.addEventListener("click",function(){if(!sf2){openCrop(p.id);return}sf2.fp=p.id;sf2.pi=[p.id];sf2.cp=p.id;ra();toast(T("photoFixed"),700)});
 var hasCrop=p.crop&&(p.crop.portrait||p.crop.landscape||p.crop.square);
 if(hasCrop){var dot=document.createElement("div");dot.style.cssText="position:absolute;bottom:4px;right:4px;width:10px;height:10px;border-radius:50%;background:rgba(74,106,138,.88);border:.75px solid rgba(255,255,255,.95)";c.appendChild(dot)}
 g.appendChild(c)})}
@@ -434,15 +512,35 @@ function exitDisp(){mode="view";tab=null;document.body.classList.remove("dm");st
 
 /* ===== Crossfade ===== */
 /* Strict no-duplicate: only pick photos not shown in ANY other frame */
+/* Memory (On This Day): silently prioritize photos taken on today's MM-DD */
+function getTodayMMDD(){var d=new Date();var mm=String(d.getMonth()+1).padStart(2,"0");var dd=String(d.getDate()).padStart(2,"0");return mm+"-"+dd}
+function getMemoryCandidates(pool,othersShowing,curId){
+var today=getTodayMMDD();
+/* Reset daily counter if date changed */
+if(memoryDateKey!==today){memoryDateKey=today;memoryCount=0;lastMemoryId=null}
+if(memoryCount>=MEMORY_MAX)return[];
+return pool.filter(function(p){
+return p.takenMMDD===today&&p.id!==curId&&!othersShowing[p.id]&&p.id!==lastMemoryId;
+});
+}
 function nextP(f){
 var pool=getPriorityPool(f.kind);
 if(pool.length<2)return null;
 var c=curP(f);
+var curId=c?c.id:null;
 var othersShowing={};
 fs.forEach(function(of){if(of.id!==f.id&&of.cp)othersShowing[of.cp]=true});
 /* Exclude current photo AND photos shown in other frames — no fallback */
-var candidates=pool.filter(function(p){return(!c||p.id!==c.id)&&!othersShowing[p.id]});
+var candidates=pool.filter(function(p){return p.id!==curId&&!othersShowing[p.id]});
 if(!candidates.length)return null;
+/* Try memory candidates first (on-this-day photos) */
+var memCands=getMemoryCandidates(candidates,othersShowing,curId);
+if(memCands.length){
+var pick=memCands[Math.floor(Math.random()*memCands.length)];
+memoryCount++;
+lastMemoryId=pick.id;
+return pick;
+}
 return candidates[Math.floor(Math.random()*candidates.length)];
 }
 function startCF(){
@@ -712,7 +810,7 @@ CROP_AR.portrait=getDisplayAR("portrait");
 CROP_AR.landscape=getDisplayAR("landscape");
 CROP_AR.square=getDisplayAR("square");
 applyI18n();
-ps=[{id:uid(),name:"placeholder",dataUrl:PH,ratio:1,orient:"square",crop:{portrait:null,landscape:null,square:null}}];
+ps=[{id:uid(),name:"placeholder",dataUrl:PH,ratio:1,orient:"square",takenMMDD:null,crop:{portrait:null,landscape:null,square:null}}];
 var gg=LO.story;
 fs=gg.map(function(x){return{id:uid(),kind:x[0],gx:x[1],gy:x[2],w:x[3],pi:[],fp:null,cp:null}});
 autoA();bind();loadBg();ra();fit();
