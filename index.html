@@ -400,10 +400,10 @@ return null;
 }
 
 function compress(file){
-var exifP=parseExifDate(file);
-return Promise.all([f2u(file).then(function(src){return limg(src)}),exifP]).then(function(res){
-var img=res[0],takenMMDD=res[1];
+return parseExifDate(file).then(function(takenMMDD){
+return f2u(file).then(function(src){return limg(src)}).then(function(img){
 var le=Math.max(img.width,img.height),sc=le<=MXE?1:MXE/le;var w=Math.round(img.width*sc),h=Math.round(img.height*sc);var cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);var ratio=w/h;return{id:uid(),name:file.name,width:w,height:h,ratio:ratio,orient:dor(ratio),dataUrl:cv.toDataURL("image/jpeg",JQ),createdAt:Date.now(),takenMMDD:takenMMDD,crop:{portrait:null,landscape:null,square:null}}});
+});
 }
 
 /* ===== Memory photo (On This Day) tracking ===== */
