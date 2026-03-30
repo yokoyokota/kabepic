@@ -16,15 +16,22 @@ input[type=file]{display:none}
 .hid{display:none!important}
 #app{position:fixed;inset:0;background:#f7f4ef}
 /* ===== EDIT BAR (redesigned) ===== */
-#editBar{position:fixed;bottom:72px;left:10px;right:10px;z-index:8000;display:flex;align-items:center;justify-content:center;gap:10px;height:44px;padding:0 10px;border-radius:20px;background:rgba(255,253,249,.97);border:1px solid rgba(130,118,96,.10);box-shadow:0 6px 20px rgba(50,40,20,.07);transform:translateY(200px);pointer-events:none;opacity:0;transition:transform .15s ease,opacity .15s ease}
+#editBar{position:fixed;bottom:72px;left:10px;right:10px;z-index:8000;display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 10px;border-radius:20px;background:rgba(255,253,249,.97);border:1px solid rgba(130,118,96,.10);box-shadow:0 6px 20px rgba(50,40,20,.07);transform:translateY(200px);pointer-events:none;opacity:0;transition:transform .15s ease,opacity .15s ease}
 #editBar.vis{transform:translateY(0);pointer-events:auto;opacity:1}
+#ebLeft{display:flex;align-items:center;gap:2px}
+#ebRight{display:flex;align-items:center;gap:8px}
+/* Small undo/redo icon buttons */
+.eb-icon{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#a09484;background:transparent;border:none;transition:transform 80ms,opacity 80ms}
+.eb-icon:active{transform:scale(.88);opacity:.7}
+.eb-icon.dis{opacity:.2;pointer-events:none}
+.eb-icon.enb{opacity:.55}
 .ebb{height:34px;padding:0 12px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:500;color:#b5a898;background:#fffdf9;border:1px solid rgba(130,118,96,.10);white-space:nowrap;transition:transform 80ms,background 80ms}
 .ebb:active{transform:scale(.93);background:rgba(0,0,0,.04)}
 .ebb.dis{opacity:.22;pointer-events:none}
 .ebb.enb{color:#3a3530;border-color:rgba(130,118,96,.22);background:#fff}
-/* Ghost button style for editBar */
-.eb-ghost{height:34px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;font-size:12px;font-weight:500;color:#b5a898;background:transparent;border:1px solid rgba(130,118,96,.08);white-space:nowrap;transition:transform 80ms,background 80ms,opacity 80ms}
-.eb-ghost:active{transform:scale(.93);background:rgba(0,0,0,.03)}
+/* Ghost button style for editBar - visible but secondary */
+.eb-ghost{height:34px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;font-size:12px;font-weight:500;color:#87796a;background:rgba(255,253,249,.6);border:1px solid rgba(130,118,96,.16);white-space:nowrap;transition:transform 80ms,background 80ms,opacity 80ms}
+.eb-ghost:active{transform:scale(.93);background:rgba(0,0,0,.04)}
 /* Accent button style for editBar */
 .eb-accent{height:34px;padding:0 16px;border-radius:999px;background:#4a6a8a;color:#fff;font-size:12px;font-weight:600;display:inline-flex;align-items:center;white-space:nowrap;transition:transform 80ms,background 80ms}
 .eb-accent:active{transform:scale(.93);background:#3a5a7a}
@@ -161,9 +168,8 @@ body.dm #bgBack.vis{display:flex}
 <body>
 <!-- ===== EDIT BAR (redesigned: context-switching) ===== -->
 <div id="editBar">
-  <button id="ebAdd" class="eb-ghost" data-t="addFrame"></button>
-  <button id="ebDetail" class="eb-accent" data-t="detailEdit"></button>
-  <button id="ebDone" class="eb-accent" data-t="editDone"></button>
+  <div id="ebLeft"><button id="ebU" class="eb-icon dis">&#x21B6;</button><button id="ebR" class="eb-icon dis">&#x21B7;</button></div>
+  <div id="ebRight"><button id="ebAdd" class="eb-ghost" data-t="addFrame"></button><button id="ebDetail" class="eb-accent" data-t="detailEdit"></button><button id="ebDone" class="eb-accent" data-t="editDone"></button></div>
 </div>
 <div id="app">
   <input id="fIn" type="file" accept="image/*" multiple>
@@ -176,7 +182,7 @@ body.dm #bgBack.vis{display:flex}
   </div>
   <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pPinHint"></div><div id="pShort"><span id="pShortMsg"></span></div><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
   <div id="shF" class="sht"><div class="shd"><div class="sht-t" data-t="navFrames"></div><button id="clF" class="pl gh" data-t="close"></button></div><div class="shb"><div id="fLst" class="ml"></div></div></div>
-  <div id="shE" class="sht"><div class="shd"><div class="sht-t" id="shEtitle" data-t="navEdit"></div><button id="clE" class="pl gh" data-t="close"></button></div><div class="shb" id="shEb"><div id="addSection"><div class="sl" data-t="addFrame"></div><div id="addA"><div id="aS1"><div class="sg"><button class="sc" data-s="square"><div class="si sq"></div><div class="sll" data-t="square"></div></button><button class="sc" data-s="landscape"><div class="si ls"></div><div class="sll" data-t="landscape"></div></button><button class="sc" data-s="portrait"><div class="si pt"></div><div class="sll" data-t="portrait"></div></button><button class="sc" data-s="oval"><div class="si ov"></div><div class="sll" data-t="oval"></div></button></div></div><div id="aS2" class="hid"><button id="aBk" class="sb" data-t="backShape"></button><div id="aDg" class="dg"></div></div></div></div><div id="detailSection"><div class="sl" data-t="selectedFrame"></div><div class="ml"><button id="chgB" class="mi dis"><span data-t="changeFrame"></span><span id="chgR" class="mir" data-t="notSelected"></span></button><div id="chgA" class="hid"><div id="cS1"><div class="sg" id="cSg"></div></div><div id="cS2" class="hid"><button id="cBk" class="sb" data-t="backShape"></button><div id="cDg" class="dg"></div></div></div><button id="pinB" class="mi dis"><span id="pinT" data-t="pinPhoto"></span><span id="pinS" class="mir" data-t="notSelected"></span></button><button id="delB" class="mi dis"><span style="color:#b04e46" data-t="delete"></span><span class="mir"></span></button></div></div></div></div>
+  <div id="shE" class="sht"><div class="shd"><div class="sht-t" id="shEtitle" data-t="navEdit"></div><button id="clE" class="pl gh" data-t="close"></button></div><div class="shb" id="shEb"><div id="addSection"><div id="addA"><div id="aS1"><div class="sg"><button class="sc" data-s="square"><div class="si sq"></div><div class="sll" data-t="square"></div></button><button class="sc" data-s="landscape"><div class="si ls"></div><div class="sll" data-t="landscape"></div></button><button class="sc" data-s="portrait"><div class="si pt"></div><div class="sll" data-t="portrait"></div></button><button class="sc" data-s="oval"><div class="si ov"></div><div class="sll" data-t="oval"></div></button></div></div><div id="aS2" class="hid"><button id="aBk" class="sb" data-t="backShape"></button><div id="aDg" class="dg"></div></div></div></div><div id="detailSection"><div class="ml"><button id="chgB" class="mi dis"><span data-t="changeFrame"></span><span id="chgR" class="mir" data-t="notSelected"></span></button><div id="chgA" class="hid"><div id="cS1"><div class="sg" id="cSg"></div></div><div id="cS2" class="hid"><button id="cBk" class="sb" data-t="backShape"></button><div id="cDg" class="dg"></div></div></div><button id="pinB" class="mi dis"><span id="pinT" data-t="pinPhoto"></span><span id="pinS" class="mir" data-t="notSelected"></span></button><button id="delB" class="mi dis"><span style="color:#b04e46" data-t="delete"></span><span class="mir"></span></button></div></div></div></div>
   <div id="vw" class="vw"><button id="vwC" class="vwx">&times;</button><img id="vwI" alt=""></div>
   <div id="dHint"></div>
   <div id="bgBack">&larr;</div>
@@ -511,6 +517,11 @@ function bFp(){var l=$("fLst");l.innerHTML="";var lb={calm:"Calm (3)",flow:"Flow
 function updEditBar(){
 var f=gsf();
 var hasSel=!!f;
+/* Undo/redo state */
+$("ebU").classList.toggle("dis",!undoS.length);
+$("ebU").classList.toggle("enb",!!undoS.length);
+$("ebR").classList.toggle("dis",!redoS.length);
+$("ebR").classList.toggle("enb",!!redoS.length);
 /* Show/hide buttons based on context */
 if(hasSel){
 /* Frame selected: Detail Edit (accent) + Done (ghost) */
@@ -539,18 +550,20 @@ function cfk(nk){var f=gsf();if(!f)return;if(f.kind===nk){toast(T("sameFrame"),8
 
 /* ===== Open edit sheet in specific mode ===== */
 function openEditSheetAdd(){
-/* Show add section, hide detail section */
 $("addSection").style.display="";
 $("detailSection").style.display="none";
 $("shEtitle").textContent=T("addFrame");
 tab="edit";rPa();
+/* Hide editBar while sheet is open */
+$("editBar").classList.remove("vis");
 }
 function openEditSheetDetail(){
-/* Show detail section, hide add section */
 $("addSection").style.display="none";
 $("detailSection").style.display="";
 $("shEtitle").textContent=T("selectedFrame");
 tab="edit";updE();rPa();
+/* Hide editBar while sheet is open */
+$("editBar").classList.remove("vis");
 }
 
 function enterEdit(){mode="edit";document.body.classList.add("em");document.body.classList.remove("dm");sel=null;tab=null;ra();fit();updEditBar();requestAnimationFrame(function(){$("editBar").classList.add("vis")})}
@@ -794,7 +807,11 @@ function opVw(s){$("vwI").src=s;$("vw").classList.add("opn")}
 function clVw(){$("vw").classList.remove("opn");$("vwI").src=""}
 function rPa(){$("shP").classList.toggle("opn",mode!=="display"&&tab==="photo");$("shF").classList.toggle("opn",mode!=="display"&&tab==="frames");$("shE").classList.toggle("opn",mode==="edit"&&tab==="edit")}
 function rNv(){$("nP").classList.toggle("on",tab==="photo"&&mode!=="edit");$("nF").classList.toggle("on",tab==="frames"&&mode!=="edit");$("nE").classList.toggle("on",mode==="edit");$("nD").classList.toggle("on",mode==="display")}
-function ra(){document.body.classList.toggle("dm",mode==="display");document.body.classList.toggle("em",mode==="edit");$("editBar").classList.toggle("vis",mode==="edit");rNv();rPa();bFp();rPh();updE();updEditBar();rc()}
+function ra(){document.body.classList.toggle("dm",mode==="display");document.body.classList.toggle("em",mode==="edit");
+/* Only show editBar if in edit mode AND edit sheet is not open */
+var sheetOpen=tab==="edit";
+$("editBar").classList.toggle("vis",mode==="edit"&&!sheetOpen);
+rNv();rPa();bFp();rPh();updE();updEditBar();rc()}
 
 function addPhotos(files){if(!files.length||uploading)return Promise.resolve();var rem=MAX_P-rp().length;if(rem<=0){toast(T("photoLimit"));prog(false);return Promise.resolve()}uploading=true;var toP=Array.prototype.slice.call(files,0,rem);var n=0;function next(i){if(i>=toP.length){uploading=false;prog(false);autoA();ra();if(n)toast(Tf("photosAdded",n));return Promise.resolve()}prog(true,i,toP.length);return new Promise(function(r){setTimeout(r,20)}).then(function(){return compress(toP[i])}).then(function(p){ps.push(p);n++;prog(true,i+1,toP.length);return next(i+1)})}return next(0)}
 function addFr(kind){pushU();var w=kind.indexOf("landscape")>=0?50:kind.indexOf("portrait")>=0?35:kind==="oval"?35:40;var f={id:uid(),kind:kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w:w,pi:[],fp:null,cp:null};fs.push(f);autoA();sel=f.id;ra();toast(T("added"))}
@@ -813,7 +830,10 @@ $("nD").addEventListener("click",function(e){e.stopPropagation();if(mode==="edit
 $("ebDone").addEventListener("click",exitEdit);
 $("ebAdd").addEventListener("click",function(){openEditSheetAdd()});
 $("ebDetail").addEventListener("click",function(){openEditSheetDetail()});
-$("clP").addEventListener("click",function(){tab=null;ra()});$("clF").addEventListener("click",function(){tab=null;ra()});$("clE").addEventListener("click",function(){tab=null;ra()});
+$("ebU").addEventListener("click",undo);
+$("ebR").addEventListener("click",redo);
+$("clP").addEventListener("click",function(){tab=null;ra()});$("clF").addEventListener("click",function(){tab=null;ra()});
+$("clE").addEventListener("click",function(){tab=null;rPa();if(mode==="edit")$("editBar").classList.add("vis");updEditBar()});
 var pickerOpen=false;var pickerTimer=null;
 $("addP").addEventListener("click",function(){pickerOpen=true;$("fIn").click()});
 window.addEventListener("focus",function(){if(pickerOpen){clearTimeout(pickerTimer);pickerTimer=setTimeout(function(){if(pickerOpen){pickerOpen=false;prog(false)}},600)}});
