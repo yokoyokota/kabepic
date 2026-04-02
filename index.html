@@ -1,4 +1,4 @@
-　<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -821,8 +821,20 @@ function addFr(kind){pushU();var w=kind.indexOf("landscape")>=0?50:kind.indexOf(
 function delFr(){var f=gsf();if(!f){toast(T("selectFrame"));return}pushU();fs=fs.filter(function(x){return x.id!==f.id});sel=null;tab=null;ra();toast(T("deleted"))}
 function togPin(){var f=gsf();if(!f){toast(T("selectFrame"));return}if(f.fp){f.fp=null;ra();toast(T("photoUnfixed"),700)}else{tab="photo";$("editBar").classList.remove("vis");ra()}}
 
-var pinching=false,pDist0=0,pScale0=1;
+var pinching=false,pDist0=0,pScale0=1,pCx0=0,pCy0=0,pOx0=0,pOy0=0;
 function gDist(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY)}
+function gCenter(t){return{x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2}}
+function clampPan(){
+/* Limit pan so canvas doesn't go too far offscreen */
+var a=$("cvArea"),sx=a.clientWidth/2400,sy=a.clientHeight/1500,s=Math.min(sx,sy)*zScale;
+var sw=2400*s,sh=1500*s;
+var maxOx=Math.max(0,(sw-a.clientWidth)/2+40);
+var maxOy=Math.max(0,(sh-a.clientHeight)/2+40);
+zOx=Math.max(-maxOx,Math.min(maxOx,zOx));
+zOy=Math.max(-maxOy,Math.min(maxOy,zOy));
+/* Reset pan at 1x zoom */
+if(zScale<=1){zOx=0;zOy=0}
+}
 
 function bind(){
 $("nP").addEventListener("click",function(e){e.stopPropagation();if(mode==="display")exitDisp();else if(mode==="edit")exitEdit();tab=tab==="photo"?null:"photo";ra()});
@@ -863,9 +875,14 @@ cropDirty=true;renderCrop();
 });
 bindCropDrag();
 $("cvArea").addEventListener("click",function(e){if(mode==="display"){if(e.target.closest("#bgPk")||e.target.closest("#bgBack"))return;toggleDispUI();return}if(!e.target.closest(".fr")){sel=null;if(mode==="edit"){tab=null;updEditBar()}ra()}});
-$("cvArea").addEventListener("touchstart",function(e){if(e.touches.length===2){pinching=true;pDist0=gDist(e.touches);pScale0=zScale}},{passive:true});
-$("cvArea").addEventListener("touchmove",function(e){if(pinching&&e.touches.length===2){var d=gDist(e.touches);var ns=pScale0*(d/pDist0);if(ns<.5)ns=.5;if(ns>4)ns=4;zScale=ns;fit()}},{passive:true});
-$("cvArea").addEventListener("touchend",function(e){if(e.touches.length<2)pinching=false},{passive:true});
+$("cvArea").addEventListener("touchstart",function(e){if(e.touches.length===2){pinching=true;pDist0=gDist(e.touches);pScale0=zScale;var c=gCenter(e.touches);pCx0=c.x;pCy0=c.y;pOx0=zOx;pOy0=zOy}},{passive:true});
+$("cvArea").addEventListener("touchmove",function(e){if(pinching&&e.touches.length===2){
+/* Zoom: distance change */
+var d=gDist(e.touches);var ns=pScale0*(d/pDist0);if(ns<.5)ns=.5;if(ns>4)ns=4;zScale=ns;
+/* Pan: center point change (only when zoomed) */
+if(zScale>1){var c=gCenter(e.touches);zOx=pOx0+(c.x-pCx0);zOy=pOy0+(c.y-pCy0);clampPan()}
+fit()}},{passive:true});
+$("cvArea").addEventListener("touchend",function(e){if(e.touches.length<2){pinching=false;clampPan();fit()}},{passive:true});
 var lastTap=0;$("cvArea").addEventListener("touchend",function(e){if(e.touches.length===0&&!pinching){var now=Date.now();if(now-lastTap<300){if(mode!=="display"&&zScale!==1){zScale=1;zOx=0;zOy=0;fit()}}lastTap=now}},{passive:true});
 window.addEventListener("resize",fit);
 }
