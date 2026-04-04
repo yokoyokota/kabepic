@@ -166,10 +166,10 @@ body.dm #bgBack.vis{display:flex}
   <input id="fIn" type="file" accept="image/*" multiple>
   <div id="cvArea"><div id="cvScale"><div id="cv"></div></div></div>
   <div class="bnav">
-    <button id="nP" class="nb"><span class="ni">◻</span><span data-t="navPhoto"></span></button>
-    <button id="nF" class="nb"><span class="ni">▦</span><span data-t="navFrames"></span></button>
-    <button id="nE" class="nb"><span class="ni">✎</span><span data-t="navEdit"></span></button>
-    <button id="nD" class="nb"><span class="ni">▶</span><span data-t="navDisplay"></span></button>
+    <button id="nP" class="nb"><span class="ni">&#9723;</span><span data-t="navPhoto"></span></button>
+    <button id="nF" class="nb"><span class="ni">&#9638;</span><span data-t="navFrames"></span></button>
+    <button id="nE" class="nb"><span class="ni">&#9998;</span><span data-t="navEdit"></span></button>
+    <button id="nD" class="nb"><span class="ni">&#9654;</span><span data-t="navDisplay"></span></button>
   </div>
   <div id="shP" class="sht"><div class="shd"><div><div class="sht-t" data-t="photoList"></div><div id="shPm" class="sht-s"></div></div><div class="sha"><button id="addP" class="pl ac" data-t="add"></button><button id="clP" class="pl gh" data-t="close"></button></div></div><div class="shb"><div id="pPinHint"></div><div id="pShort"><span id="pShortMsg"></span></div><div id="pGr" class="pg"></div><div id="pEm" class="pem" data-t="photoEmpty"></div></div></div>
   <div id="shF" class="sht"><div class="shd"><div class="sht-t" data-t="navFrames"></div><button id="clF" class="pl gh" data-t="close"></button></div><div class="shb"><div id="fLst" class="ml"></div></div></div>
@@ -192,7 +192,7 @@ body.dm #bgBack.vis{display:flex}
 <script>
 (function(){
 "use strict";
-var TEXT={ja:{undo:"\u21B6 \u623B\u3059",redo:"\u21B7 \u3084\u308A\u76F4\u3059",editDone:"\u5B8C\u4E86",photoList:"\u5199\u771F\u4E00\u89A7",add:"\u8FFD\u52A0",close:"\u9589\u3058\u308B",photoEmpty:"\u5199\u771F\u3092\u8FFD\u52A0\u3057\u3066\u58C1\u306B\u98FE\u308A\u307E\u3057\u3087\u3046",addFrame:"\u30D5\u30EC\u30FC\u30E0\u8FFD\u52A0",square:"\u6B63\u65B9\u5F62",landscape:"\u6A2A",portrait:"\u7E26",oval:"\u6955\u5186",backShape:"\u2190 \u5F62\u3092\u9078\u3073\u76F4\u3059",selectedFrame:"\u9078\u629E\u4E2D\u30D5\u30EC\u30FC\u30E0",changeFrame:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4",notSelected:"\u672A\u9078\u629E",pinPhoto:"\u5199\u771F\u56FA\u5B9A",unpinPhoto:"\u56FA\u5B9A\u89E3\u9664",delete:"\u524A\u9664",addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",pinned:"\u56FA\u5B9A",fixing:"\u56FA\u5B9A\u4E2D",fixed:"\u56FA\u5B9A\u4E2D",unfixed:"\u672A\u56FA\u5B9A",classic:"\u30AF\u30E9\u30B7\u30C3\u30AF",simple:"\u30B7\u30F3\u30D7\u30EB",photoCount:"\u5199\u771F {0}/{1}",loading:"\u8AAD\u307F\u8FBC\u307F\u4E2D",undone:"\u623B\u3057\u307E\u3057\u305F",redone:"\u3084\u308A\u76F4\u3057\u307E\u3057\u305F",added:"\u8FFD\u52A0\u3057\u307E\u3057\u305F",deleted:"\u524A\u9664\u3057\u307E\u3057\u305F",photoFixed:"\u5199\u771F\u56FA\u5B9A",photoUnfixed:"\u56FA\u5B9A\u89E3\u9664",sameFrame:"\u540C\u3058\u30D5\u30EC\u30FC\u30E0\u3067\u3059",frameChanged:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4\u3057\u307E\u3057\u305F",selectFrame:"\u30D5\u30EC\u30FC\u30E0\u3092\u9078\u629E",noPhoto:"\u5199\u771F\u304C\u3042\u308A\u307E\u305B\u3093",photoLimit:"\u5199\u771F\u4E0A\u9650\u3067\u3059",photosAdded:"{0}\u679A\u8FFD\u52A0\u3057\u307E\u3057\u305F",switchedTo:"{0} \u306B\u5207\u308A\u66FF\u3048\u307E\u3057\u305F",initFail:"\u521D\u671F\u5316\u306B\u5931\u6557\u3057\u307E\u3057\u305F",selected:"\u9078\u629E\u4E2D",calmDesc:"\u4F59\u767D\u91CD\u8996\u3002\u5927\u304D\u306A\u5199\u771F\u3002",flowDesc:"\u8EFD\u3044\u7269\u8A9E\u69CB\u6210\u3002",storyDesc:"\u30D0\u30E9\u30F3\u30B9\u578B\u30AE\u30E3\u30E9\u30EA\u30FC\u3002",sceneDesc:"\u58C1\u3068\u3057\u3066\u5B8C\u6210\u3059\u308B\u69CB\u6210\u3002",brightness:"\u660E\u308B\u3055",cropTitle:"\u8868\u793A\u8ABF\u6574",cropCancel:"\u30AD\u30E3\u30F3\u30BB\u30EB",cropSave:"\u4FDD\u5B58",cropSaved:"\u4FDD\u5B58\u3057\u307E\u3057\u305F",cropHint:"\u5199\u771F\u3092\u30C9\u30E9\u30C3\u30B0\u3057\u3066\u8ABF\u6574",adjust:"\u8ABF\u6574",navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",photoShort:"\u5199\u771F\u3092\u8FFD\u52A0\u3059\u308B\u3068\u3001\u3059\u3079\u3066\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8868\u793A\u3055\u308C\u307E\u3059",photoShortCount:"\u3042\u3068{0}\u679A\u3067\u5168\u30D5\u30EC\u30FC\u30E0\u8868\u793A",pinHint:"\u3053\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8A2D\u5B9A",detailEdit:"\u8A73\u7D30",layoutConfirm:"\u30EC\u30A4\u30A2\u30A6\u30C8\u3092\u5909\u66F4\u3059\u308B\u3068\u30D5\u30EC\u30FC\u30E0\u306E\u914D\u7F6E\u304C\u30EA\u30BB\u30C3\u30C8\u3055\u308C\u307E\u3059\u3002\u3088\u308D\u3057\u3044\u3067\u3059\u304B\uFF1F"},en:{undo:"\u21B6 Undo",redo:"\u21B7 Redo",editDone:"Done",photoList:"Photos",add:"Add",close:"Close",photoEmpty:"Add photos to decorate your wall",addFrame:"Add Frame",square:"Square",landscape:"Landscape",portrait:"Portrait",oval:"Oval",backShape:"\u2190 Back",selectedFrame:"Selected Frame",changeFrame:"Change Frame",notSelected:"None",pinPhoto:"Pin Photo",unpinPhoto:"Unpin",delete:"Delete",addingPhotos:"Adding photos",pinned:"Pinned",fixing:"Pinned",fixed:"Pinned",unfixed:"Unpinned",classic:"Classic",simple:"Simple",photoCount:"Photos {0}/{1}",loading:"Loading",undone:"Undone",redone:"Redone",added:"Added",deleted:"Deleted",photoFixed:"Photo pinned",photoUnfixed:"Unpinned",sameFrame:"Same frame",frameChanged:"Frame changed",selectFrame:"Select a frame",noPhoto:"No photo available",photoLimit:"Photo limit reached",photosAdded:"{0} photos added",switchedTo:"Switched to {0}",initFail:"Init failed",selected:"Selected",calmDesc:"Spacious. Big photos.",flowDesc:"Light narrative flow.",storyDesc:"Balanced gallery.",sceneDesc:"Complete wall composition.",brightness:"Brightness",cropTitle:"Adjust View",cropCancel:"Cancel",cropSave:"Save",cropSaved:"Saved",cropHint:"Drag photo to adjust",adjust:"Adjust",navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",photoShort:"Add more photos to fill all frames",photoShortCount:"{0} more to fill all frames",pinHint:"Set photo for this frame",detailEdit:"Details",layoutConfirm:"Changing the layout will reset frame positions. Are you sure?"}};
+var TEXT={ja:{undo:"\u21B6 \u623B\u3059",redo:"\u21B7 \u3084\u308A\u76F4\u3059",editDone:"\u5B8C\u4E86",photoList:"\u5199\u771F\u4E00\u89A7",add:"\u8FFD\u52A0",close:"\u9589\u3058\u308B",photoEmpty:"\u5199\u771F\u3092\u8FFD\u52A0\u3057\u3066\u58C1\u306B\u98FE\u308A\u307E\u3057\u3087\u3046",addFrame:"\u30D5\u30EC\u30FC\u30E0\u8FFD\u52A0",square:"\u6B63\u65B9\u5F62",landscape:"\u6A2A",portrait:"\u7E26",oval:"\u6955\u5186",backShape:"\u2190 \u5F62\u3092\u9078\u3073\u76F4\u3059",selectedFrame:"\u9078\u629E\u4E2D\u30D5\u30EC\u30FC\u30E0",changeFrame:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4",notSelected:"\u672A\u9078\u629E",pinPhoto:"\u5199\u771F\u56FA\u5B9A",unpinPhoto:"\u56FA\u5B9A\u89E3\u9664",delete:"\u524A\u9664",addingPhotos:"\u5199\u771F\u3092\u8FFD\u52A0\u4E2D",pinned:"\u56FA\u5B9A",fixing:"\u56FA\u5B9A\u4E2D",fixed:"\u56FA\u5B9A\u4E2D",unfixed:"\u672A\u56FA\u5B9A",classic:"\u30AF\u30E9\u30B7\u30C3\u30AF",simple:"\u30B7\u30F3\u30D7\u30EB",photoCount:"\u5199\u771F {0}/{1}",loading:"\u8AAD\u307F\u8FBC\u307F\u4E2D",undone:"\u623B\u3057\u307E\u3057\u305F",redone:"\u3084\u308A\u76F4\u3057\u307E\u3057\u305F",added:"\u8FFD\u52A0\u3057\u307E\u3057\u305F",deleted:"\u524A\u9664\u3057\u307E\u3057\u305F",photoFixed:"\u5199\u771F\u56FA\u5B9A",photoUnfixed:"\u56FA\u5B9A\u89E3\u9664",sameFrame:"\u540C\u3058\u30D5\u30EC\u30FC\u30E0\u3067\u3059",frameChanged:"\u30D5\u30EC\u30FC\u30E0\u5909\u66F4\u3057\u307E\u3057\u305F",selectFrame:"\u30D5\u30EC\u30FC\u30E0\u3092\u9078\u629E",noPhoto:"\u5199\u771F\u304C\u3042\u308A\u307E\u305B\u3093",photoLimit:"\u5199\u771F\u4E0A\u9650\u3067\u3059",photosAdded:"{0}\u679A\u8FFD\u52A0\u3057\u307E\u3057\u305F",switchedTo:"{0} \u306B\u5207\u308A\u66FF\u3048\u307E\u3057\u305F",initFail:"\u521D\u671F\u5316\u306B\u5931\u6557\u3057\u307E\u3057\u305F",selected:"\u9078\u629E\u4E2D",calmDesc:"\u4F59\u767D\u91CD\u8996\u3002\u5927\u304D\u306A\u5199\u771F\u3002",flowDesc:"\u8EFD\u3044\u7269\u8A9E\u69CB\u6210\u3002",storyDesc:"\u30D0\u30E9\u30F3\u30B9\u578B\u30AE\u30E3\u30E9\u30EA\u30FC\u3002",sceneDesc:"\u58C1\u3068\u3057\u3066\u5B8C\u6210\u3059\u308B\u69CB\u6210\u3002",brightness:"\u660E\u308B\u3055",cropTitle:"\u8868\u793A\u8ABF\u6574",cropCancel:"\u30AD\u30E3\u30F3\u30BB\u30EB",cropSave:"\u4FDD\u5B58",cropSaved:"\u4FDD\u5B58\u3057\u307E\u3057\u305F",cropHint:"\u5199\u771F\u3092\u30C9\u30E9\u30C3\u30B0\u3057\u3066\u8ABF\u6574",adjust:"\u8ABF\u6574",navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",photoShort:"\u5199\u771F\u3092\u8FFD\u52A0\u3059\u308B\u3068\u3001\u3059\u3079\u3066\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8868\u793A\u3055\u308C\u307E\u3059",photoShortCount:"\u3042\u3068{0}\u679A\u3067\u5168\u30D5\u30EC\u30FC\u30E0\u8868\u793A",pinHint:"\u3053\u306E\u30D5\u30EC\u30FC\u30E0\u306B\u8A2D\u5B9A",detailEdit:"\u8A73\u7D30",layoutConfirm:"\u30EC\u30A4\u30A2\u30A6\u30C8\u3092\u5909\u66F4\u3059\u308B\u3068\u30D5\u30EC\u30FC\u30E0\u306E\u914D\u7F6E\u304C\u30EA\u30BB\u30C3\u30C8\u3055\u308C\u307E\u3059\u3002\u3088\u308D\u3057\u3044\u3067\u3059\u304B\uFF1F",uploadFail:"\u30A2\u30C3\u30D7\u30ED\u30FC\u30C9\u5931\u6557"},en:{undo:"\u21B6 Undo",redo:"\u21B7 Redo",editDone:"Done",photoList:"Photos",add:"Add",close:"Close",photoEmpty:"Add photos to decorate your wall",addFrame:"Add Frame",square:"Square",landscape:"Landscape",portrait:"Portrait",oval:"Oval",backShape:"\u2190 Back",selectedFrame:"Selected Frame",changeFrame:"Change Frame",notSelected:"None",pinPhoto:"Pin Photo",unpinPhoto:"Unpin",delete:"Delete",addingPhotos:"Adding photos",pinned:"Pinned",fixing:"Pinned",fixed:"Pinned",unfixed:"Unpinned",classic:"Classic",simple:"Simple",photoCount:"Photos {0}/{1}",loading:"Loading",undone:"Undone",redone:"Redone",added:"Added",deleted:"Deleted",photoFixed:"Photo pinned",photoUnfixed:"Unpinned",sameFrame:"Same frame",frameChanged:"Frame changed",selectFrame:"Select a frame",noPhoto:"No photo available",photoLimit:"Photo limit reached",photosAdded:"{0} photos added",switchedTo:"Switched to {0}",initFail:"Init failed",selected:"Selected",calmDesc:"Spacious. Big photos.",flowDesc:"Light narrative flow.",storyDesc:"Balanced gallery.",sceneDesc:"Complete wall composition.",brightness:"Brightness",cropTitle:"Adjust View",cropCancel:"Cancel",cropSave:"Save",cropSaved:"Saved",cropHint:"Drag photo to adjust",adjust:"Adjust",navPhoto:"Photo",navFrames:"Frames",navEdit:"Edit",navDisplay:"Display",photoShort:"Add more photos to fill all frames",photoShortCount:"{0} more to fill all frames",pinHint:"Set photo for this frame",detailEdit:"Details",layoutConfirm:"Changing the layout will reset frame positions. Are you sure?",uploadFail:"Upload failed"}};
 var LANG=(navigator.language||"ja").startsWith("ja")?"ja":"en";
 try{var sl=localStorage.getItem("kabepic_lang");if(sl&&TEXT[sl])LANG=sl}catch(e){}
 function T(k){return TEXT[LANG][k]||TEXT.en[k]||k}
@@ -292,7 +292,73 @@ function clVw(){$("vw").classList.remove("opn");$("vwI").src=""}
 function rPa(){$("shP").classList.toggle("opn",mode!=="display"&&tab==="photo");$("shF").classList.toggle("opn",mode!=="display"&&tab==="frames");$("shE").classList.toggle("opn",mode==="edit"&&tab==="edit")}
 function rNv(){$("nP").classList.toggle("on",tab==="photo"&&mode!=="edit");$("nF").classList.toggle("on",tab==="frames"&&mode!=="edit");$("nE").classList.toggle("on",mode==="edit");$("nD").classList.toggle("on",mode==="display")}
 function ra(){document.body.classList.toggle("dm",mode==="display");document.body.classList.toggle("em",mode==="edit");var sheetOpen=tab==="edit"||(tab==="photo"&&mode==="edit");$("editBar").classList.toggle("vis",mode==="edit"&&!sheetOpen);rNv();rPa();bFp();rPh();updE();updEditBar();rc()}
-function addPhotos(files){if(!files.length||uploading)return Promise.resolve();var rem=MAX_P-rp().length;if(rem<=0){toast(T("photoLimit"));prog(false);return Promise.resolve()}uploading=true;var toP=Array.prototype.slice.call(files,0,rem);var n=0;function next(i){if(i>=toP.length){uploading=false;prog(false);autoA();ra();if(n)toast(Tf("photosAdded",n));return Promise.resolve()}prog(true,i,toP.length);return new Promise(function(r){setTimeout(r,20)}).then(function(){return compress(toP[i])}).then(function(p){ps.push(p);n++;prog(true,i+1,toP.length);return next(i+1)})}return next(0)}
+/* ===== Step 2: addPhotos with Firebase Storage + Firestore (sync/serial) ===== */
+function addPhotos(files){
+  if(!files.length||uploading)return Promise.resolve();
+  var rem=MAX_P-rp().length;
+  if(rem<=0){toast(T("photoLimit"));prog(false);return Promise.resolve()}
+  uploading=true;
+  var toP=Array.prototype.slice.call(files,0,rem);
+  var n=0;
+  function next(i){
+    if(i>=toP.length){
+      uploading=false;prog(false);autoA();ra();
+      if(n)toast(Tf("photosAdded",n));
+      return Promise.resolve()
+    }
+    prog(true,i,toP.length);
+    return new Promise(function(r){setTimeout(r,20)})
+      .then(function(){return compress(toP[i])})
+      .then(function(p){
+        var theUid=window.__kabepicUid;
+        if(!theUid){
+          /* uid not ready - local only */
+          ps.push(p);n++;
+          prog(true,i+1,toP.length);
+          return next(i+1)
+        }
+        var storagePath="users/"+theUid+"/photos/"+p.id+".jpg";
+        return fetch(p.dataUrl)
+          .then(function(r){return r.blob()})
+          .then(function(blob){
+            var ref=firebase.storage().ref(storagePath);
+            return ref.put(blob,{contentType:"image/jpeg"})
+          })
+          .then(function(snap){return snap.ref.getDownloadURL()})
+          .then(function(url){
+            p.storagePath=storagePath;
+            p.downloadUrl=url;
+            var meta={
+              id:p.id,
+              name:p.name,
+              width:p.width,
+              height:p.height,
+              ratio:p.ratio,
+              orient:p.orient,
+              storagePath:storagePath,
+              downloadUrl:url,
+              createdAt:p.createdAt,
+              takenMMDD:p.takenMMDD||null
+            };
+            return firebase.firestore()
+              .collection("users").doc(theUid)
+              .collection("photos").doc(p.id)
+              .set(meta)
+          })
+          .then(function(){
+            ps.push(p);n++;
+            prog(true,i+1,toP.length);
+            return next(i+1)
+          })
+          .catch(function(err){
+            toast(T("uploadFail")+": "+(err.message||err.code),2500);
+            prog(true,i+1,toP.length);
+            return next(i+1)
+          })
+      })
+  }
+  return next(0)
+}
 function addFr(kind){pushU();var w=kind.indexOf("landscape")>=0?50:kind.indexOf("portrait")>=0?35:kind==="oval"?35:40;var f={id:uid(),kind:kind,gx:24+Math.random()*140,gy:15+Math.random()*90,w:w,pi:[],fp:null,cp:null};fs.push(f);autoA();sel=f.id;ra();toast(T("added"))}
 function delFr(){var f=gsf();if(!f){toast(T("selectFrame"));return}pushU();fs=fs.filter(function(x){return x.id!==f.id});sel=null;tab=null;ra();toast(T("deleted"))}
 function togPin(){var f=gsf();if(!f){toast(T("selectFrame"));return}if(f.fp){f.fp=null;ra();toast(T("photoUnfixed"),700)}else{tab="photo";$("editBar").classList.remove("vis");ra()}}
@@ -347,6 +413,10 @@ chkMask().then(function(){return hydrateAR()}).then(function(){CROP_AR.portrait=
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
 (function(){
   var firebaseConfig = {
@@ -361,15 +431,14 @@ chkMask().then(function(){return hydrateAR()}).then(function(){CROP_AR.portrait=
 
   firebase.auth().signInAnonymously()
     .then(function(cred) {
-      console.log("[KABEPIC] Anonymous auth OK, uid:", cred.user.uid);
+      window.__kabepicUid = cred.user.uid;
     })
     .catch(function(err) {
-      console.warn("[KABEPIC] Anonymous auth failed:", err.code, err.message);
+      toast("Auth error: " + (err.message || err.code), 2000);
     });
 
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-      console.log("[KABEPIC] User signed in, uid:", user.uid);
       window.__kabepicUid = user.uid;
     }
   });
