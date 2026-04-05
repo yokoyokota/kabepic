@@ -261,8 +261,11 @@ function exitDisp(){mode="view";tab=null;document.body.classList.remove("dm");st
 function getTodayMMDD(){var d=new Date();var mm=String(d.getMonth()+1).padStart(2,"0");var dd=String(d.getDate()).padStart(2,"0");return mm+"-"+dd}
 function getMemoryCandidates(pool,othersShowing,curId){var today=getTodayMMDD();if(memoryDateKey!==today){memoryDateKey=today;memoryCount=0;lastMemoryId=null}if(memoryCount>=MEMORY_MAX)return[];return pool.filter(function(p){return p.takenMMDD===today&&p.id!==curId&&!othersShowing[p.id]&&p.id!==lastMemoryId})}
 function nextP(f){var pool=getPriorityPool(f.kind);if(pool.length<2)return null;var c=curP(f);var curId=c?c.id:null;var othersShowing={};fs.forEach(function(of){if(of.id!==f.id&&of.cp)othersShowing[of.cp]=true});var candidates=pool.filter(function(p){return p.id!==curId&&!othersShowing[p.id]});if(!candidates.length)return null;var memCands=getMemoryCandidates(candidates,othersShowing,curId);if(memCands.length){var pick=memCands[Math.floor(Math.random()*memCands.length)];memoryCount++;lastMemoryId=pick.id;return pick}return candidates[Math.floor(Math.random()*candidates.length)]}
-function startCF(){stopCF();if(rp().length<2)return;fs.forEach(function(f){if(f.fp)return;var interval=SW0+Math.random()*(SW1-SW0);var initialDelay=Math.random()*interval;var timerId=setTimeout(function(){doFade(f);var repeater=setInterval(function(){doFade(f)},interval);dt.push(repeater)},initialDelay);dt.push(timerId)})}
-function doFade(f){var n=nextP(f);if(!n)return;var el=$("cv").querySelector('[data-id="'+f.id+'"]');if(!el)return;var imgs=el.querySelectorAll(".pm img.cf");if(imgs.length<2)return;var currentSlot=cfSlots[f.id]||0;var nextSlot=1-currentSlot;var preload=new Image();preload.onload=function(){imgs[nextSlot].src=n.dataUrl;imgs[nextSlot].style.objectPosition=getCropPos(n,f.kind);void imgs[nextSlot].offsetWidth;requestAnimationFrame(function(){imgs[nextSlot].style.opacity="1";imgs[currentSlot].style.opacity="0"});cfSlots[f.id]=nextSlot;f.cp=n.id};preload.src=n.dataUrl}
+var cfFading={};
+var CF_MIN_GAP=2000;
+var cfLastFadeTime={};
+function startCF(){stopCF();if(rp().length<2)return;var baseDelay=3000;fs.forEach(function(f,idx){if(f.fp)return;var interval=SW0+Math.random()*(SW1-SW0);var initialDelay=baseDelay+idx*4000+Math.random()*3000;cfFading[f.id]=false;cfLastFadeTime[f.id]=0;var timerId=setTimeout(function(){doFade(f);var repeater=setInterval(function(){doFade(f)},interval);dt.push(repeater)},initialDelay);dt.push(timerId)})}
+function doFade(f){if(cfFading[f.id])return;var now=Date.now();if(now-cfLastFadeTime[f.id]<CF_MIN_GAP)return;var n=nextP(f);if(!n)return;var el=$("cv").querySelector('[data-id="'+f.id+'"]');if(!el)return;var imgs=el.querySelectorAll(".pm img.cf");if(imgs.length<2)return;var currentSlot=cfSlots[f.id]||0;var nextSlot=1-currentSlot;cfFading[f.id]=true;var preload=new Image();preload.onload=function(){imgs[nextSlot].src=n.dataUrl;imgs[nextSlot].style.objectPosition=getCropPos(n,f.kind);void imgs[nextSlot].offsetWidth;requestAnimationFrame(function(){imgs[nextSlot].style.opacity="1";imgs[currentSlot].style.opacity="0"});cfSlots[f.id]=nextSlot;f.cp=n.id;cfLastFadeTime[f.id]=Date.now();setTimeout(function(){cfFading[f.id]=false},1600)};preload.onerror=function(){cfFading[f.id]=false};preload.src=n.dataUrl}
 function stopCF(){dt.forEach(function(t){clearInterval(t);clearTimeout(t)});dt=[]}
 var BG_PRESETS=[{name:"Pure White",hex:"#F8F7F4"},{name:"Warm Ivory",hex:"#F3EEE6"},{name:"Soft Beige",hex:"#E7DED1"},{name:"Calm Gray",hex:"#E5E5E3"},{name:"Mid Gray",hex:"#8C8C8C"},{name:"Deep Shadow",hex:"#2B2B2B"}];
 var bgIdx=1,bgBri=0,bgPickerVis=false;var dispUIVis=false,dispUITimer=null;var DISP_UI_TIMEOUT=4000;
@@ -394,14 +397,19 @@ function restoreFromFirestore(theUid){
         });
       });
       if(!restored.length)return;
-      /* Remove placeholder, merge without duplicates */
+      /* Remove placeholder, merge without duplicates by id AND downloadUrl */
       var existingIds={};
-      rp().forEach(function(p){existingIds[p.id]=true});
+      var existingUrls={};
+      rp().forEach(function(p){
+        existingIds[p.id]=true;
+        if(p.downloadUrl)existingUrls[p.downloadUrl]=true;
+      });
       var added=0;
       restored.forEach(function(r){
-        if(!existingIds[r.id]){
+        if(!existingIds[r.id]&&!existingUrls[r.downloadUrl]){
           ps.push(r);
           existingIds[r.id]=true;
+          if(r.downloadUrl)existingUrls[r.downloadUrl]=true;
           added++;
         }
       });
